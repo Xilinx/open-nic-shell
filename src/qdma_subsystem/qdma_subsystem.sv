@@ -95,9 +95,9 @@ module qdma_subsystem #(
   output                         powerup_rstn,
 `else // !`ifdef __synthesis__
   input                          s_axis_qdma_h2c_tvalid,
-  input                          s_axis_qdma_h2c_tlast,
   input                  [511:0] s_axis_qdma_h2c_tdata,
-  input                   [63:0] s_axis_qdma_h2c_dpar,
+  input                   [31:0] s_axis_qdma_h2c_tcrc,
+  input                          s_axis_qdma_h2c_tlast,
   input                   [10:0] s_axis_qdma_h2c_tuser_qid,
   input                    [2:0] s_axis_qdma_h2c_tuser_port_id,
   input                          s_axis_qdma_h2c_tuser_err,
@@ -107,11 +107,12 @@ module qdma_subsystem #(
   output                         s_axis_qdma_h2c_tready,
 
   output                         m_axis_qdma_c2h_tvalid,
-  output                         m_axis_qdma_c2h_tlast,
   output                 [511:0] m_axis_qdma_c2h_tdata,
-  output                  [63:0] m_axis_qdma_c2h_dpar,
+  output                  [31:0] m_axis_qdma_c2h_tcrc,
+  output                         m_axis_qdma_c2h_tlast,
   output                         m_axis_qdma_c2h_ctrl_marker,
   output                   [2:0] m_axis_qdma_c2h_ctrl_port_id,
+  output                   [6:0] m_axis_qdma_c2h_ctrl_ecc,
   output                  [15:0] m_axis_qdma_c2h_ctrl_len,
   output                  [10:0] m_axis_qdma_c2h_ctrl_qid,
   output                         m_axis_qdma_c2h_ctrl_has_cmpt,
@@ -130,6 +131,7 @@ module qdma_subsystem #(
   output                         m_axis_qdma_cpl_ctrl_user_trig,
   output                   [2:0] m_axis_qdma_cpl_ctrl_col_idx,
   output                   [2:0] m_axis_qdma_cpl_ctrl_err_idx,
+  output                         m_axis_qdma_cpl_ctrl_no_wrb_marker,
   input                          m_axis_qdma_cpl_tready,
 `endif
 
@@ -142,82 +144,109 @@ module qdma_subsystem #(
 `else
   output reg                     axil_aclk,
   output reg                     axis_aclk
-                                 `endif
-  );
+`endif
+);
 
-  wire                      axis_qdma_h2c_tvalid;
-  wire                      axis_qdma_h2c_tlast;
-  wire              [511:0] axis_qdma_h2c_tdata;
-  wire               [63:0] axis_qdma_h2c_dpar;
-  wire               [10:0] axis_qdma_h2c_tuser_qid;
-  wire                [2:0] axis_qdma_h2c_tuser_port_id;
-  wire                      axis_qdma_h2c_tuser_err;
-  wire               [31:0] axis_qdma_h2c_tuser_mdata;
-  wire                [5:0] axis_qdma_h2c_tuser_mty;
-  wire                      axis_qdma_h2c_tuser_zero_byte;
-  wire                      axis_qdma_h2c_tready;
+  wire         axis_qdma_h2c_tvalid;
+  wire [511:0] axis_qdma_h2c_tdata;
+  wire  [31:0] axis_qdma_h2c_tcrc;
+  wire         axis_qdma_h2c_tlast;
+  wire  [10:0] axis_qdma_h2c_tuser_qid;
+  wire   [2:0] axis_qdma_h2c_tuser_port_id;
+  wire         axis_qdma_h2c_tuser_err;
+  wire  [31:0] axis_qdma_h2c_tuser_mdata;
+  wire   [5:0] axis_qdma_h2c_tuser_mty;
+  wire         axis_qdma_h2c_tuser_zero_byte;
+  wire         axis_qdma_h2c_tready;
 
-  wire                      axis_qdma_c2h_tvalid;
-  wire                      axis_qdma_c2h_tlast;
-  wire              [511:0] axis_qdma_c2h_tdata;
-  wire               [63:0] axis_qdma_c2h_dpar;
-  wire                      axis_qdma_c2h_ctrl_marker;
-  wire                [2:0] axis_qdma_c2h_ctrl_port_id;
-  wire               [15:0] axis_qdma_c2h_ctrl_len;
-  wire               [10:0] axis_qdma_c2h_ctrl_qid;
-  wire                      axis_qdma_c2h_ctrl_has_cmpt;
-  wire                [5:0] axis_qdma_c2h_mty;
-  wire                      axis_qdma_c2h_tready;
+  wire         axis_qdma_c2h_tvalid;
+  wire [511:0] axis_qdma_c2h_tdata;
+  wire  [31:0] axis_qdma_c2h_tcrc;
+  wire         axis_qdma_c2h_tlast;
+  wire         axis_qdma_c2h_ctrl_marker;
+  wire   [2:0] axis_qdma_c2h_ctrl_port_id;
+  wire   [6:0] axis_qdma_c2h_ctrl_ecc;
+  wire  [15:0] axis_qdma_c2h_ctrl_len;
+  wire  [10:0] axis_qdma_c2h_ctrl_qid;
+  wire         axis_qdma_c2h_ctrl_has_cmpt;
+  wire   [5:0] axis_qdma_c2h_mty;
+  wire         axis_qdma_c2h_tready;
 
-  wire                      axis_qdma_cpl_tvalid;
-  wire              [511:0] axis_qdma_cpl_tdata;
-  wire                [1:0] axis_qdma_cpl_size;
-  wire               [15:0] axis_qdma_cpl_dpar;
-  wire               [10:0] axis_qdma_cpl_ctrl_qid;
-  wire                [1:0] axis_qdma_cpl_ctrl_cmpt_type;
-  wire               [15:0] axis_qdma_cpl_ctrl_wait_pld_pkt_id;
-  wire                [2:0] axis_qdma_cpl_ctrl_port_id;
-  wire                      axis_qdma_cpl_ctrl_marker;
-  wire                      axis_qdma_cpl_ctrl_user_trig;
-  wire                [2:0] axis_qdma_cpl_ctrl_col_idx;
-  wire                [2:0] axis_qdma_cpl_ctrl_err_idx;
-  wire                      axis_qdma_cpl_tready;
+  wire         axis_qdma_cpl_tvalid;
+  wire [511:0] axis_qdma_cpl_tdata;
+  wire   [1:0] axis_qdma_cpl_size;
+  wire  [15:0] axis_qdma_cpl_dpar;
+  wire  [10:0] axis_qdma_cpl_ctrl_qid;
+  wire   [1:0] axis_qdma_cpl_ctrl_cmpt_type;
+  wire  [15:0] axis_qdma_cpl_ctrl_wait_pld_pkt_id;
+  wire   [2:0] axis_qdma_cpl_ctrl_port_id;
+  wire         axis_qdma_cpl_ctrl_marker;
+  wire         axis_qdma_cpl_ctrl_user_trig;
+  wire   [2:0] axis_qdma_cpl_ctrl_col_idx;
+  wire   [2:0] axis_qdma_cpl_ctrl_err_idx;
+  wire         axis_qdma_cpl_ctrl_no_wrb_marker;
+  wire         axis_qdma_cpl_tready;
 
-  wire              [255:0] h2c_byp_out_dsc;
-  wire                      h2c_byp_out_mrkr_rsp;
-  wire                      h2c_byp_out_st_mm;
-  wire                [1:0] h2c_byp_out_dsc_sz;
-  wire               [10:0] h2c_byp_out_qid;
-  wire                      h2c_byp_out_error;
-  wire                [7:0] h2c_byp_out_func;
-  wire               [15:0] h2c_byp_out_cidx;
-  wire                [2:0] h2c_byp_out_port_id;
-  wire                      h2c_byp_out_vld;
-  wire                      h2c_byp_out_rdy;
+  wire         h2c_byp_out_vld;
+  wire [255:0] h2c_byp_out_dsc;
+  wire         h2c_byp_out_st_mm;
+  wire   [1:0] h2c_byp_out_dsc_sz;
+  wire  [10:0] h2c_byp_out_qid;
+  wire         h2c_byp_out_error;
+  wire   [7:0] h2c_byp_out_func;
+  wire  [15:0] h2c_byp_out_cidx;
+  wire   [2:0] h2c_byp_out_port_id;
+  wire   [3:0] h2c_byp_out_fmt;
+  wire         h2c_byp_out_rdy;
 
-  wire               [63:0] h2c_byp_in_st_addr;
-  wire               [15:0] h2c_byp_in_st_len;
-  wire                      h2c_byp_in_st_eop;
-  wire                      h2c_byp_in_st_sop;
-  wire                      h2c_byp_in_st_mrkr_req;
-  wire                [2:0] h2c_byp_in_st_port_id;
-  wire                      h2c_byp_in_st_sdi;
-  wire               [10:0] h2c_byp_in_st_qid;
-  wire                      h2c_byp_in_st_error;
-  wire                [7:0] h2c_byp_in_st_func;
-  wire               [15:0] h2c_byp_in_st_cidx;
-  wire                      h2c_byp_in_st_no_dma;
-  wire                      h2c_byp_in_st_vld;
-  wire                      h2c_byp_in_st_rdy;
+  wire         h2c_byp_in_st_vld;
+  wire  [63:0] h2c_byp_in_st_addr;
+  wire  [15:0] h2c_byp_in_st_len;
+  wire         h2c_byp_in_st_eop;
+  wire         h2c_byp_in_st_sop;
+  wire         h2c_byp_in_st_mrkr_req;
+  wire   [2:0] h2c_byp_in_st_port_id;
+  wire         h2c_byp_in_st_sdi;
+  wire  [10:0] h2c_byp_in_st_qid;
+  wire         h2c_byp_in_st_error;
+  wire   [7:0] h2c_byp_in_st_func;
+  wire  [15:0] h2c_byp_in_st_cidx;
+  wire         h2c_byp_in_st_no_dma;
+  wire         h2c_byp_in_st_rdy;
 
-  wire                      axil_aresetn;
+  wire         c2h_byp_out_vld;
+  wire [255:0] c2h_byp_out_dsc;
+  wire         c2h_byp_out_st_mm;
+  wire  [10:0] c2h_byp_out_qid;
+  wire   [1:0] c2h_byp_out_dsc_sz;
+  wire         c2h_byp_out_error;
+  wire   [7:0] c2h_byp_out_func;
+  wire  [15:0] c2h_byp_out_cidx;
+  wire   [2:0] c2h_byp_out_port_id;
+  wire   [3:0] c2h_byp_out_fmt;
+  wire   [6:0] c2h_byp_out_pfch_tag;
+  wire         c2h_byp_out_rdy;
+
+  wire         c2h_byp_in_st_csh_vld;
+  wire  [63:0] c2h_byp_in_st_csh_addr;
+  wire   [2:0] c2h_byp_in_st_csh_port_id;
+  wire  [10:0] c2h_byp_in_st_csh_qid;
+  wire         c2h_byp_in_st_csh_error;
+  wire   [7:0] c2h_byp_in_st_csh_func;
+  wire   [6:0] c2h_byp_in_st_csh_pfch_tag;
+  wire         c2h_byp_in_st_csh_rdy;
+
+  wire         axil_aresetn;
 
   // Reset is clocked by the 125MHz AXI-Lite clock
-  qdma_subsystem_reset reset_inst (
+  generic_reset #(
+    .NUM_INPUT_CLK  (1),
+    .RESET_DURATION (100)
+  ) reset_inst (
     .mod_rstn     (mod_rstn),
     .mod_rst_done (mod_rst_done),
-    .axil_aresetn (axil_aresetn),
-    .axil_aclk    (axil_aclk)
+    .clk          (axil_aclk),
+    .rstn         (axil_aresetn)
   );
 
 `ifdef __synthesis__
@@ -232,21 +261,29 @@ module qdma_subsystem #(
     .ODIV2 (pcie_refclk)
   );
 
-  assign h2c_byp_out_rdy        = 1'b1;
+  assign h2c_byp_out_rdy            = 1'b1;
+  assign h2c_byp_in_st_vld          = 1'b0;
+  assign h2c_byp_in_st_addr         = 0;
+  assign h2c_byp_in_st_len          = 0;
+  assign h2c_byp_in_st_eop          = 1'b0;
+  assign h2c_byp_in_st_sop          = 1'b0;
+  assign h2c_byp_in_st_mrkr_req     = 1'b0;
+  assign h2c_byp_in_st_port_id      = 0;
+  assign h2c_byp_in_st_sdi          = 1'b0;
+  assign h2c_byp_in_st_qid          = 0;
+  assign h2c_byp_in_st_error        = 1'b0;
+  assign h2c_byp_in_st_func         = 0;
+  assign h2c_byp_in_st_cidx         = 0;
+  assign h2c_byp_in_st_no_dma       = 1'b0;
 
-  assign h2c_byp_in_st_addr     = 0;
-  assign h2c_byp_in_st_len      = 0;
-  assign h2c_byp_in_st_eop      = 0;
-  assign h2c_byp_in_st_sop      = 0;
-  assign h2c_byp_in_st_mrkr_req = 0;
-  assign h2c_byp_in_st_port_id  = 0;
-  assign h2c_byp_in_st_sdi      = 0;
-  assign h2c_byp_in_st_qid      = 0;
-  assign h2c_byp_in_st_error    = 0;
-  assign h2c_byp_in_st_func     = 0;
-  assign h2c_byp_in_st_cidx     = 0;
-  assign h2c_byp_in_st_no_dma   = 0;
-  assign h2c_byp_in_st_vld      = 0;
+  assign c2h_byp_out_rdy            = 1'b1;
+  assign c2h_byp_in_st_csh_vld      = 1'b0;
+  assign c2h_byp_in_st_csh_addr     = 0;
+  assign c2h_byp_in_st_csh_port_id  = 0;
+  assign c2h_byp_in_st_csh_qid      = 0;
+  assign c2h_byp_in_st_csh_error    = 1'b0;
+  assign c2h_byp_in_st_csh_func     = 0;
+  assign c2h_byp_in_st_csh_pfch_tag = 0;
 
   qdma_subsystem_qdma_wrapper qdma_wrapper_inst (
     .pcie_rxp                        (pcie_rxp),
@@ -254,27 +291,27 @@ module qdma_subsystem #(
     .pcie_txp                        (pcie_txp),
     .pcie_txn                        (pcie_txn),
 
-    .m_axil_awaddr                   (m_axil_pcie_awaddr),
     .m_axil_awvalid                  (m_axil_pcie_awvalid),
+    .m_axil_awaddr                   (m_axil_pcie_awaddr),
     .m_axil_awready                  (m_axil_pcie_awready),
-    .m_axil_wdata                    (m_axil_pcie_wdata),
     .m_axil_wvalid                   (m_axil_pcie_wvalid),
+    .m_axil_wdata                    (m_axil_pcie_wdata),
     .m_axil_wready                   (m_axil_pcie_wready),
     .m_axil_bvalid                   (m_axil_pcie_bvalid),
     .m_axil_bresp                    (m_axil_pcie_bresp),
     .m_axil_bready                   (m_axil_pcie_bready),
-    .m_axil_araddr                   (m_axil_pcie_araddr),
     .m_axil_arvalid                  (m_axil_pcie_arvalid),
+    .m_axil_araddr                   (m_axil_pcie_araddr),
     .m_axil_arready                  (m_axil_pcie_arready),
+    .m_axil_rvalid                   (m_axil_pcie_rvalid),
     .m_axil_rdata                    (m_axil_pcie_rdata),
     .m_axil_rresp                    (m_axil_pcie_rresp),
-    .m_axil_rvalid                   (m_axil_pcie_rvalid),
     .m_axil_rready                   (m_axil_pcie_rready),
 
     .m_axis_h2c_tvalid               (axis_qdma_h2c_tvalid),
-    .m_axis_h2c_tlast                (axis_qdma_h2c_tlast),
     .m_axis_h2c_tdata                (axis_qdma_h2c_tdata),
-    .m_axis_h2c_dpar                 (axis_qdma_h2c_dpar),
+    .m_axis_h2c_tcrc                 (axis_qdma_h2c_tcrc),
+    .m_axis_h2c_tlast                (axis_qdma_h2c_tlast),
     .m_axis_h2c_tuser_qid            (axis_qdma_h2c_tuser_qid),
     .m_axis_h2c_tuser_port_id        (axis_qdma_h2c_tuser_port_id),
     .m_axis_h2c_tuser_err            (axis_qdma_h2c_tuser_err),
@@ -284,11 +321,12 @@ module qdma_subsystem #(
     .m_axis_h2c_tready               (axis_qdma_h2c_tready),
 
     .s_axis_c2h_tvalid               (axis_qdma_c2h_tvalid),
-    .s_axis_c2h_tlast                (axis_qdma_c2h_tlast),
     .s_axis_c2h_tdata                (axis_qdma_c2h_tdata),
-    .s_axis_c2h_dpar                 (axis_qdma_c2h_dpar),
+    .s_axis_c2h_tcrc                 (axis_qdma_c2h_tcrc),
+    .s_axis_c2h_tlast                (axis_qdma_c2h_tlast),
     .s_axis_c2h_ctrl_marker          (axis_qdma_c2h_ctrl_marker),
     .s_axis_c2h_ctrl_port_id         (axis_qdma_c2h_ctrl_port_id),
+    .s_axis_c2h_ctrl_ecc             (axis_qdma_c2h_ctrl_ecc),
     .s_axis_c2h_ctrl_len             (axis_qdma_c2h_ctrl_len),
     .s_axis_c2h_ctrl_qid             (axis_qdma_c2h_ctrl_qid),
     .s_axis_c2h_ctrl_has_cmpt        (axis_qdma_c2h_ctrl_has_cmpt),
@@ -307,10 +345,11 @@ module qdma_subsystem #(
     .s_axis_cpl_ctrl_user_trig       (axis_qdma_cpl_ctrl_user_trig),
     .s_axis_cpl_ctrl_col_idx         (axis_qdma_cpl_ctrl_col_idx),
     .s_axis_cpl_ctrl_err_idx         (axis_qdma_cpl_ctrl_err_idx),
+    .s_axis_cpl_ctrl_no_wrb_marker   (axis_qdma_cpl_ctrl_no_wrb_marker),
     .s_axis_cpl_tready               (axis_qdma_cpl_tready),
 
+    .h2c_byp_out_vld                 (h2c_byp_out_vld),
     .h2c_byp_out_dsc                 (h2c_byp_out_dsc),
-    .h2c_byp_out_mrkr_rsp            (h2c_byp_out_mrkr_rsp),
     .h2c_byp_out_st_mm               (h2c_byp_out_st_mm),
     .h2c_byp_out_dsc_sz              (h2c_byp_out_dsc_sz),
     .h2c_byp_out_qid                 (h2c_byp_out_qid),
@@ -318,9 +357,10 @@ module qdma_subsystem #(
     .h2c_byp_out_func                (h2c_byp_out_func),
     .h2c_byp_out_cidx                (h2c_byp_out_cidx),
     .h2c_byp_out_port_id             (h2c_byp_out_port_id),
-    .h2c_byp_out_vld                 (h2c_byp_out_vld),
+    .h2c_byp_out_fmt                 (h2c_byp_out_fmt),
     .h2c_byp_out_rdy                 (h2c_byp_out_rdy),
 
+    .h2c_byp_in_st_vld               (h2c_byp_in_st_vld),
     .h2c_byp_in_st_addr              (h2c_byp_in_st_addr),
     .h2c_byp_in_st_len               (h2c_byp_in_st_len),
     .h2c_byp_in_st_eop               (h2c_byp_in_st_eop),
@@ -333,8 +373,29 @@ module qdma_subsystem #(
     .h2c_byp_in_st_func              (h2c_byp_in_st_func),
     .h2c_byp_in_st_cidx              (h2c_byp_in_st_cidx),
     .h2c_byp_in_st_no_dma            (h2c_byp_in_st_no_dma),
-    .h2c_byp_in_st_vld               (h2c_byp_in_st_vld),
     .h2c_byp_in_st_rdy               (h2c_byp_in_st_rdy),
+
+    .c2h_byp_out_vld                 (c2h_byp_out_vld),
+    .c2h_byp_out_dsc                 (c2h_byp_out_dsc),
+    .c2h_byp_out_st_mm               (c2h_byp_out_st_mm),
+    .c2h_byp_out_qid                 (c2h_byp_out_qid),
+    .c2h_byp_out_dsc_sz              (c2h_byp_out_dsc_sz),
+    .c2h_byp_out_error               (c2h_byp_out_error),
+    .c2h_byp_out_func                (c2h_byp_out_func),
+    .c2h_byp_out_cidx                (c2h_byp_out_cidx),
+    .c2h_byp_out_port_id             (c2h_byp_out_port_id),
+    .c2h_byp_out_fmt                 (c2h_byp_out_fmt),
+    .c2h_byp_out_pfch_tag            (c2h_byp_out_pfch_tag),
+    .c2h_byp_out_rdy                 (c2h_byp_out_rdy),
+
+    .c2h_byp_in_st_csh_vld           (c2h_byp_in_st_csh_vld),
+    .c2h_byp_in_st_csh_addr          (c2h_byp_in_st_csh_addr),
+    .c2h_byp_in_st_csh_port_id       (c2h_byp_in_st_csh_port_id),
+    .c2h_byp_in_st_csh_qid           (c2h_byp_in_st_csh_qid),
+    .c2h_byp_in_st_csh_error         (c2h_byp_in_st_csh_error),
+    .c2h_byp_in_st_csh_func          (c2h_byp_in_st_csh_func),
+    .c2h_byp_in_st_csh_pfch_tag      (c2h_byp_in_st_csh_pfch_tag),
+    .c2h_byp_in_st_csh_rdy           (c2h_byp_in_st_csh_rdy),
 
     .pcie_refclk                     (pcie_refclk),
     .pcie_refclk_gt                  (pcie_refclk_gt),
@@ -358,9 +419,9 @@ module qdma_subsystem #(
   always #2000ps axis_aclk = ~axis_aclk;
 
   assign axis_qdma_h2c_tvalid                 = s_axis_qdma_h2c_tvalid;
-  assign axis_qdma_h2c_tlast                  = s_axis_qdma_h2c_tlast;
   assign axis_qdma_h2c_tdata                  = s_axis_qdma_h2c_tdata;
-  assign axis_qdma_h2c_dpar                   = s_axis_qdma_h2c_dpar;
+  assign axis_qdma_h2c_tcrc                   = s_axis_qdma_h2c_tcrc;
+  assign axis_qdma_h2c_tlast                  = s_axis_qdma_h2c_tlast;
   assign axis_qdma_h2c_tuser_qid              = s_axis_qdma_h2c_tuser_qid;
   assign axis_qdma_h2c_tuser_port_id          = s_axis_qdma_h2c_tuser_port_id;
   assign axis_qdma_h2c_tuser_err              = s_axis_qdma_h2c_tuser_err;
@@ -370,11 +431,12 @@ module qdma_subsystem #(
   assign s_axis_qdma_h2c_tready               = axis_qdma_h2c_tready;
 
   assign m_axis_qdma_c2h_tvalid               = axis_qdma_c2h_tvalid;
-  assign m_axis_qdma_c2h_tlast                = axis_qdma_c2h_tlast;
   assign m_axis_qdma_c2h_tdata                = axis_qdma_c2h_tdata;
-  assign m_axis_qdma_c2h_dpar                 = axis_qdma_c2h_dpar;
+  assign m_axis_qdma_c2h_tcrc                 = axis_qdma_c2h_tcrc;
+  assign m_axis_qdma_c2h_tlast                = axis_qdma_c2h_tlast;
   assign m_axis_qdma_c2h_ctrl_marker          = axis_qdma_c2h_ctrl_marker;
   assign m_axis_qdma_c2h_ctrl_port_id         = axis_qdma_c2h_ctrl_port_id;
+  assign m_axis_qdma_c2h_ctrl_ecc             = axis_qdma_c2h_ctrl_ecc;
   assign m_axis_qdma_c2h_ctrl_len             = axis_qdma_c2h_ctrl_len;
   assign m_axis_qdma_c2h_ctrl_qid             = axis_qdma_c2h_ctrl_qid;
   assign m_axis_qdma_c2h_ctrl_has_cmpt        = axis_qdma_c2h_ctrl_has_cmpt;
@@ -393,6 +455,7 @@ module qdma_subsystem #(
   assign m_axis_qdma_cpl_ctrl_user_trig       = axis_qdma_cpl_ctrl_user_trig;
   assign m_axis_qdma_cpl_ctrl_col_idx         = axis_qdma_cpl_ctrl_col_idx;
   assign m_axis_qdma_cpl_ctrl_err_idx         = axis_qdma_cpl_ctrl_err_idx;
+  assign m_axis_qdma_cpl_ctrl_no_wrb_marker   = axis_qdma_cpl_ctrl_no_wrb_marker;
   assign axis_qdma_cpl_tready                 = m_axis_qdma_cpl_tready;
 `endif
 
@@ -427,11 +490,12 @@ module qdma_subsystem #(
     assign axis_qdma_h2c_tready               = 1'b1;
 
     assign axis_qdma_c2h_tvalid               = 1'b0;
-    assign axis_qdma_c2h_tlast                = 1'b0;
     assign axis_qdma_c2h_tdata                = 0;
-    assign axis_qdma_c2h_dpar                 = 0;
+    assign axis_qdma_c2h_tcrc                 = 0;
+    assign axis_qdma_c2h_tlast                = 1'b0;
     assign axis_qdma_c2h_ctrl_marker          = 1'b0;
     assign axis_qdma_c2h_ctrl_port_id         = 0;
+    assign axis_qdma_c2h_ctrl_ecc             = 0;
     assign axis_qdma_c2h_ctrl_len             = 0;
     assign axis_qdma_c2h_ctrl_qid             = 0;
     assign axis_qdma_c2h_ctrl_has_cmpt        = 1'b0;
@@ -449,6 +513,7 @@ module qdma_subsystem #(
     assign axis_qdma_cpl_ctrl_user_trig       = 1'b0;
     assign axis_qdma_cpl_ctrl_col_idx         = 0;
     assign axis_qdma_cpl_ctrl_err_idx         = 0;
+    assign axis_qdma_cpl_ctrl_no_wrb_marker   = 1'b0;
 
     // Terminate H2C and C2H interfaces of the shell
     assign m_axis_h2c_tvalid     = 1'b0;
@@ -604,9 +669,9 @@ module qdma_subsystem #(
       .NUM_PHYS_FUNC (NUM_PHYS_FUNC)
     ) h2c_inst (
       .s_axis_qdma_h2c_tvalid          (axis_qdma_h2c_tvalid),
-      .s_axis_qdma_h2c_tlast           (axis_qdma_h2c_tlast),
       .s_axis_qdma_h2c_tdata           (axis_qdma_h2c_tdata),
-      .s_axis_qdma_h2c_dpar            (axis_qdma_h2c_dpar),
+      .s_axis_qdma_h2c_tcrc            (axis_qdma_h2c_tcrc),
+      .s_axis_qdma_h2c_tlast           (axis_qdma_h2c_tlast),
       .s_axis_qdma_h2c_tuser_qid       (axis_qdma_h2c_tuser_qid),
       .s_axis_qdma_h2c_tuser_port_id   (axis_qdma_h2c_tuser_port_id),
       .s_axis_qdma_h2c_tuser_err       (axis_qdma_h2c_tuser_err),
@@ -641,11 +706,12 @@ module qdma_subsystem #(
       .s_axis_c2h_tready                    (axis_c2h_tready),
 
       .m_axis_qdma_c2h_tvalid               (axis_qdma_c2h_tvalid),
-      .m_axis_qdma_c2h_tlast                (axis_qdma_c2h_tlast),
       .m_axis_qdma_c2h_tdata                (axis_qdma_c2h_tdata),
-      .m_axis_qdma_c2h_dpar                 (axis_qdma_c2h_dpar),
+      .m_axis_qdma_c2h_tcrc                 (axis_qdma_c2h_tcrc),
+      .m_axis_qdma_c2h_tlast                (axis_qdma_c2h_tlast),
       .m_axis_qdma_c2h_ctrl_marker          (axis_qdma_c2h_ctrl_marker),
       .m_axis_qdma_c2h_ctrl_port_id         (axis_qdma_c2h_ctrl_port_id),
+      .m_axis_qdma_c2h_ctrl_ecc             (axis_qdma_c2h_ctrl_ecc),
       .m_axis_qdma_c2h_ctrl_len             (axis_qdma_c2h_ctrl_len),
       .m_axis_qdma_c2h_ctrl_qid             (axis_qdma_c2h_ctrl_qid),
       .m_axis_qdma_c2h_ctrl_has_cmpt        (axis_qdma_c2h_ctrl_has_cmpt),
@@ -664,6 +730,7 @@ module qdma_subsystem #(
       .m_axis_qdma_cpl_ctrl_user_trig       (axis_qdma_cpl_ctrl_user_trig),
       .m_axis_qdma_cpl_ctrl_col_idx         (axis_qdma_cpl_ctrl_col_idx),
       .m_axis_qdma_cpl_ctrl_err_idx         (axis_qdma_cpl_ctrl_err_idx),
+      .m_axis_qdma_cpl_ctrl_no_wrb_marker   (axis_qdma_cpl_ctrl_no_wrb_marker),
       .m_axis_qdma_cpl_tready               (axis_qdma_cpl_tready),
 
       .c2h_status_valid                     (c2h_status_valid),

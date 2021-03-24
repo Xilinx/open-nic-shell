@@ -18,7 +18,7 @@
 set axi_crossbar cmac_subsystem_axi_crossbar
 create_ip -name axi_crossbar -vendor xilinx.com -library ip -module_name $axi_crossbar -dir ${ip_build_dir}
 set_property -dict { 
-    CONFIG.NUM_MI {3}
+    CONFIG.NUM_MI {2}
     CONFIG.PROTOCOL {AXI4LITE}
     CONFIG.CONNECTIVITY_MODE {SASD}
     CONFIG.R_REGISTER {1}
@@ -88,6 +88,5 @@ set_property -dict {
     CONFIG.M15_READ_ISSUING {1}
     CONFIG.S00_SINGLE_THREAD {1}
     CONFIG.M01_A00_BASE_ADDR {0x0000000000002000}
-    CONFIG.M02_A00_BASE_ADDR {0x0000000000003000}
     CONFIG.M00_A00_ADDR_WIDTH {13}
 } [get_ips $axi_crossbar]

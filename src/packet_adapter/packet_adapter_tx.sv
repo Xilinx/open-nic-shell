@@ -16,7 +16,7 @@
 //
 // *************************************************************************
 `timescale 1ns/1ps
-module cmac_subsystem_tx_adapter #(
+module packet_adapter_tx #(
   parameter int  CMAC_ID     = 0,
   parameter int  MAX_PKT_LEN = 1514,
   parameter real PKT_CAP     = 1.5
@@ -186,4 +186,4 @@ module cmac_subsystem_tx_adapter #(
     .s_aresetn          (axil_aresetn)
   );
 
-endmodule: cmac_subsystem_tx_adapter
+endmodule: packet_adapter_tx

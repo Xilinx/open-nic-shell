@@ -21,9 +21,11 @@ if {!$sim} {
         qdma_subsystem_clk_div
         qdma_subsystem_axi_cdc
         qdma_subsystem_axi_crossbar
+        qdma_subsystem_c2h_ecc
     }
 } else {
     set ips {
         qdma_subsystem_axi_crossbar
+        qdma_subsystem_c2h_ecc
     }
 }

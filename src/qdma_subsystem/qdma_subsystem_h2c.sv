@@ -25,9 +25,9 @@ module qdma_subsystem_h2c #(
   parameter int NUM_PHYS_FUNC = 1
 ) (
   input                          s_axis_qdma_h2c_tvalid,
-  input                          s_axis_qdma_h2c_tlast,
   input                  [511:0] s_axis_qdma_h2c_tdata,
-  input                   [63:0] s_axis_qdma_h2c_dpar,
+  input                   [31:0] s_axis_qdma_h2c_tcrc,
+  input                          s_axis_qdma_h2c_tlast,
   input                   [10:0] s_axis_qdma_h2c_tuser_qid,
   input                    [2:0] s_axis_qdma_h2c_tuser_port_id,
   input                          s_axis_qdma_h2c_tuser_err,

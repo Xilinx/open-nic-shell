@@ -22,58 +22,58 @@ module qdma_subsystem_function #(
   parameter int MAX_PKT_LEN = 1514,
   parameter int MIN_PKT_LEN = 64
 ) (
-  input             s_axil_awvalid,
-  input      [31:0] s_axil_awaddr,
-  output            s_axil_awready,
-  input             s_axil_wvalid,
-  input      [31:0] s_axil_wdata,
-  output            s_axil_wready,
-  output            s_axil_bvalid,
-  output      [1:0] s_axil_bresp,
-  input             s_axil_bready,
-  input             s_axil_arvalid,
-  input      [31:0] s_axil_araddr,
-  output            s_axil_arready,
-  output            s_axil_rvalid,
-  output     [31:0] s_axil_rdata,
-  output      [1:0] s_axil_rresp,
-  input             s_axil_rready,
+  input          s_axil_awvalid,
+  input   [31:0] s_axil_awaddr,
+  output         s_axil_awready,
+  input          s_axil_wvalid,
+  input   [31:0] s_axil_wdata,
+  output         s_axil_wready,
+  output         s_axil_bvalid,
+  output   [1:0] s_axil_bresp,
+  input          s_axil_bready,
+  input          s_axil_arvalid,
+  input   [31:0] s_axil_araddr,
+  output         s_axil_arready,
+  output         s_axil_rvalid,
+  output  [31:0] s_axil_rdata,
+  output   [1:0] s_axil_rresp,
+  input          s_axil_rready,
 
-  input             s_axis_h2c_tvalid,
-  input     [511:0] s_axis_h2c_tdata,
-  input             s_axis_h2c_tlast,
-  input      [15:0] s_axis_h2c_tuser_size,
-  input      [10:0] s_axis_h2c_tuser_qid,
-  output            s_axis_h2c_tready,
+  input          s_axis_h2c_tvalid,
+  input  [511:0] s_axis_h2c_tdata,
+  input          s_axis_h2c_tlast,
+  input   [15:0] s_axis_h2c_tuser_size,
+  input   [10:0] s_axis_h2c_tuser_qid,
+  output         s_axis_h2c_tready,
 
-  output            m_axis_h2c_tvalid,
-  output    [511:0] m_axis_h2c_tdata,
-  output reg [63:0] m_axis_h2c_tkeep,
-  output            m_axis_h2c_tlast,
-  output     [15:0] m_axis_h2c_tuser_size,
-  output     [15:0] m_axis_h2c_tuser_src,
-  output     [15:0] m_axis_h2c_tuser_dst,
-  input             m_axis_h2c_tready,
+  output         m_axis_h2c_tvalid,
+  output [511:0] m_axis_h2c_tdata,
+  output  [63:0] m_axis_h2c_tkeep,
+  output         m_axis_h2c_tlast,
+  output  [15:0] m_axis_h2c_tuser_size,
+  output  [15:0] m_axis_h2c_tuser_src,
+  output  [15:0] m_axis_h2c_tuser_dst,
+  input          m_axis_h2c_tready,
 
-  input             s_axis_c2h_tvalid,
-  input     [511:0] s_axis_c2h_tdata,
-  input      [63:0] s_axis_c2h_tkeep,
-  input             s_axis_c2h_tlast,
-  input      [15:0] s_axis_c2h_tuser_size,
-  input      [15:0] s_axis_c2h_tuser_src,
-  input      [15:0] s_axis_c2h_tuser_dst,
-  output            s_axis_c2h_tready,
+  input          s_axis_c2h_tvalid,
+  input  [511:0] s_axis_c2h_tdata,
+  input   [63:0] s_axis_c2h_tkeep,
+  input          s_axis_c2h_tlast,
+  input   [15:0] s_axis_c2h_tuser_size,
+  input   [15:0] s_axis_c2h_tuser_src,
+  input   [15:0] s_axis_c2h_tuser_dst,
+  output         s_axis_c2h_tready,
 
-  output            m_axis_c2h_tvalid,
-  output    [511:0] m_axis_c2h_tdata,
-  output            m_axis_c2h_tlast,
-  output     [15:0] m_axis_c2h_tuser_size,
-  output     [10:0] m_axis_c2h_tuser_qid,
-  input             m_axis_c2h_tready,
+  output         m_axis_c2h_tvalid,
+  output [511:0] m_axis_c2h_tdata,
+  output         m_axis_c2h_tlast,
+  output  [15:0] m_axis_c2h_tuser_size,
+  output  [10:0] m_axis_c2h_tuser_qid,
+  input          m_axis_c2h_tready,
 
-  input             axil_aclk,
-  input             axis_aclk,
-  input             axil_aresetn
+  input          axil_aclk,
+  input          axis_aclk,
+  input          axil_aresetn
 );
 
   // The value of `C_PKT_FIFO_DEPTH` should be at least the latency of queue ID
@@ -93,6 +93,7 @@ module qdma_subsystem_function #(
 
   wire          axis_h2c_tvalid;
   wire  [511:0] axis_h2c_tdata;
+  wire   [63:0] axis_h2c_tkeep;
   wire          axis_h2c_tlast;
   wire   [15:0] axis_h2c_tuser_size;
   wire          axis_h2c_tready;
@@ -194,11 +195,11 @@ module qdma_subsystem_function #(
   axi_stream_register_slice #(
     .TDATA_W (512),
     .TUSER_W (16),
-    .MODE    ("forward")
+    .MODE    ("full")
   ) h2c_slice_inst (
     .s_axis_tvalid (axis_h2c_tvalid),
     .s_axis_tdata  (axis_h2c_tdata),
-    .s_axis_tkeep  ({64{1'b1}}),
+    .s_axis_tkeep  (axis_h2c_tkeep),
     .s_axis_tlast  (axis_h2c_tlast),
     .s_axis_tuser  (axis_h2c_tuser_size),
     .s_axis_tid    (0),
@@ -207,7 +208,7 @@ module qdma_subsystem_function #(
 
     .m_axis_tvalid (m_axis_h2c_tvalid),
     .m_axis_tdata  (m_axis_h2c_tdata),
-    .m_axis_tkeep  (),
+    .m_axis_tkeep  (m_axis_h2c_tkeep),
     .m_axis_tlast  (m_axis_h2c_tlast),
     .m_axis_tuser  (m_axis_h2c_tuser_size),
     .m_axis_tid    (),
@@ -219,24 +220,13 @@ module qdma_subsystem_function #(
   );
 
   generate for (genvar i = 0; i < 64; i++) begin
-    always @(posedge axis_aclk) begin
-      if (~axil_aresetn) begin
-        m_axis_h2c_tkeep[i] <= 1'b0;
-      end
-      else if (axis_h2c_tvalid && axis_h2c_tready) begin
-        if (axis_h2c_tlast && (axis_h2c_tuser_size[5:0] != 0)) begin
-          m_axis_h2c_tkeep[i] <= (axis_h2c_tuser_size[5:0] > i);
-        end
-        else begin
-          m_axis_h2c_tkeep[i] <= 1'b1;
-        end
-      end
-    end
+    assign axis_h2c_tkeep[i] = (axis_h2c_tvalid && axis_h2c_tready && axis_h2c_tlast) ?
+                               (axis_h2c_tuser_size[5:0] > i) : 1'b1;
   end
   endgenerate
 
-  assign m_axis_h2c_tuser_src  = 16'h1 << FUNC_ID;
-  assign m_axis_h2c_tuser_dst  = 0;
+  assign m_axis_h2c_tuser_src = 16'h1 << FUNC_ID;
+  assign m_axis_h2c_tuser_dst = 0;
 
   // ==========
   // RX path

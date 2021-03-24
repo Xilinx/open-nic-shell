@@ -16,7 +16,7 @@
 //
 // *************************************************************************
 `timescale 1ns/1ps
-module cmac_subsystem_rx_adapter #(
+module packet_adapter_rx #(
   parameter int  CMAC_ID     = 0,
   parameter int  MAX_PKT_LEN = 1514,
   parameter int  MIN_PKT_LEN = 64,
@@ -205,4 +205,4 @@ module cmac_subsystem_rx_adapter #(
   assign m_axis_rx_tuser_src = 16'h1 << (CMAC_ID + 6);
   assign m_axis_rx_tuser_dst = 0;
 
-endmodule: cmac_subsystem_rx_adapter
+endmodule: packet_adapter_rx

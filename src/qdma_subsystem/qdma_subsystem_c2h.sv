@@ -28,11 +28,12 @@ module qdma_subsystem_c2h #(
   output    [NUM_PHYS_FUNC-1:0] s_axis_c2h_tready,
 
   output                        m_axis_qdma_c2h_tvalid,
-  output                        m_axis_qdma_c2h_tlast,
   output                [511:0] m_axis_qdma_c2h_tdata,
-  output                 [63:0] m_axis_qdma_c2h_dpar,
+  output                 [31:0] m_axis_qdma_c2h_tcrc,
+  output                        m_axis_qdma_c2h_tlast,
   output                        m_axis_qdma_c2h_ctrl_marker,
   output                  [2:0] m_axis_qdma_c2h_ctrl_port_id,
+  output                  [6:0] m_axis_qdma_c2h_ctrl_ecc,
   output                 [15:0] m_axis_qdma_c2h_ctrl_len,
   output                 [10:0] m_axis_qdma_c2h_ctrl_qid,
   output                        m_axis_qdma_c2h_ctrl_has_cmpt,
@@ -51,6 +52,7 @@ module qdma_subsystem_c2h #(
   output                        m_axis_qdma_cpl_ctrl_user_trig,
   output                  [2:0] m_axis_qdma_cpl_ctrl_col_idx,
   output                  [2:0] m_axis_qdma_cpl_ctrl_err_idx,
+  output                        m_axis_qdma_cpl_ctrl_no_wrb_marker,
   input                         m_axis_qdma_cpl_tready,
 
   output                        c2h_status_valid,
@@ -73,6 +75,13 @@ module qdma_subsystem_c2h #(
   reg               [15:0] axis_c2h_tuser_size;
   reg               [10:0] axis_c2h_tuser_qid;
   wire                     axis_c2h_tready;
+
+  wire                     crc32_en;
+  wire             [511:0] crc32_data;
+  wire              [31:0] crc32_out;
+
+  wire              [56:0] c2h_ecc_data;
+  wire               [6:0] c2h_ecc;
 
   reg               [15:0] pkt_pld_id;
 
@@ -171,13 +180,40 @@ module qdma_subsystem_c2h #(
     end
   end
 
+  assign m_axis_qdma_c2h_tcrc          = crc32_out;
   assign m_axis_qdma_c2h_ctrl_marker   = 1'b0;
   assign m_axis_qdma_c2h_ctrl_port_id  = 0;
   assign m_axis_qdma_c2h_ctrl_has_cmpt = 1'b1;
-  generate for (genvar i = 0; i < 64; i = i + 1) begin
-    assign m_axis_qdma_c2h_dpar[i] = ~(^m_axis_qdma_c2h_tdata[(i*8) +: 8]);
-  end
-  endgenerate
+  assign m_axis_qdma_c2h_ctrl_ecc      = c2h_ecc;
+
+  assign crc32_en   = axis_c2h_tvalid && axis_c2h_tready;
+  assign crc32_data = axis_c2h_tdata;
+
+  crc32 crc32_inst (
+    .crc_en  (crc32_en),
+    .data_in (crc32_data),
+    .crc_out (crc32_out),
+    .clk     (axis_aclk),
+    .rst     (~axil_aresetn)
+  );
+
+  assign c2h_ecc_data[56:33] = 24'h0; // reserved
+  assign c2h_ecc_data[32]    = 1'b1;  // c2h_ctrl_has_cmpt
+  assign c2h_ecc_data[31]    = 1'b0;  // c2h_ctrl_marker
+  assign c2h_ecc_data[30:28] = 3'h0;  // c2h_ctrl_port_id
+  assign c2h_ecc_data[27]    = 1'b0;  // reserved
+  assign c2h_ecc_data[26:16] = axis_c2h_tuser_qid;
+  assign c2h_ecc_data[15:0]  = axis_c2h_tuser_size;
+
+  qdma_subsystem_c2h_ecc ecc_inst (
+    .ecc_data_in     (c2h_ecc_data),
+    .ecc_data_out    (),
+    .ecc_chkbits_out (c2h_ecc),
+
+    .ecc_clk         (axis_aclk),
+    .ecc_clken       (1'b1),
+    .ecc_reset       (~axil_aresetn)
+  );
 
   // Note that packet ID is only incremented when the packet has actually been
   // received by QDMA.  Thus it samples the "m_axis_*" signals.
@@ -246,6 +282,7 @@ module qdma_subsystem_c2h #(
   assign m_axis_qdma_cpl_tdata[26:16]         = cpl_fifo_dout[42:32];
   assign m_axis_qdma_cpl_tdata[15:0]          = 0;
 
+  assign m_axis_qdma_cpl_ctrl_no_wrb_marker   = 1'b0;
   assign m_axis_qdma_cpl_ctrl_col_idx         = 1'b0;
   assign m_axis_qdma_cpl_ctrl_err_idx         = 1'b0;
   assign m_axis_qdma_cpl_ctrl_qid             = cpl_fifo_dout[42:32];

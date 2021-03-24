@@ -21,6 +21,9 @@
 set_property PACKAGE_PIN AM10 [get_ports pcie_refclk_n]
 set_property PACKAGE_PIN AM11 [get_ports pcie_refclk_p]
 
+set_property PACKAGE_PIN BD21 [get_ports pcie_rstn]
+set_property IOSTANDARD LVCMOS12 [get_ports pcie_rstn]
+
 set num_ports [llength [get_ports qsfp_refclk_p]]
 if {$num_ports >= 1} {
     set_property PACKAGE_PIN M10 [get_ports qsfp_refclk_n[0]]

@@ -16,7 +16,7 @@
 //
 // *************************************************************************
 `timescale 1ns/1ps
-module cmac_subsystem_adapter #(
+module packet_adapter #(
   parameter int CMAC_ID     = 0,
   parameter int MAX_PKT_LEN = 1514,
   parameter int MIN_PKT_LEN = 64
@@ -69,13 +69,16 @@ module cmac_subsystem_adapter #(
   output  [15:0] m_axis_rx_tuser_dst,
   input          m_axis_rx_tready,
 
+  input          mod_rstn,
+  output         mod_rst_done,
+
   input          axil_aclk,
   input          axis_aclk,
-  input          axil_aresetn,
-
-  input          cmac_clk,
-  input          cmac_rstn
+  input          cmac_clk
 );
+
+  wire        axil_aresetn;
+  wire        cmac_rstn;
 
   wire        tx_pkt_sent;
   wire        tx_pkt_drop;
@@ -86,67 +89,18 @@ module cmac_subsystem_adapter #(
   wire        rx_pkt_err;
   wire [15:0] rx_bytes;
 
-  cmac_subsystem_tx_adapter #(
-    .CMAC_ID     (CMAC_ID),
-    .MAX_PKT_LEN (MAX_PKT_LEN),
-    .PKT_CAP     (1.5)
-  ) tx_inst (
-    .s_axis_tx_tvalid     (s_axis_tx_tvalid),
-    .s_axis_tx_tdata      (s_axis_tx_tdata),
-    .s_axis_tx_tkeep      (s_axis_tx_tkeep),
-    .s_axis_tx_tlast      (s_axis_tx_tlast),
-    .s_axis_tx_tuser_size (s_axis_tx_tuser_size),
-    .s_axis_tx_tuser_src  (s_axis_tx_tuser_src),
-    .s_axis_tx_tuser_dst  (s_axis_tx_tuser_dst),
-    .s_axis_tx_tready     (s_axis_tx_tready),
-
-    .m_axis_tx_tvalid     (m_axis_tx_tvalid),
-    .m_axis_tx_tdata      (m_axis_tx_tdata),
-    .m_axis_tx_tkeep      (m_axis_tx_tkeep),
-    .m_axis_tx_tlast      (m_axis_tx_tlast),
-    .m_axis_tx_tuser_err  (m_axis_tx_tuser_err),
-    .m_axis_tx_tready     (m_axis_tx_tready),
-
-    .tx_pkt_sent          (tx_pkt_sent),
-    .tx_pkt_drop          (tx_pkt_drop),
-    .tx_bytes             (tx_bytes),
-
-    .axis_aclk            (axis_aclk),
-    .axil_aresetn         (axil_aresetn),
-    .cmac_clk             (cmac_clk)
+  // Reset is clocked by the 125MHz AXI-Lite clock
+  generic_reset #(
+    .NUM_INPUT_CLK  (2),
+    .RESET_DURATION (100)
+  ) reset_inst (
+    .mod_rstn     (mod_rstn),
+    .mod_rst_done (mod_rst_done),
+    .clk          ({cmac_clk, axil_aclk}),
+    .rstn         ({cmac_rstn, axil_aresetn})
   );
 
-  cmac_subsystem_rx_adapter #(
-    .CMAC_ID     (CMAC_ID),
-    .MAX_PKT_LEN (MAX_PKT_LEN),
-    .PKT_CAP     (1.5)
-  ) rx_inst (
-    .s_axis_rx_tvalid     (s_axis_rx_tvalid),
-    .s_axis_rx_tdata      (s_axis_rx_tdata),
-    .s_axis_rx_tkeep      (s_axis_rx_tkeep),
-    .s_axis_rx_tlast      (s_axis_rx_tlast),
-    .s_axis_rx_tuser_err  (s_axis_rx_tuser_err),
-
-    .m_axis_rx_tvalid     (m_axis_rx_tvalid),
-    .m_axis_rx_tdata      (m_axis_rx_tdata),
-    .m_axis_rx_tkeep      (m_axis_rx_tkeep),
-    .m_axis_rx_tlast      (m_axis_rx_tlast),
-    .m_axis_rx_tuser_size (m_axis_rx_tuser_size),
-    .m_axis_rx_tuser_src  (m_axis_rx_tuser_src),
-    .m_axis_rx_tuser_dst  (m_axis_rx_tuser_dst),
-    .m_axis_rx_tready     (m_axis_rx_tready),
-
-    .rx_pkt_recv          (rx_pkt_recv),
-    .rx_pkt_drop          (rx_pkt_drop),
-    .rx_pkt_err           (rx_pkt_err),
-    .rx_bytes             (rx_bytes),
-
-    .axis_aclk            (axis_aclk),
-    .cmac_clk             (cmac_clk),
-    .cmac_rstn            (cmac_rstn)
-  );
-
-  cmac_subsystem_adapter_register reg_inst (
+  packet_adapter_register reg_inst (
     .s_axil_awvalid (s_axil_awvalid),
     .s_axil_awaddr  (s_axil_awaddr),
     .s_axil_awready (s_axil_awready),
@@ -178,4 +132,64 @@ module cmac_subsystem_adapter #(
     .axil_aresetn   (axil_aresetn)
   );
 
-endmodule: cmac_subsystem_adapter
+  packet_adapter_tx #(
+    .CMAC_ID     (CMAC_ID),
+    .MAX_PKT_LEN (MAX_PKT_LEN),
+    .PKT_CAP     (1.5)
+  ) tx_inst (
+    .s_axis_tx_tvalid     (s_axis_tx_tvalid),
+    .s_axis_tx_tdata      (s_axis_tx_tdata),
+    .s_axis_tx_tkeep      (s_axis_tx_tkeep),
+    .s_axis_tx_tlast      (s_axis_tx_tlast),
+    .s_axis_tx_tuser_size (s_axis_tx_tuser_size),
+    .s_axis_tx_tuser_src  (s_axis_tx_tuser_src),
+    .s_axis_tx_tuser_dst  (s_axis_tx_tuser_dst),
+    .s_axis_tx_tready     (s_axis_tx_tready),
+
+    .m_axis_tx_tvalid     (m_axis_tx_tvalid),
+    .m_axis_tx_tdata      (m_axis_tx_tdata),
+    .m_axis_tx_tkeep      (m_axis_tx_tkeep),
+    .m_axis_tx_tlast      (m_axis_tx_tlast),
+    .m_axis_tx_tuser_err  (m_axis_tx_tuser_err),
+    .m_axis_tx_tready     (m_axis_tx_tready),
+
+    .tx_pkt_sent          (tx_pkt_sent),
+    .tx_pkt_drop          (tx_pkt_drop),
+    .tx_bytes             (tx_bytes),
+
+    .axis_aclk            (axis_aclk),
+    .axil_aresetn         (axil_aresetn),
+    .cmac_clk             (cmac_clk)
+  );
+
+  packet_adapter_rx #(
+    .CMAC_ID     (CMAC_ID),
+    .MAX_PKT_LEN (MAX_PKT_LEN),
+    .PKT_CAP     (1.5)
+  ) rx_inst (
+    .s_axis_rx_tvalid     (s_axis_rx_tvalid),
+    .s_axis_rx_tdata      (s_axis_rx_tdata),
+    .s_axis_rx_tkeep      (s_axis_rx_tkeep),
+    .s_axis_rx_tlast      (s_axis_rx_tlast),
+    .s_axis_rx_tuser_err  (s_axis_rx_tuser_err),
+
+    .m_axis_rx_tvalid     (m_axis_rx_tvalid),
+    .m_axis_rx_tdata      (m_axis_rx_tdata),
+    .m_axis_rx_tkeep      (m_axis_rx_tkeep),
+    .m_axis_rx_tlast      (m_axis_rx_tlast),
+    .m_axis_rx_tuser_size (m_axis_rx_tuser_size),
+    .m_axis_rx_tuser_src  (m_axis_rx_tuser_src),
+    .m_axis_rx_tuser_dst  (m_axis_rx_tuser_dst),
+    .m_axis_rx_tready     (m_axis_rx_tready),
+
+    .rx_pkt_recv          (rx_pkt_recv),
+    .rx_pkt_drop          (rx_pkt_drop),
+    .rx_pkt_err           (rx_pkt_err),
+    .rx_bytes             (rx_bytes),
+
+    .axis_aclk            (axis_aclk),
+    .cmac_clk             (cmac_clk),
+    .cmac_rstn            (cmac_rstn)
+  );
+
+endmodule: packet_adapter

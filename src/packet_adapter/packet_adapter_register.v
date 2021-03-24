@@ -55,7 +55,7 @@
 //   0x04C  |      |
 // -----------------------------------------------------------------------------
 `timescale 1ns/1ps
-module cmac_subsystem_adapter_register (
+module packet_adapter_register (
   input         s_axil_awvalid,
   input  [31:0] s_axil_awaddr,
   output        s_axil_awready,
@@ -296,4 +296,4 @@ module cmac_subsystem_adapter_register (
     end
   end
 
-endmodule: cmac_subsystem_adapter_register
+endmodule: packet_adapter_register
