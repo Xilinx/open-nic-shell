@@ -40,4 +40,5 @@ set_property -dict {
     CONFIG.LANE10_GT_LOC {NA}
     CONFIG.GT_DRP_CLK {125.00}
     CONFIG.INS_LOSS_NYQ {20}
+    CONFIG.ENABLE_PIPELINE_REG {1}
 } [get_ips $cmac_usplus]

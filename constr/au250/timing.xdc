@@ -25,9 +25,10 @@ foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
     set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103
 }
 
-create_pblock pblock_qdma_subsystem
-add_cells_to_pblock [get_pblocks pblock_qdma_subsystem] [get_cells -quiet [list qdma_subsystem_inst]]
-resize_pblock [get_pblocks pblock_qdma_subsystem] -add {SLR1}
-#create_pblock pblock_cmac_subsystem
-#add_cells_to_pblock [get_pblocks pblock_cmac_subsystem] [get_cells -quiet [list cmac_subsystem_inst]]
-#resize_pblock [get_pblocks pblock_cmac_subsystem] -add {SLR2}
+create_pblock pblock_packet_adapter_tx
+add_cells_to_pblock [get_pblocks pblock_packet_adapter_tx] [get_cells -quiet {cmac_port*.packet_adapter_inst/tx_inst}]
+resize_pblock [get_pblocks pblock_packet_adapter_tx] -add {CLOCKREGION_X1Y8:CLOCKREGION_X2Y8}
+
+create_pblock pblock_packet_adapter_rx
+add_cells_to_pblock [get_pblocks pblock_packet_adapter_rx] [get_cells -quiet {cmac_port*.packet_adapter_inst/rx_inst}]
+resize_pblock [get_pblocks pblock_packet_adapter_rx] -add {CLOCKREGION_X5Y8:CLOCKREGION_X6Y8}
