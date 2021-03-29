@@ -22,7 +22,7 @@
 // -----------------------------------------------------------------------------
 //  Address | Mode |          Description
 // -----------------------------------------------------------------------------
-//   0x000  |  RO  | Build status register
+//   0x000  |  RO  | Build timestamp register
 // -----------------------------------------------------------------------------
 //   0x004  |  WO  | System reset register
 // -----------------------------------------------------------------------------
@@ -37,7 +37,9 @@
 //   0x018  |  RO  | User status register
 // -----------------------------------------------------------------------------
 `timescale 1ns/1ps
-module system_config_register (
+module system_config_register #(
+  parameter [31:0] BUILD_TIMESTAMP = 32'h01010000
+) (
   input         s_axil_awvalid,
   input  [31:0] s_axil_awaddr,
   output        s_axil_awready,
@@ -64,20 +66,19 @@ module system_config_register (
   input         aresetn
 );
 
-  localparam C_BUILD_STATUS = 32'h20190624;
-  localparam C_ADDR_W       = 12;
+  localparam C_ADDR_W = 12;
 
   // Register address
-  localparam REG_BUILD_STATUS  = 12'h000;
-  localparam REG_SYSTEM_RST    = 12'h004;
-  localparam REG_SYSTEM_STATUS = 12'h008;
-  localparam REG_SHELL_RST     = 12'h00C;
-  localparam REG_SHELL_STATUS  = 12'h010;
-  localparam REG_USER_RST      = 12'h014;
-  localparam REG_USER_STATUS   = 12'h018;
+  localparam REG_BUILD_TIMESTAMP = 12'h000;
+  localparam REG_SYSTEM_RST      = 12'h004;
+  localparam REG_SYSTEM_STATUS   = 12'h008;
+  localparam REG_SHELL_RST       = 12'h00C;
+  localparam REG_SHELL_STATUS    = 12'h010;
+  localparam REG_USER_RST        = 12'h014;
+  localparam REG_USER_STATUS     = 12'h018;
 
   // Regsiters
-  reg          [31:0] reg_build_status;
+  reg          [31:0] reg_build_timestamp;
   reg                 reg_system_rst;
   reg                 reg_system_status;
   reg          [31:0] reg_shell_rst;
@@ -137,8 +138,8 @@ module system_config_register (
     end
     else if (reg_en && ~reg_we) begin
       case (reg_addr)
-        REG_BUILD_STATUS: begin
-          reg_dout <= C_BUILD_STATUS;
+        REG_BUILD_TIMESTAMP: begin
+          reg_dout <= BUILD_TIMESTAMP;
         end
         REG_SYSTEM_STATUS: begin
           reg_dout <= {31'b0, reg_system_status};

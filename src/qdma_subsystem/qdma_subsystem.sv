@@ -18,8 +18,8 @@
 `include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
 module qdma_subsystem #(
-  parameter int MAX_PKT_LEN   = 1514,
   parameter int MIN_PKT_LEN   = 64,
+  parameter int MAX_PKT_LEN   = 1514,
   parameter int USE_PHYS_FUNC = 1,
   parameter int NUM_PHYS_FUNC = 1,
   parameter int NUM_QUEUE     = 2048

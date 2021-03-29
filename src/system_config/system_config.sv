@@ -17,7 +17,8 @@
 // *************************************************************************
 `timescale 1ns/1ps
 module system_config #(
-  parameter int NUM_CMAC_PORT = 1
+  parameter [31:0] BUILD_TIMESTAMP = 32'h01010000,
+  parameter int    NUM_CMAC_PORT   = 1
 ) (
   input                         s_axil_awvalid,
   input                  [31:0] s_axil_awaddr,
@@ -280,7 +281,9 @@ module system_config #(
     .aresetn             (aresetn)
   );
 
-  system_config_register scfg_reg_inst (
+  system_config_register #(
+    .BUILD_TIMESTAMP (BUILD_TIMESTAMP)
+  ) scfg_reg_inst (
     .s_axil_awvalid (axil_scfg_awvalid),
     .s_axil_awaddr  (axil_scfg_awaddr),
     .s_axil_awready (axil_scfg_awready),
