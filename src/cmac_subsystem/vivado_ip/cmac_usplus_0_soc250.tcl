@@ -17,8 +17,6 @@
 # *************************************************************************
 set cmac_usplus cmac_usplus_0
 create_ip -name cmac_usplus -vendor xilinx.com -library ip -module_name $cmac_usplus -dir ${ip_build_dir}
-set_property CONFIG.RX_MIN_PACKET_LEN $min_pkt_len [get_ips $cmac_usplus]
-set_property CONFIG.RX_MAX_PACKET_LEN $max_pkt_len [get_ips $cmac_usplus]
 set_property -dict {
     CONFIG.CMAC_CAUI4_MODE {1}
     CONFIG.NUM_LANES {4x25}
@@ -40,5 +38,8 @@ set_property -dict {
     CONFIG.LANE10_GT_LOC {NA}
     CONFIG.GT_DRP_CLK {125.00}
     CONFIG.INS_LOSS_NYQ {20}
+    CONFIG.INCLUDE_RS_FEC {1}
     CONFIG.ENABLE_PIPELINE_REG {1}
 } [get_ips $cmac_usplus]
+set_property CONFIG.RX_MIN_PACKET_LEN $min_pkt_len [get_ips $cmac_usplus]
+set_property CONFIG.RX_MAX_PACKET_LEN $max_pkt_len [get_ips $cmac_usplus]

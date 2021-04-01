@@ -241,24 +241,24 @@ module cmac_subsystem_cmac_wrapper #(
   wire  [4:0] stat_rx_pcsl_number_8;
   wire  [4:0] stat_rx_pcsl_number_9;
 
-  // wire        stat_rx_rsfec_am_lock0;
-  // wire        stat_rx_rsfec_am_lock1;
-  // wire        stat_rx_rsfec_am_lock2;
-  // wire        stat_rx_rsfec_am_lock3;
-  // wire        stat_rx_rsfec_corrected_cw_inc;
-  // wire        stat_rx_rsfec_cw_inc;
-  // wire  [2:0] stat_rx_rsfec_err_count0_inc;
-  // wire  [2:0] stat_rx_rsfec_err_count1_inc;
-  // wire  [2:0] stat_rx_rsfec_err_count2_inc;
-  // wire  [2:0] stat_rx_rsfec_err_count3_inc;
-  // wire        stat_rx_rsfec_hi_ser;
-  // wire        stat_rx_rsfec_lane_alignment_status;
-  // wire [13:0] stat_rx_rsfec_lane_fill_0;
-  // wire [13:0] stat_rx_rsfec_lane_fill_1;
-  // wire [13:0] stat_rx_rsfec_lane_fill_2;
-  // wire [13:0] stat_rx_rsfec_lane_fill_3;
-  // wire  [7:0] stat_rx_rsfec_lane_mapping;
-  // wire        stat_rx_rsfec_uncorrected_cw_inc;
+  wire        stat_rx_rsfec_am_lock0;
+  wire        stat_rx_rsfec_am_lock1;
+  wire        stat_rx_rsfec_am_lock2;
+  wire        stat_rx_rsfec_am_lock3;
+  wire        stat_rx_rsfec_corrected_cw_inc;
+  wire        stat_rx_rsfec_cw_inc;
+  wire  [2:0] stat_rx_rsfec_err_count0_inc;
+  wire  [2:0] stat_rx_rsfec_err_count1_inc;
+  wire  [2:0] stat_rx_rsfec_err_count2_inc;
+  wire  [2:0] stat_rx_rsfec_err_count3_inc;
+  wire        stat_rx_rsfec_hi_ser;
+  wire        stat_rx_rsfec_lane_alignment_status;
+  wire [13:0] stat_rx_rsfec_lane_fill_0;
+  wire [13:0] stat_rx_rsfec_lane_fill_1;
+  wire [13:0] stat_rx_rsfec_lane_fill_2;
+  wire [13:0] stat_rx_rsfec_lane_fill_3;
+  wire  [7:0] stat_rx_rsfec_lane_mapping;
+  wire        stat_rx_rsfec_uncorrected_cw_inc;
 
   wire        stat_tx_bad_fcs;
   wire        stat_tx_broadcast;
@@ -311,29 +311,10 @@ module cmac_subsystem_cmac_wrapper #(
 
   generate if (CMAC_ID == 0) begin
     cmac_usplus_0 cmac_inst (
-`ifdef __zynq_family__
-      .gt0_rxp_in                          (gt_rxp),
-      .gt0_rxn_in                          (gt_rxn),
-      .gt1_rxp_in                          (gt_rxp),
-      .gt1_rxn_in                          (gt_rxn),
-      .gt2_rxp_in                          (gt_rxp),
-      .gt2_rxn_in                          (gt_rxn),
-      .gt3_rxp_in                          (gt_rxp),
-      .gt3_rxn_in                          (gt_rxn),
-      .gt0_txp_out                         (gt_txp),
-      .gt0_txn_out                         (gt_txn),
-      .gt1_txp_out                         (gt_txp),
-      .gt1_txn_out                         (gt_txn),
-      .gt2_txp_out                         (gt_txp),
-      .gt2_txn_out                         (gt_txn),
-      .gt3_txp_out                         (gt_txp),
-      .gt3_txn_out                         (gt_txn),
-`else
       .gt_rxp_in                           (gt_rxp),
       .gt_rxn_in                           (gt_rxn),
       .gt_txp_out                          (gt_txp),
       .gt_txn_out                          (gt_txn),
-`endif
 
       .gt_ref_clk_p                        (gt_refclk_p),
       .gt_ref_clk_n                        (gt_refclk_n),
@@ -555,24 +536,24 @@ module cmac_subsystem_cmac_wrapper #(
       .stat_rx_pcsl_number_8               (stat_rx_pcsl_number_8),
       .stat_rx_pcsl_number_9               (stat_rx_pcsl_number_9),
 
-      // .stat_rx_rsfec_am_lock0              (stat_rx_rsfec_am_lock0),
-      // .stat_rx_rsfec_am_lock1              (stat_rx_rsfec_am_lock1),
-      // .stat_rx_rsfec_am_lock2              (stat_rx_rsfec_am_lock2),
-      // .stat_rx_rsfec_am_lock3              (stat_rx_rsfec_am_lock3),
-      // .stat_rx_rsfec_corrected_cw_inc      (stat_rx_rsfec_corrected_cw_inc),
-      // .stat_rx_rsfec_cw_inc                (stat_rx_rsfec_cw_inc),
-      // .stat_rx_rsfec_err_count0_inc        (stat_rx_rsfec_err_count0_inc),
-      // .stat_rx_rsfec_err_count1_inc        (stat_rx_rsfec_err_count1_inc),
-      // .stat_rx_rsfec_err_count2_inc        (stat_rx_rsfec_err_count2_inc),
-      // .stat_rx_rsfec_err_count3_inc        (stat_rx_rsfec_err_count3_inc),
-      // .stat_rx_rsfec_hi_ser                (stat_rx_rsfec_hi_ser),
-      // .stat_rx_rsfec_lane_alignment_status (stat_rx_rsfec_lane_alignment_status),
-      // .stat_rx_rsfec_lane_fill_0           (stat_rx_rsfec_lane_fill_0),
-      // .stat_rx_rsfec_lane_fill_1           (stat_rx_rsfec_lane_fill_1),
-      // .stat_rx_rsfec_lane_fill_2           (stat_rx_rsfec_lane_fill_2),
-      // .stat_rx_rsfec_lane_fill_3           (stat_rx_rsfec_lane_fill_3),
-      // .stat_rx_rsfec_lane_mapping          (stat_rx_rsfec_lane_mapping),
-      // .stat_rx_rsfec_uncorrected_cw_inc    (stat_rx_rsfec_uncorrected_cw_inc),
+      .stat_rx_rsfec_am_lock0              (stat_rx_rsfec_am_lock0),
+      .stat_rx_rsfec_am_lock1              (stat_rx_rsfec_am_lock1),
+      .stat_rx_rsfec_am_lock2              (stat_rx_rsfec_am_lock2),
+      .stat_rx_rsfec_am_lock3              (stat_rx_rsfec_am_lock3),
+      .stat_rx_rsfec_corrected_cw_inc      (stat_rx_rsfec_corrected_cw_inc),
+      .stat_rx_rsfec_cw_inc                (stat_rx_rsfec_cw_inc),
+      .stat_rx_rsfec_err_count0_inc        (stat_rx_rsfec_err_count0_inc),
+      .stat_rx_rsfec_err_count1_inc        (stat_rx_rsfec_err_count1_inc),
+      .stat_rx_rsfec_err_count2_inc        (stat_rx_rsfec_err_count2_inc),
+      .stat_rx_rsfec_err_count3_inc        (stat_rx_rsfec_err_count3_inc),
+      .stat_rx_rsfec_hi_ser                (stat_rx_rsfec_hi_ser),
+      .stat_rx_rsfec_lane_alignment_status (stat_rx_rsfec_lane_alignment_status),
+      .stat_rx_rsfec_lane_fill_0           (stat_rx_rsfec_lane_fill_0),
+      .stat_rx_rsfec_lane_fill_1           (stat_rx_rsfec_lane_fill_1),
+      .stat_rx_rsfec_lane_fill_2           (stat_rx_rsfec_lane_fill_2),
+      .stat_rx_rsfec_lane_fill_3           (stat_rx_rsfec_lane_fill_3),
+      .stat_rx_rsfec_lane_mapping          (stat_rx_rsfec_lane_mapping),
+      .stat_rx_rsfec_uncorrected_cw_inc    (stat_rx_rsfec_uncorrected_cw_inc),
 
       .stat_tx_bad_fcs                     (stat_tx_bad_fcs),
       .stat_tx_broadcast                   (stat_tx_broadcast),
@@ -621,29 +602,10 @@ module cmac_subsystem_cmac_wrapper #(
   end
   else begin
     cmac_usplus_1 cmac_inst (
-`ifdef __zynq_family__
-      .gt0_rxp_in                          (gt_rxp),
-      .gt0_rxn_in                          (gt_rxn),
-      .gt1_rxp_in                          (gt_rxp),
-      .gt1_rxn_in                          (gt_rxn),
-      .gt2_rxp_in                          (gt_rxp),
-      .gt2_rxn_in                          (gt_rxn),
-      .gt3_rxp_in                          (gt_rxp),
-      .gt3_rxn_in                          (gt_rxn),
-      .gt0_txp_out                         (gt_txp),
-      .gt0_txn_out                         (gt_txn),
-      .gt1_txp_out                         (gt_txp),
-      .gt1_txn_out                         (gt_txn),
-      .gt2_txp_out                         (gt_txp),
-      .gt2_txn_out                         (gt_txn),
-      .gt3_txp_out                         (gt_txp),
-      .gt3_txn_out                         (gt_txn),
-`else
       .gt_rxp_in                           (gt_rxp),
       .gt_rxn_in                           (gt_rxn),
       .gt_txp_out                          (gt_txp),
       .gt_txn_out                          (gt_txn),
-`endif
 
       .gt_ref_clk_p                        (gt_refclk_p),
       .gt_ref_clk_n                        (gt_refclk_n),
@@ -865,24 +827,24 @@ module cmac_subsystem_cmac_wrapper #(
       .stat_rx_pcsl_number_8               (stat_rx_pcsl_number_8),
       .stat_rx_pcsl_number_9               (stat_rx_pcsl_number_9),
 
-      // .stat_rx_rsfec_am_lock0              (stat_rx_rsfec_am_lock0),
-      // .stat_rx_rsfec_am_lock1              (stat_rx_rsfec_am_lock1),
-      // .stat_rx_rsfec_am_lock2              (stat_rx_rsfec_am_lock2),
-      // .stat_rx_rsfec_am_lock3              (stat_rx_rsfec_am_lock3),
-      // .stat_rx_rsfec_corrected_cw_inc      (stat_rx_rsfec_corrected_cw_inc),
-      // .stat_rx_rsfec_cw_inc                (stat_rx_rsfec_cw_inc),
-      // .stat_rx_rsfec_err_count0_inc        (stat_rx_rsfec_err_count0_inc),
-      // .stat_rx_rsfec_err_count1_inc        (stat_rx_rsfec_err_count1_inc),
-      // .stat_rx_rsfec_err_count2_inc        (stat_rx_rsfec_err_count2_inc),
-      // .stat_rx_rsfec_err_count3_inc        (stat_rx_rsfec_err_count3_inc),
-      // .stat_rx_rsfec_hi_ser                (stat_rx_rsfec_hi_ser),
-      // .stat_rx_rsfec_lane_alignment_status (stat_rx_rsfec_lane_alignment_status),
-      // .stat_rx_rsfec_lane_fill_0           (stat_rx_rsfec_lane_fill_0),
-      // .stat_rx_rsfec_lane_fill_1           (stat_rx_rsfec_lane_fill_1),
-      // .stat_rx_rsfec_lane_fill_2           (stat_rx_rsfec_lane_fill_2),
-      // .stat_rx_rsfec_lane_fill_3           (stat_rx_rsfec_lane_fill_3),
-      // .stat_rx_rsfec_lane_mapping          (stat_rx_rsfec_lane_mapping),
-      // .stat_rx_rsfec_uncorrected_cw_inc    (stat_rx_rsfec_uncorrected_cw_inc),
+      .stat_rx_rsfec_am_lock0              (stat_rx_rsfec_am_lock0),
+      .stat_rx_rsfec_am_lock1              (stat_rx_rsfec_am_lock1),
+      .stat_rx_rsfec_am_lock2              (stat_rx_rsfec_am_lock2),
+      .stat_rx_rsfec_am_lock3              (stat_rx_rsfec_am_lock3),
+      .stat_rx_rsfec_corrected_cw_inc      (stat_rx_rsfec_corrected_cw_inc),
+      .stat_rx_rsfec_cw_inc                (stat_rx_rsfec_cw_inc),
+      .stat_rx_rsfec_err_count0_inc        (stat_rx_rsfec_err_count0_inc),
+      .stat_rx_rsfec_err_count1_inc        (stat_rx_rsfec_err_count1_inc),
+      .stat_rx_rsfec_err_count2_inc        (stat_rx_rsfec_err_count2_inc),
+      .stat_rx_rsfec_err_count3_inc        (stat_rx_rsfec_err_count3_inc),
+      .stat_rx_rsfec_hi_ser                (stat_rx_rsfec_hi_ser),
+      .stat_rx_rsfec_lane_alignment_status (stat_rx_rsfec_lane_alignment_status),
+      .stat_rx_rsfec_lane_fill_0           (stat_rx_rsfec_lane_fill_0),
+      .stat_rx_rsfec_lane_fill_1           (stat_rx_rsfec_lane_fill_1),
+      .stat_rx_rsfec_lane_fill_2           (stat_rx_rsfec_lane_fill_2),
+      .stat_rx_rsfec_lane_fill_3           (stat_rx_rsfec_lane_fill_3),
+      .stat_rx_rsfec_lane_mapping          (stat_rx_rsfec_lane_mapping),
+      .stat_rx_rsfec_uncorrected_cw_inc    (stat_rx_rsfec_uncorrected_cw_inc),
 
       .stat_tx_bad_fcs                     (stat_tx_bad_fcs),
       .stat_tx_broadcast                   (stat_tx_broadcast),
