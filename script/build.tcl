@@ -15,67 +15,6 @@
 # limitations under the License.
 #
 # *************************************************************************
-
-# Procedure definitions
-proc write_questa_sim {} {
-    global script_dir
-    global sim_dir
-    global top_build_dir
-    global top
-    global generic
-
-    set param_decls {}
-    foreach p $generic {lappend param_decls "localparam $p;"}
-
-    set fp [open "${top_build_dir}/questa_sim.do" w]
-    puts $fp "set top $top"
-    puts $fp "set top_build_dir $top_build_dir"
-    puts $fp "set sim_dir $sim_dir"
-    puts $fp {set fp [open ${top_build_dir}/${top}.f r]}
-    puts $fp "foreach path \[read \$fp\] {"
-    puts $fp {    if {[string equal [file extension $path] ".vhd"]} {vcom +acc +incdir+${top_build_dir} $path} else {vlog -sv +acc +incdir+${top_build_dir} $path}}
-    puts $fp "}"
-    puts $fp {close $fp}
-    puts $fp {vsim -sv_root ${sim_dir}/dpi -sv_lib tap -L xpm -L unisims_ver -L axi_crossbar_v2_1_23 -L generic_baseblocks_v2_1_0 -L axis_register_slice_v1_1_22 -L axis_infrastructure_v1_1_0 -L axi_register_slice_v2_1_22 -L ecc_v2_0_13 ${top}_tb glbl}
-    puts $fp {run -all}
-    close $fp
-
-    set fp [open "${top_build_dir}/sim_config.vh" w]
-    foreach p $param_decls {
-        puts $fp $p
-    }
-    close $fp
-
-    set run_script "${top_build_dir}/run_questa_sim.sh"
-    set fp [open $run_script w]
-    set questa_dir {$(dirname $(which vsim))/..}
-    puts $fp "#! /bin/bash"
-    puts $fp {if [ $# -ne 1 ]; then}
-    puts $fp {    echo "Usage: run_questa_sim.sh SIMLIB_INI"}
-    puts $fp {    exit 1}
-    puts $fp {fi}
-    puts $fp "questa_dir=\"$questa_dir\""
-    puts $fp "simlib_ini=\$1"
-    foreach p $generic {
-        puts $fp $p
-    }
-    puts $fp "pushd ${top_build_dir} > /dev/null"
-    puts $fp {echo "Compiling DPI libraries..."}
-    puts $fp "gcc -shared -fPIC -I\${questa_dir}/include -o ${sim_dir}/dpi/tap.so ${sim_dir}/dpi/tap.c"
-    puts $fp {echo "Setting up virtual adapters..."}
-    puts $fp "${script_dir}/setup_sim.sh \$NUM_PHYS_FUNC \$NUM_CMAC_PORT"
-    puts $fp {echo "Launching QuestaSim..."}
-    puts $fp "vsim -c -64 -modelsimini \${simlib_ini} -do questa_sim.do"
-    puts $fp {echo "Cleaning up virtual adapters..."}
-    puts $fp "${script_dir}/clean_sim.sh \$NUM_PHYS_FUNC \$NUM_CMAC_PORT"
-    puts $fp "popd > /dev/null"
-    close $fp
-    file attributes $run_script -permissions "a+x"
-
-    return $run_script
-}
-#######################
-
 # Vivado version check
 set VIVADO_VERSION "2020.2"
 if {![string equal [version -short] $VIVADO_VERSION]} {
@@ -89,7 +28,6 @@ set constr_dir ${root_dir}/constr
 set plugin_dir ${root_dir}/plugin
 set script_dir ${root_dir}/script
 set src_dir ${root_dir}/src
-set sim_dir ${root_dir}/sim
 
 # Build options
 #   board_repo   Path to the Xilinx board store repository
@@ -101,7 +39,6 @@ set sim_dir ${root_dir}/sim
 #   impl         Run implementation after creating design project
 #   post_impl    Perform post implementation actions
 #   sdnet        Path to SDNet executable
-#   sim          Switch to simulation build
 #   user_plugin  Path to the user plugin repo
 #
 # Design parameters
@@ -122,7 +59,6 @@ array set build_options {
     -impl        0
     -post_impl   0
     -sdnet       ""
-    -sim         0
     -user_plugin ""
 }
 set build_opitons(-user_plugin) ${plugin_dir}/p2p
@@ -162,10 +98,6 @@ foreach {key value} [array get design_params] {
 }
 
 # Sanity check
-set synth_ip  [expr {!$sim && $synth_ip}]
-set impl      [expr {!$sim && $impl}]
-set post_impl [expr {!$sim && $post_impl}]
-
 if {$min_pkt_len < 64 || $min_pkt_len > 256} {
     puts "Invalid value for -min_pkt_len: allowed range is \[64, 256\]"
     exit
@@ -195,9 +127,7 @@ set build_name ${board}
 if {![string equal $tag ""]} {
     set build_name ${build_name}_${tag}
 }
-if {$sim} {
-    set build_name sim_${build_name}
-}
+
 set build_dir [file normalize ${root_dir}/build/${build_name}]
 if {[file exists $build_dir]} {
     puts "Found existing build directory $build_dir"
@@ -281,14 +211,9 @@ dict for {module module_dir} $module_dict {
         }
 
         # Build the IPs only when
-        # - No DCP genereated (for implementation), or
-        # - No simulation wrapper genereated (for simulation), or
+        # - No DCP genereated, or
         # - "$overwrite" option is nonzero
-        if {$sim} {
-            set cached [file exists ${ip_build_dir}/${ip}/sim]
-        } else {
-            set cached [file exists ${ip_build_dir}/${ip}/${ip}.dcp]
-        }
+        set cached [file exists ${ip_build_dir}/${ip}/${ip}.dcp]
         if {$cached && !$overwrite} {
             puts "INFO: \[$ip\] Use existing IP build (overwrite=0)"
             continue
@@ -311,12 +236,7 @@ dict for {module module_dir} $module_dict {
         }
 
         upgrade_ip [get_ips $ip]
-
-        if {$sim} {
-            generate_target simulation [get_ips $ip]
-        } else {
-            generate_target synthesis [get_ips $ip]
-        }
+        generate_target synthesis [get_ips $ip]
 
         # Run out-of-context IP synthesis
         if {$synth_ip} {
@@ -342,36 +262,23 @@ if {[file exists $top_build_dir]} {
     file delete -force $top_build_dir
 }
 
-# For simulation build, we only generate a list file under `top_build_dir`,
-# which specifies the files needed to include in simulation.  The file can be
-# then read into different simulators.
-
-if {$sim} {
-    set sim_files {}
-    lappend sim_files "[file dirname [exec which vivado]]/../data/verilog/src/glbl.v"
-} else {
-    create_project -force $top $top_build_dir -part $part
-    if {![string equal $board_part ""]} {
-        set_property BOARD_PART $board_part [current_project]
-    }
-    set_property target_language verilog [current_project]
-
-    # Marco to enable conditional compilation at Verilog level
-    set verilog_define "__synthesis__ __${board}__"
-    if {$zynq_family} {
-        append verilog_define " " "__zynq_family__"
-    }
-    set_property verilog_define $verilog_define [current_fileset]
+create_project -force $top $top_build_dir -part $part
+if {![string equal $board_part ""]} {
+    set_property BOARD_PART $board_part [current_project]
 }
+set_property target_language verilog [current_project]
+
+# Marco to enable conditional compilation at Verilog level
+set verilog_define "__synthesis__ __${board}__"
+if {$zynq_family} {
+    append verilog_define " " "__zynq_family__"
+}
+set_property verilog_define $verilog_define [current_fileset]
 
 # Read IPs from finished IP runs
 # - Some IPs are board-specific and will be ignored for other board targets
 dict for {ip ip_dir} $ip_dict {
-    if {$sim} {
-        set sim_files [concat $sim_files [glob -nocomplain -directory ${ip_dir}/sim "${ip}.{v,sv,vhd}"]]
-    } else {
-        read_ip -quiet ${ip_dir}/${ip}.xci
-    }
+    read_ip -quiet ${ip_dir}/${ip}.xci
 }
 
 # Read user plugin files
@@ -379,17 +286,14 @@ set include_dirs [get_property include_dirs [current_fileset]]
 foreach freq [list 250mhz 322mhz] {
     set box "box_$freq"
     set box_plugin ${user_plugin}/${box}
-    set default_box_plugin ${plugin_dir}/p2p/${box}
     
-    if {[file exists $box_plugin] && [file exists ${user_plugin}/build_${box}.tcl]} {
-        source ${box_plugin}/${box}_axi_crossbar.tcl
-        read_verilog -quiet ${box_plugin}/${box}_address_map.v
-        lappend include_dirs $box_plugin
-    } else {
-        source ${default_box_plugin}/${box}_axi_crossbar.tcl
-        read_verilog -quiet ${default_box_plugin}/${box}_address_map.v
-        lappend include_dirs $default_box_plugin
+    if {![file exists $box_plugin] || ![file exists ${user_plugin}/build_${box}.tcl]} {
+        set box_plugin ${plugin_dir}/p2p/${box}
     }
+
+    source ${box_plugin}/${box}_axi_crossbar.tcl
+    read_verilog -quiet ${box_plugin}/${box}_address_map.v
+    lappend include_dirs $box_plugin
 
     cd $user_plugin
     source build_${box}.tcl
@@ -407,23 +311,15 @@ dict for {module module_dir} $module_dict {
         cd $script_dir
     }
 
-    if {$sim} {
-        set sim_files [concat $sim_files [glob -nocomplain -directory $module_dir "*.{v,sv,vhd}"]]
-    } else {
-        read_verilog -quiet [glob -nocomplain -directory $module_dir "*.{v,vh}"]
-        read_verilog -quiet -sv [glob -nocomplain -directory $module_dir "*.sv"]
-        read_vhdl -quiet [glob -nocomplain -directory $module_dir "*.vhd"]
-    }
+    read_verilog -quiet [glob -nocomplain -directory $module_dir "*.{v,vh}"]
+    read_verilog -quiet -sv [glob -nocomplain -directory $module_dir "*.sv"]
+    read_vhdl -quiet [glob -nocomplain -directory $module_dir "*.vhd"]
 }
 
 # Read top-level source files
-if {$sim} {
-    set sim_files [concat $sim_files [glob -nocomplain -directory $src_dir "*.{v,sv,vhd}"]]
-} else {
-    read_verilog -quiet [glob -nocomplain -directory $src_dir "*.{v,vh}"]
-    read_verilog -quiet -sv [glob -nocomplain -directory $src_dir "*.sv"]
-    read_vhdl -quiet [glob -nocomplain -directory $src_dir "*.vhd"]
-}
+read_verilog -quiet [glob -nocomplain -directory $src_dir "*.{v,vh}"]
+read_verilog -quiet -sv [glob -nocomplain -directory $src_dir "*.sv"]
+read_vhdl -quiet [glob -nocomplain -directory $src_dir "*.vhd"]
 
 # Set vivado generic
 set design_params(-build_timestamp) "32'h$design_params(-build_timestamp)"
@@ -433,32 +329,6 @@ foreach {key value} [array get design_params] {
     lappend generic "$p=$value"
 }
 set_property -name generic -value $generic -object [current_fileset]
-
-# For simulation build, write out the file list and exit
-if {$sim} {
-    set fp [open "${sim_dir}/${top}_tb.f" r]
-    set tb_files [read $fp]
-    close $fp
-
-    file mkdir $top_build_dir
-    set fp [open "${top_build_dir}/${top}.f" w]
-    foreach path $sim_files {
-        puts $fp $path
-    }
-    foreach path $tb_files {
-        puts $fp "${sim_dir}/${path}"
-    }
-    close $fp
-
-    set run_script [write_questa_sim]
-
-    puts "=========="
-    puts "Simulation Build Done"
-    puts "To run simulation, run the script \"$run_script\""
-    puts "=========="
-    exit
-}
-
 set_property top $top [get_property srcset [current_run]]
 
 # Read constraint files
