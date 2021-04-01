@@ -8,12 +8,12 @@ include
 - Xilinx Alveo U280, and
 - Bittware 250-SoC.
 
-The NIC shell consits of skeleton compoents which implement host and ethernet
+The NIC shell consists of skeleton components which implement host and Ethernet
 interfaces and two user logic boxes that wraps up user RTL plugins.  Its
 architecture is shown in the figure below.
 
     -----  -----------------------------------------------
-    |   |  |            System Config                    | 
+    |   |  |            System Configuration             | 
     |   |  -----------------------------------------------
     |   |     |         |         |         |         |  AXI-lite 125MHz
     |   |     V         V         V         V         V
@@ -29,7 +29,7 @@ architecture is shown in the figure below.
                    -----------         -----------
                  AXI-stream 250MHz   AXI-stream 322MHz
 
-The shell skeleton has the following compoents.
+The shell skeleton has the following components.
 
 - QDMA subsystem.  It includes the Xilinx QDMA IP and RTL logic that bridges the
   QDMA IP interface and the 250MHz user logic box.  The interfaces between QDMA
@@ -39,16 +39,16 @@ The shell skeleton has the following compoents.
   OpenNIC shell supports either 1 or 2 CMAC ports.  In the case of 2 CMAC ports,
   there are two instances of CMAC subsystems with dedicated data and control
   interfaces.  The CMAC subsystem runs at 322MHz and connects to the 322MHz user
-  logic box using a variant of the AXI4-stream protocol.  Similarly, let us refer
-  the variant as the 322MHz AXI-stream.
+  logic box using a variant of the AXI4-stream protocol.  Similarly, let us
+  refer the variant as the 322MHz AXI-stream.
 - Packet adapter.  It is used to convert between the 250MHz AXI-stream and
   322MHz AXI-stream.  On both TX and RX paths, the packet adapter serves as a
   packet-mode FIFO, which buffers the whole packet before sending out.  On the
   RX path, it also restores the back-pressure capability which is missing from
   the CMAC subsystem interface.
-- System config.  It implements a reset mechanism and allocates the register
-  addresses for each components.  The register interface uses AXI4-lite protocol
-  and runs at 125MHz, which is phase-aligned with the 25MHz clock.
+- System configuration.  It implements a reset mechanism and allocates the
+  register addresses for each components.  The register interface uses AXI4-lite
+  protocol and runs at 125MHz, which is phase-aligned with the 25MHz clock.
 
 There are 2 user logic boxes, one running at 250MHz and the other at 322MHz.
 Each has a AXI-lite interface for register, 2 pairs of slave and master
@@ -86,7 +86,7 @@ The `open-nic-shell` repository is organized as follows.
         |-- ...
 
 Most of the directories are self-explanatory.  The code under `src` contains the
-skeleton compoents and the "empty" boxes.  Sample plugins are available under
+skeleton components and the "empty" boxes.  Sample plugins are available under
 the `plugin` directory.
 
 ## How to Build
@@ -212,7 +212,7 @@ Under the build directory, there is a text file, `DESIGN_PARAMETERS`, which
 contains the parameters passed to the RTL top-level.  All the IP files are
 stored under `vivado_ip`.  The shell project is under `open_nic_shell`.
 
-The following Verilog macros are defined and made avaiable to the RTL source
+The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
@@ -231,10 +231,10 @@ The standard Petalinux flow for flash programming Bittware SoC-250 requires a
 customized board support package (BSP).  It is created from a ZynqMP template,
 adding changes which have been documented in the BSP creation guide from
 Bittware, which is available at [Bittware Developer
-Site](https://developer.bittware.com/) once registered.  The guide is targetd on
-Petalinux/Vivado 2018.3.  Thus we need to adapt the changes to Petalinux/Vivado
-2020.2 accordingly.  Due to policy reasons, the BSP file is only provided upon
-request.
+Site](https://developer.bittware.com/) once registered.  The guide is targeted
+on Petalinux/Vivado 2018.3.  Thus we need to adapt the changes to
+Petalinux/Vivado 2020.2 accordingly.  Due to policy reasons, the BSP file is
+only provided upon request.
 
 ## User Plugin Integration
 
@@ -312,21 +312,22 @@ are
 - 0x10000 - 0x3FFFF for the 322MHz box, and
 - 0x40000 - 0xFFFFF for the 250MHz box.
 
-The 250MHz and 322MHz AXI-stream interfaces have slightly different sematics.
+The 250MHz and 322MHz AXI-stream interfaces have slightly different semantics.
 The 250MHz interface has the following signals.
 
 - `tvalid`, 1 bit: same as standard AXI4-stream protocol.
 - `tdata`, 512 bits: data maps from lower to upper bytes.
-- `tkeep`, 64 bits: null bytes are only allowed when both TVALID and TLAST are
-  asserted and cannot be followed by other data bytes for the same packet. For
-  example, a 96B packet has a TKEEP value of 0xFFFFFFFFFFFFFFFF in the first
-  beat, and 0x00000000FFFFFFFF in the second beat.
+- `tkeep`, 64 bits: null bytes are only allowed when both `tvalid` and `tlast`
+  are asserted and cannot be followed by other data bytes for the same packet.
+  For example, a 96B packet has a `tkeep` value of 0xFFFFFFFFFFFFFFFF in the
+  first beat, and 0x00000000FFFFFFFF in the second beat.
 - `tlast`, 1 bit: same as standard AXI4-stream protocol.
-- `tuser_size`, 16 bits: field to specify packet size. It contains the number of
-  bytes in the packet and must remain valid and unchanged if TVALID is asserted.
+- `tuser_size`, 16 bits: field to specify packet size.  It contains the number
+  of bytes in the packet and must remain valid and unchanged if `tvalid` is
+  asserted.
 - `tuser_src`, 16 bits: source of the packet.
 - `tuser_dst`, 16 bits: destination of the packet.
-- `tuser_user`, N bits: sideband user data.
+- `tuser_user`, N bits: side-band user data.
 - `tready`, 1 bit: same as standard AXI4-stream protocol.
 
 For the `tkeep` signal, the interface assumes its presence depending on the
@@ -334,8 +335,8 @@ direction of a packet.
 
 - For packets exiting the shell, it is guaranteed that `tkeep` is consistent
   with `tuser_size`.  This means that `tkeep` consists of all 1s when `tvalid`
-  is asserted and `tlast` is de-asserted and shows a bitmask for the valid bytes
-  in the beat when both `tvalid` and `tlast` are asserted.
+  is asserted and `tlast` is de-asserted and shows a bit-mask for the valid
+  bytes in the beat when both `tvalid` and `tlast` are asserted.
 - For packets entering the shell, `tkeep` can be optionally set to all 1s
   regardless of the value of `tuser_size`.  This allows user plugins to drop
   `tkeep` in their implementation.  If `tkeep` is not set to all 1s, it must be
