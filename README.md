@@ -4,9 +4,11 @@ OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
 latest version is built with Vivado 2020.2.  Currently, the supported boards
 include
 
-- Xilinx Alveo U250,
-- Xilinx Alveo U280, and
-- Bittware 250-SoC.
+- Xilinx Alveo U250, and
+- Xilinx Alveo U280
+
+Starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no
+longer maintained.
 
 The NIC shell consists of skeleton components which implement host and Ethernet
 interfaces and two user logic boxes that wraps up user RTL plugins.  Its
@@ -78,7 +80,6 @@ The `open-nic-shell` repository is organized as follows.
             |-- qdma_subsystem --
             |-- system_config --
             |-- utility --
-            |-- zynq_usplus_ps --
             |-- open_nic_shell.sv
             |-- ...
         |-- LICENSE.txt
@@ -120,9 +121,8 @@ the design parameters.
 
     -board       BOARD_NAME
                  supported boards include:
-                 - au250,
-                 - au280, and
-                 - soc250.
+                 - au250, and
+                 - au280.
 
     -tag         DESIGN_TAG
                  string to identify the build.  The tag, along with the board
@@ -143,14 +143,7 @@ the design parameters.
                  any run.
 
     -post_impl   0 (default), 1
-                 indicate if the script performs post implementation actions:
-                 for Zynq family (e.g., soc250), 1 means generating the XSA file
-                 after bitstream; for FPGAs (e.g., au250), 1 means generating
-                 the MCS file.
-
-    -sdnet       PATH
-                 path to the SDNet executable.  If specified, a Tcl variable
-                 sdnet will be available to user plugin build scripts.
+                 indicate if MCS file is generated after bitstream generations.
 
     -user_plugin PATH
                  path to the user plugin repository where a Tcl script build.tcl
@@ -183,7 +176,7 @@ the design parameters.
     -num_phys_func   [1, 4] (default to 1)
                      number of QDMA physical functions.
 
-    -num_queue       [1, 2048] (default to 2048)
+    -num_queue       [1, 2048] (default to 512)
                      number of QDMA queues
 
     -mum_cmac_port   1 (default), 2
@@ -216,25 +209,13 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name.  Valid names include `__au250__`, `__au280__` and `__soc250__`.
-- The `__zynq_family__` macro if the device is in the Zynq family.
+- Board name, either `__au250__` or `__au280__`.
 
 ### Build without Github Access from Vivado
 
 If Vivado does not have access to Github, we need to have a local copy of the
 [Xilinx Board Store](https://github.com/Xilinx/XilinxBoardStore) repository, and
 pass the path to the build script via the `-board_repo` option.
-
-### Board Support Package for SoC-250
-
-The standard Petalinux flow for flash programming Bittware SoC-250 requires a
-customized board support package (BSP).  It is created from a ZynqMP template,
-adding changes which have been documented in the BSP creation guide from
-Bittware, which is available at [Bittware Developer
-Site](https://developer.bittware.com/) once registered.  The guide is targeted
-on Petalinux/Vivado 2018.3.  Thus we need to adapt the changes to
-Petalinux/Vivado 2020.2 accordingly.  Due to policy reasons, the BSP file is
-only provided upon request.
 
 ## User Plugin Integration
 

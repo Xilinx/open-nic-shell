@@ -15,6 +15,41 @@
 # limitations under the License.
 #
 # *************************************************************************
+proc _do_impl {jobs {strategies ""}} {
+    if {![llength $strategies]} {
+        launch_runs impl_1 -to_step write_bitstream -jobs $jobs
+        wait_on_run impl_1
+    } else {
+        set impl_runs "impl_1"
+        set_property STRATEGY [lindex $strategies 0] [get_runs impl_1]
+        for {set i 1} {$i < [llength $strategies]} {incr i 1} {
+            set r impl_${[expr {$i + 1}]}
+            set s [lindex $strategies $i]
+            create_run $r -flow {Vivado Implementation 2020} -parent_run synth_1 -strategy $s
+            lappend impl_runs $r
+        }
+        launch_runs impl_runs -to_step write_bitstream -jobs $jobs
+        foreach r $impl_runs {
+            wait_on_run $r
+        }
+    }
+}
+
+proc _do_post_impl {build_dir top impl_run {zynq_family 0}} {
+    if {$zynq_family} {
+        current_run $impl_run
+        set sdk_dir ${build_dir}/${top}.sdk
+        file mkdir $sdk_dir
+        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa
+    } else {
+        set interface SPIx4
+        set start_address 0x01002000
+        set bit_file ${build_dir}/${top}.runs/${impl_run}/${top}.bit
+        set mcs_file ${build_dir}/${top}.runs/${impl_run}/${top}.mcs
+        write_cfgmem -format mcs -size 128 -interface $interface -loadbit "up $start_address $bit_file" -file "$mcs_file"
+    }
+}
+
 # Vivado version check
 set VIVADO_VERSION "2020.2"
 if {![string equal [version -short] $VIVADO_VERSION]} {
@@ -38,7 +73,6 @@ set src_dir ${root_dir}/src
 #   synth_ip     Synthesize IPs before creating design project
 #   impl         Run implementation after creating design project
 #   post_impl    Perform post implementation actions
-#   sdnet        Path to SDNet executable
 #   user_plugin  Path to the user plugin repo
 #
 # Design parameters
@@ -58,7 +92,6 @@ array set build_options {
     -synth_ip    1
     -impl        0
     -post_impl   0
-    -sdnet       ""
     -user_plugin ""
 }
 set build_opitons(-user_plugin) ${plugin_dir}/p2p
@@ -66,10 +99,10 @@ set build_opitons(-user_plugin) ${plugin_dir}/p2p
 array set design_params {
     -build_timestamp  0
     -min_pkt_len      64
-    -max_pkt_len      1514
+    -max_pkt_len      1518
     -use_phys_func    1
     -num_phys_func    1
-    -num_queue        2048
+    -num_queue        512
     -num_cmac_port    1
 }
 set design_params(-build_timestamp) [clock format [clock seconds] -format %m%d%H%M]
@@ -211,9 +244,9 @@ dict for {module module_dir} $module_dict {
         }
 
         # Build the IPs only when
-        # - No DCP genereated, or
+        # - IP directory does not exist, or
         # - "$overwrite" option is nonzero
-        set cached [file exists ${ip_build_dir}/${ip}/${ip}.dcp]
+        set cached [file exists ${ip_build_dir}/${ip}]
         if {$cached && !$overwrite} {
             puts "INFO: \[$ip\] Use existing IP build (overwrite=0)"
             continue
@@ -339,23 +372,9 @@ read_xdc ${constr_dir}/${board}/general.xdc
 # Implement design
 if {$impl} {
     update_compile_order -fileset sources_1
-    launch_runs impl_1 -to_step write_bitstream -jobs $jobs
-    wait_on_run impl_1
+    _do_impl {Implementation Defaults} $jobs
 }
 
-# TODO: check implementation results before starting post steps
-
 if {$post_impl} {
-    if {$zynq_family} {
-        set sdk_dir ${top_build_dir}/${top}.sdk
-        file mkdir $sdk_dir
-        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa
-    } else {
-        set interface SPIx4
-        set start_address 0x01002000
-        set bit_file ${top_build_dir}/${top}.runs/impl_1/${top}.bit
-        set mcs_file ${top_build_dir}/${top}.runs/impl_1/${top}.mcs
-
-        write_cfgmem -format mcs -size 128 -interface $interface -loadbit "up $start_address $bit_file" -file "$mcs_file"
-    }
+    _do_post_impl $top_build_dir $top impl_1 $zynq_family
 }

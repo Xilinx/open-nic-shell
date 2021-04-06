@@ -19,7 +19,7 @@
 module cmac_subsystem #(
   parameter int CMAC_ID     = 0,
   parameter int MIN_PKT_LEN = 64,
-  parameter int MAX_PKT_LEN = 1514
+  parameter int MAX_PKT_LEN = 1518
 ) (
   input          s_axil_awvalid,
   input   [31:0] s_axil_awaddr,

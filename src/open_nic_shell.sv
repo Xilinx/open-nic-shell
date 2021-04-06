@@ -20,10 +20,10 @@
 module open_nic_shell #(
   parameter [31:0] BUILD_TIMESTAMP = 32'h01010000,
   parameter int    MIN_PKT_LEN     = 64,
-  parameter int    MAX_PKT_LEN     = 1514,
+  parameter int    MAX_PKT_LEN     = 1518,
   parameter int    USE_PHYS_FUNC   = 1,
   parameter int    NUM_PHYS_FUNC   = 1,
-  parameter int    NUM_QUEUE       = 2048,
+  parameter int    NUM_QUEUE       = 512,
   parameter int    NUM_CMAC_PORT   = 1
 ) (
 `ifdef __synthesis__
