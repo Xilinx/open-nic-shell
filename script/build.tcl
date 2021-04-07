@@ -94,7 +94,7 @@ array set build_options {
     -post_impl   0
     -user_plugin ""
 }
-set build_opitons(-user_plugin) ${plugin_dir}/p2p
+set build_options(-user_plugin) ${plugin_dir}/p2p
 
 array set design_params {
     -build_timestamp  0
@@ -372,7 +372,7 @@ read_xdc ${constr_dir}/${board}/general.xdc
 # Implement design
 if {$impl} {
     update_compile_order -fileset sources_1
-    _do_impl {Implementation Defaults} $jobs
+    _do_impl $jobs {Implementation Defaults}
 }
 
 if {$post_impl} {
