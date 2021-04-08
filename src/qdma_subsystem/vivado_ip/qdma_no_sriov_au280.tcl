@@ -42,6 +42,9 @@ set_property -dict {
     CONFIG.PF3_MSIX_CAP_TABLE_SIZE_qdma {008}
     CONFIG.dma_intf_sel_qdma {AXI_Stream_with_Completion}
     CONFIG.en_axi_mm_qdma {false}
+    CONFIG.SYS_RST_N_BOARD_INTERFACE {pcie_perstn}
+    CONFIG.PCIE_BOARD_INTERFACE {pci_express_x16}
+    CONFIG.xlnx_ref_board {AU280}
 } [get_ips $qdma]
 set_property CONFIG.tl_pf_enable_reg $num_phys_func [get_ips $qdma]
 set_property CONFIG.num_queues $num_queue [get_ips $qdma]

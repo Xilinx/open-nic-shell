@@ -21,14 +21,14 @@ proc _do_impl {jobs {strategies ""}} {
         wait_on_run impl_1
     } else {
         set impl_runs "impl_1"
-        set_property STRATEGY [lindex $strategies 0] [get_runs impl_1]
+        set_property STRATEGY "[lindex $strategies 0]" [get_runs impl_1]
         for {set i 1} {$i < [llength $strategies]} {incr i 1} {
             set r impl_${[expr {$i + 1}]}
             set s [lindex $strategies $i]
-            create_run $r -flow {Vivado Implementation 2020} -parent_run synth_1 -strategy $s
+            create_run $r -flow {Vivado Implementation 2020} -parent_run synth_1 -strategy "$s"
             lappend impl_runs $r
         }
-        launch_runs impl_runs -to_step write_bitstream -jobs $jobs
+        launch_runs $impl_runs -to_step write_bitstream -jobs $jobs
         foreach r $impl_runs {
             wait_on_run $r
         }
@@ -372,7 +372,7 @@ read_xdc ${constr_dir}/${board}/general.xdc
 # Implement design
 if {$impl} {
     update_compile_order -fileset sources_1
-    _do_impl $jobs {Implementation Defaults}
+    _do_impl $jobs {"Vivado Implementation Defaults"}
 }
 
 if {$post_impl} {
