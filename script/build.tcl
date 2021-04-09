@@ -23,7 +23,7 @@ proc _do_impl {jobs {strategies ""}} {
         set impl_runs "impl_1"
         set_property STRATEGY "[lindex $strategies 0]" [get_runs impl_1]
         for {set i 1} {$i < [llength $strategies]} {incr i 1} {
-            set r impl_${[expr {$i + 1}]}
+            set r impl_[expr $i + 1]
             set s [lindex $strategies $i]
             create_run $r -flow {Vivado Implementation 2020} -parent_run synth_1 -strategy "$s"
             lappend impl_runs $r
