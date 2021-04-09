@@ -146,8 +146,7 @@ the design parameters.
                  indicate if MCS file is generated after bitstream generations.
 
     -user_plugin PATH
-                 path to the user plugin repository where a Tcl script build.tcl
-                 is expected.
+                 path to the user plugin repository.
 
     # Design parameters
 
@@ -348,56 +347,69 @@ has the following signals.
   shell, i.e., from the RX side of CMAC IPs, the `tready` signal is not present
   and the master side assumes that `tready` is always asserted.
 
-## Known issues
+## Programming FPGA
 
-Here are the known issues and the potential workarounds.
+After bitstream generation, FPGA can be programming in two ways.
 
-### Kernel panic/reboot while programming the FPGA
+1. Program the device directly.  The FPGA configuration will lose after reboot.
+2. Program and boot from the configuration memory.
 
-When loading bitstream onto the Alveo U250 board using Vivado's hardware
-manager, kernel panic occurred and the system rebooted automatically before the
-process was complete.  On subsequent tries it worked in 50% of the cases.
+Because the shell bitstream contains a PCI-e IP core, both approaches will cause
+the lost of PCI-e link.  It could be fatal depending on the model of host
+motherboards.  For example, for Dell servers, losing discovered PCI-e links
+could lead to a forced reboot triggered by iDRAC.
 
-There are a few solutions for different use cases.
+To avoid this, use the Bash script `script/setup_device.sh`, which disables the
+reporting of fatal errors to PCI-e root complex before programming and triggers
+a PCI-e link re-scan after programming.  The script takes the device BDF (i.e.,
+`BB:DD.FF` without the domain, which usually is `0000`) as the single input, and
+should be ran on the server with the FPGA card.
 
-- A potential fix is to disable PCIe fatal error reporting and clearing out SERR
-  in the command register.  [This
-  post](http://alexforencich.com/wiki/en/pcie/disable-fatal) describes the fix.
-- Another workaround is to use a different server/workstation to program the
-  board, i.e., launching Vivado on a different server/workstation and connecting
-  the JTAG/USB cable there.
+There are two limitations related to the script.  First, if an FPGA is not yet
+programmed with a PCI-e enabled bitstream, it would not have an BDF address.  In
+this case, the script does not work.  The second case is when OpenNIC driver is
+already loaded, it can hang the kernel after the script issues link re-scan.
+This issue is planned to be addressed in the future driver release.
 
-### Server fails to boot after programming the FPGA
+For the above two cases, the safest workaround is to use a different server to
+program the FPGA.  For configuration memory programming, do a cold reboot to
+trigger the FPGA boot process.
+
+## Known Issues
+
+### Server Boot Failure after FPGA Programming
 
 A warm reboot is needed after loading the bitstream onto the FPGA.  But this
-reboot fails with the error message: "A PCIe link training failure is observed
-in Slot1 and the link is disabled".
+reboot fails with the error message: 
+
+    A PCIe link training failure is observed in Slot1 and the link is disabled.
 
 For Dell servers, there is a temporary hack [discussed
 here](https://forums.xilinx.com/t5/PCIe-and-CPM/PCIE-link-training-error-on-DELL-R730/m-p/806428).
-The trick is to issue a second "warm reboot" command using iDRAC while the
-system is rebooting and before PCIe endpoint detection.  The hypothesis is that
-this gives enough time to load the configuration on the FPGA.  This seems to be
+The trick is to issue a second warm reboot command using iDRAC while the system
+is rebooting and before PCIe endpoint detection.  The hypothesis is that this
+gives enough time to load the configuration on the FPGA.  This seems to be
 working so far.
 
-### CMAC license issue when building the design
+### CMAC license
 
-This error was seen when some people tried to build the hardware.
+Some users have reported this error when trying to build the shell.
 
-ERROR: [Common 17-69] Command failed: This design contains one or more cells for
-which bitstream generation is not permitted:
-`cmac_subsystem_inst/cmac_wrapper_inst/cmac_inst/inst/i_cmac_usplus_0_top
-(<encrypted cellview>)`.  If a new IP Core license was added, in order for the
-new license to be picked up, the current netlist needs to be updated by
-resetting and re-generating the IP output products before bitstream generation.
+    ERROR: [Common 17-69] Command failed: This design contains one or more cells
+    for which bitstream generation is not permitted:
+    `cmac_subsystem_inst/cmac_wrapper_inst/cmac_inst/inst/i_cmac_usplus_0_top
+    (<encrypted cellview>)`.  If a new IP Core license was added, in order for
+    the new license to be picked up, the current netlist needs to be updated by
+    resetting and re-generating the IP output products before bitstream
+    generation.
 
-Since the 100G MAC is hardened in Ultrascale+, `cmac_usplus` has a free license.
-Go to [www.xilinx.com/getlicense](www.xilinx.com/getlicense).  After login,
-click "Search Now" in the "Evaluation and No Charge Cores" box on the right side
-of the page.  You will see a popup with a "Search" box at top left.  Enter
-"100G" in the search box.  You will see "UltraScale+ Integrated 100G Ethernet No
-Charge License".  Select this and click "Add".  A screenshot could be found
-![here](vivado_cmac.png).
+Since CMAC is hardened in Ultrascale+, `cmac_usplus` has a free license.  To get
+the CMAC license, go to [www.xilinx.com/getlicense](www.xilinx.com/getlicense).
+After login, click "Search Now" in the "Evaluation and No Charge Cores" box on
+the right side of the page.  You will see a popup with a "Search" box at top
+left.  Enter "100G" in the search box.  You will see "UltraScale+ Integrated
+100G Ethernet No Charge License".  Select this and click "Add".  A screenshot
+could be found ![here](vivado_cmac.png).
 
 ---
 
