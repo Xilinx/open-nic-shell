@@ -172,6 +172,7 @@ if {[file exists $build_dir]} {
     if {[string equal $ans "2"]} {
         file delete -force $build_dir
         puts "Deleted existing build directory $build_dir"
+        file mkdir $build_dir
     } elseif {[string equal $ans "3"]} {
         puts "Build directory existed. Try to specify a different design tag"
         exit
