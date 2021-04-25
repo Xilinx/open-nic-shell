@@ -221,7 +221,7 @@ module qdma_subsystem_function #(
 
   generate for (genvar i = 0; i < 64; i++) begin
     assign axis_h2c_tkeep[i] = (axis_h2c_tvalid && axis_h2c_tready && axis_h2c_tlast) ?
-                               (axis_h2c_tuser_size[5:0] > i) : 1'b1;
+                               ((axis_h2c_tuser_size[5:0] - 6'd1) >= i) : 1'b1;
   end
   endgenerate
 
