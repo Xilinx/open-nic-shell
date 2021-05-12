@@ -283,8 +283,8 @@ module qdma_subsystem_c2h #(
   assign m_axis_qdma_cpl_tdata[15:0]          = 0;
 
   assign m_axis_qdma_cpl_ctrl_no_wrb_marker   = 1'b0;
-  assign m_axis_qdma_cpl_ctrl_col_idx         = 1'b0;
-  assign m_axis_qdma_cpl_ctrl_err_idx         = 1'b0;
+  assign m_axis_qdma_cpl_ctrl_col_idx         = 0;
+  assign m_axis_qdma_cpl_ctrl_err_idx         = 0;
   assign m_axis_qdma_cpl_ctrl_qid             = cpl_fifo_dout[42:32];
   assign m_axis_qdma_cpl_ctrl_marker          = 1'b0;
   assign m_axis_qdma_cpl_ctrl_cmpt_type       = 2'b11;  //regular mode
