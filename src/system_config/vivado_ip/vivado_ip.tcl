@@ -17,4 +17,5 @@
 # *************************************************************************
 set ips {
     system_config_axi_crossbar
+    system_management_wiz
 }
