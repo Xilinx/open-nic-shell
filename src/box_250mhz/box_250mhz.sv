@@ -102,12 +102,12 @@ module box_250mhz #(
 
   generate if (USE_PHYS_FUNC == 0) begin
     // Terminate H2C and C2H interfaces of the box
-    assign s_axis_qdma_h2c_tready     = 1'b1;
+    assign s_axis_qdma_h2c_tready     = {NUM_PHYS_FUNC{1'b1}};
 
-    assign m_axis_qdma_c2h_tvalid     = 1'b0;
+    assign m_axis_qdma_c2h_tvalid     = 0;
     assign m_axis_qdma_c2h_tdata      = 0;
     assign m_axis_qdma_c2h_tkeep      = 0;
-    assign m_axis_qdma_c2h_tlast      = 1'b0;
+    assign m_axis_qdma_c2h_tlast      = 0;
     assign m_axis_qdma_c2h_tuser_size = 0;
     assign m_axis_qdma_c2h_tuser_src  = 0;
     assign m_axis_qdma_c2h_tuser_dst  = 0;
