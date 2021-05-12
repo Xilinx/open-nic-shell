@@ -89,7 +89,7 @@ module box_322mhz_address_map (
   localparam C_DUMMY_INDEX = 1;
 
   localparam C_P2P_BASE_ADDR   = 32'h0;
-  localparam C_DUMMY_BASE_ADDR = 32'h1000;
+  localparam C_DUMMY_BASE_ADDR = 32'h200000;
 
   wire                  [31:0] axil_p2p_awaddr;
   wire                  [31:0] axil_p2p_araddr;
