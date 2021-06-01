@@ -171,10 +171,10 @@ module qdma_subsystem_function #(
     if (~axil_aresetn) begin
       h2c_matched <= 1'b0;
     end
-    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast) begin
+    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast && s_axis_h2c_tready) begin
       h2c_matched <= h2c_q_in_range;
     end
-    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast) begin
+    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast && s_axis_h2c_tready) begin
       h2c_matched <= 1'b0;
     end
   end

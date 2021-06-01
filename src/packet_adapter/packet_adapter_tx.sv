@@ -102,7 +102,7 @@ module packet_adapter_tx #(
           axis_tx_tkeep[i] <= (s_axis_tx_tuser_size[5:0] > i);
         end
         else begin
-          axis_tx_tkeep[i] <= 1'b1;
+          axis_tx_tkeep[i] <= s_axis_tx_tkeep[i];
         end
       end
     end
