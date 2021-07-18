@@ -178,7 +178,7 @@ the design parameters.
     -num_queue       [1, 2048] (default to 512)
                      number of QDMA queues
 
-    -mum_cmac_port   1 (default), 2
+    -num_cmac_port   1 (default), 2
                      number of CMAC ports.
 
 ### Build Process
