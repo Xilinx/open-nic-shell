@@ -15,27 +15,30 @@
 // limitations under the License.
 //
 // *************************************************************************
-// System address map (through PCI-e BAR2 1MB)
+// System address map (through PCI-e BAR2 4MB)
 //
 // --------------------------------------------------
-//   BaseAddr |  HighAddr |  Module
+//   BaseAddr  |  HighAddr |  Module
 // --------------------------------------------------
-//   0x00000  |  0x00FFF  |  System configuration
+//    0x00000  |  0x00FFF  |  System configuration
 // --------------------------------------------------
-//   0x01000  |  0x05FFF  |  QDMA subsystem
+//    0x01000  |  0x05FFF  |  QDMA subsystem
 // --------------------------------------------------
-//   0x08000  |  0x0AFFF  |  CMAC subsystem #0
+//    0x08000  |  0x0AFFF  |  CMAC subsystem #0
 // --------------------------------------------------
-//   0x0B000  |  0x0BFFF  |  Packet adapter #0
+//    0x0B000  |  0x0BFFF  |  Packet adapter #0
 // --------------------------------------------------
-//   0x0C000  |  0x0EFFF  |  CMAC subsystem #1
+//    0x0C000  |  0x0EFFF  |  CMAC subsystem #1
 // --------------------------------------------------
-//   0x0F000  |  0x0FFFF  |  Packet adapter #1
+//    0x0F000  |  0x0FFFF  |  Packet adapter #1
 // --------------------------------------------------
-//   0x10000  |  0x3FFFF  |  Box1 @ 322MHz
+//    0x10000  |  0x11FFF  |  Sysmon block
 // --------------------------------------------------
-//   0x40000  |  0xFFFFF  |  Box0 @ 250MHz
+//   0x100000  |  0x1FFFFF |  Box0 @ 250MHz
 // --------------------------------------------------
+//   0x200000  |  0x2FFFFF |  Box1 @ 322MHz
+// --------------------------------------------------
+
 `include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
 module system_config_address_map #(
@@ -160,11 +163,28 @@ module system_config_address_map #(
   input                   [1:0] m_axil_box1_rresp,
   output                        m_axil_box1_rready,
 
+  output                        m_axil_smon_awvalid,
+  output                 [31:0] m_axil_smon_awaddr,
+  input                         m_axil_smon_awready,
+  output                        m_axil_smon_wvalid,
+  output                 [31:0] m_axil_smon_wdata,
+  input                         m_axil_smon_wready,
+  input                         m_axil_smon_bvalid,
+  input                   [1:0] m_axil_smon_bresp,
+  output                        m_axil_smon_bready,
+  output                        m_axil_smon_arvalid,
+  output                 [31:0] m_axil_smon_araddr,
+  input                         m_axil_smon_arready,
+  input                         m_axil_smon_rvalid,
+  input                  [31:0] m_axil_smon_rdata,
+  input                   [1:0] m_axil_smon_rresp,
+  output                        m_axil_smon_rready,
+
   input                         aclk,
   input                         aresetn
 );
 
-  localparam C_NUM_SLAVES  = 8;
+  localparam C_NUM_SLAVES  = 9;
 
   localparam C_SCFG_INDEX  = 0;
   localparam C_QDMA_INDEX  = 1;
@@ -172,8 +192,9 @@ module system_config_address_map #(
   localparam C_ADAP0_INDEX = 3;
   localparam C_CMAC1_INDEX = 4;
   localparam C_ADAP1_INDEX = 5;
-  localparam C_BOX1_INDEX  = 6;
-  localparam C_BOX0_INDEX  = 7;
+  localparam C_SMON_INDEX  = 6;
+  localparam C_BOX1_INDEX  = 7;
+  localparam C_BOX0_INDEX  = 8;
 
   localparam C_SCFG_BASE_ADDR  = 32'h0;
   localparam C_QDMA_BASE_ADDR  = 32'h01000;
@@ -181,8 +202,9 @@ module system_config_address_map #(
   localparam C_ADAP0_BASE_ADDR = 32'h0B000;
   localparam C_CMAC1_BASE_ADDR = 32'h0C000;
   localparam C_ADAP1_BASE_ADDR = 32'h0F000;
-  localparam C_BOX1_BASE_ADDR  = 32'h10000;
-  localparam C_BOX0_BASE_ADDR  = 32'h40000;
+  localparam C_SMON_BASE_ADDR  = 32'h10000;  // 14 bits
+  localparam C_BOX1_BASE_ADDR  = 32'h200000; // 20 bits
+  localparam C_BOX0_BASE_ADDR  = 32'h100000; // 20 bits
 
   wire                [31:0] axil_scfg_awaddr;
   wire                [31:0] axil_scfg_araddr;
@@ -200,6 +222,8 @@ module system_config_address_map #(
   wire                [31:0] axil_box1_araddr;
   wire                [31:0] axil_box0_awaddr;
   wire                [31:0] axil_box0_araddr;
+  wire                [31:0] axil_smon_awaddr;
+  wire                [31:0] axil_smon_araddr;
 
   wire  [1*C_NUM_SLAVES-1:0] axil_awvalid;
   wire [32*C_NUM_SLAVES-1:0] axil_awaddr;
@@ -231,6 +255,8 @@ module system_config_address_map #(
   assign axil_cmac1_araddr                     = axil_araddr[`getvec(32, C_CMAC1_INDEX)] - C_CMAC1_BASE_ADDR;
   assign axil_adap1_awaddr                     = axil_awaddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
   assign axil_adap1_araddr                     = axil_araddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
+  assign axil_smon_awddr                       = axil_awaddr[`getvec(32, C_SMON_INDEX)]  - C_SMON_BASE_ADDR;
+  assign axil_smon_araddr                      = axil_araddr[`getvec(32, C_SMON_INDEX)] - C_SMON_BASE_ADDR;
   assign axil_box1_awaddr                      = axil_awaddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
   assign axil_box1_araddr                      = axil_araddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
   assign axil_box0_awaddr                      = axil_awaddr[`getvec(32, C_BOX0_INDEX)] - C_BOX0_BASE_ADDR;
@@ -460,6 +486,23 @@ module system_config_address_map #(
   assign axil_rdata[`getvec(32, C_BOX0_INDEX)] = m_axil_box0_rdata;
   assign axil_rresp[`getvec(2, C_BOX0_INDEX)]  = m_axil_box0_rresp;
   assign m_axil_box0_rready                    = axil_rready[C_BOX0_INDEX];
+
+  assign m_axil_smon_awvalid                   = axil_awvalid[C_SMON_INDEX];
+  assign m_axil_smon_awaddr                    = axil_smon_awaddr;
+  assign axil_awready[C_SMON_INDEX]            = m_axil_smon_awready;
+  assign m_axil_smon_wvalid                    = axil_wvalid[C_SMON_INDEX];
+  assign m_axil_smon_wdata                     = axil_wdata[`getvec(32, C_SMON_INDEX)];
+  assign axil_wready[C_SMON_INDEX]             = m_axil_smon_wready;
+  assign axil_bvalid[C_SMON_INDEX]             = m_axil_smon_bvalid;
+  assign axil_bresp[`getvec(2, C_SMON_INDEX)]  = m_axil_smon_bresp;
+  assign m_axil_smon_bready                    = axil_bready[C_SMON_INDEX];
+  assign m_axil_smon_arvalid                   = axil_arvalid[C_SMON_INDEX];
+  assign m_axil_smon_araddr                    = axil_smon_araddr;
+  assign axil_arready[C_SMON_INDEX]            = m_axil_smon_arready;
+  assign axil_rvalid[C_SMON_INDEX]             = m_axil_smon_rvalid;
+  assign axil_rdata[`getvec(32, C_SMON_INDEX)] = m_axil_smon_rdata;
+  assign axil_rresp[`getvec(2, C_SMON_INDEX)]  = m_axil_smon_rresp;
+  assign m_axil_smon_rready                    = axil_rready[C_SMON_INDEX];
 
   system_config_axi_crossbar xbar_inst (
     .s_axi_awaddr  (s_axil_awaddr),

@@ -155,6 +155,23 @@ module system_config #(
   wire  [1:0] axil_scfg_rresp;
   wire        axil_scfg_rready;
 
+  wire        axil_smon_awvalid;
+  wire [31:0] axil_smon_awaddr;
+  wire        axil_smon_awready;
+  wire        axil_smon_wvalid;
+  wire [31:0] axil_smon_wdata;
+  wire        axil_smon_wready;
+  wire        axil_smon_bvalid;
+  wire  [1:0] axil_smon_bresp;
+  wire        axil_smon_bready;
+  wire        axil_smon_arvalid;
+  wire [31:0] axil_smon_araddr;
+  wire        axil_smon_arready;
+  wire        axil_smon_rvalid;
+  wire [31:0] axil_smon_rdata;
+  wire  [1:0] axil_smon_rresp;
+  wire        axil_smon_rready;
+   
   system_config_address_map #(
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
   ) scfg_address_map_inst (
@@ -242,7 +259,24 @@ module system_config #(
     .m_axil_cmac_rdata   (m_axil_cmac_rdata),
     .m_axil_cmac_rresp   (m_axil_cmac_rresp),
     .m_axil_cmac_rready  (m_axil_cmac_rready),
-
+    
+    .m_axil_smon_awvalid (axil_smon_awvalid),
+    .m_axil_smon_awaddr  (axil_smon_awaddr),
+    .m_axil_smon_awready (axil_smon_awready),
+    .m_axil_smon_wvalid  (axil_smon_wvalid),
+    .m_axil_smon_wdata   (axil_smon_wdata),
+    .m_axil_smon_wready  (axil_smon_wready),
+    .m_axil_smon_bvalid  (axil_smon_bvalid),
+    .m_axil_smon_bresp   (axil_smon_bresp),
+    .m_axil_smon_bready  (axil_smon_bready),
+    .m_axil_smon_arvalid (axil_smon_arvalid),
+    .m_axil_smon_araddr  (axil_smon_araddr),
+    .m_axil_smon_arready (axil_smon_arready),
+    .m_axil_smon_rvalid  (axil_smon_rvalid),
+    .m_axil_smon_rdata   (axil_smon_rdata),
+    .m_axil_smon_rresp   (axil_smon_rresp),
+    .m_axil_smon_rready  (axil_smon_rready),
+			   
     .m_axil_box0_awvalid (m_axil_box0_awvalid),
     .m_axil_box0_awaddr  (m_axil_box0_awaddr),
     .m_axil_box0_awready (m_axil_box0_awready),
@@ -308,6 +342,30 @@ module system_config #(
 
     .aclk           (aclk),
     .aresetn        (aresetn)
+  );
+
+   system_management_wiz
+   system_management_wiz_inst (
+     .s_axi_aclk      (aclk),                    
+     .s_axi_aresetn   (aresetn),                    
+ 
+     .s_axi_awaddr    (axil_smon_awaddr),                    
+     .s_axi_awvalid   (axil_smon_awvalid),                    
+     .s_axi_awready   (axil_smon_awready),                    
+     .s_axi_wdata     (axil_smon_wdata),                    
+     .s_axi_wstrb     (4'hF),                    
+     .s_axi_wvalid    (axil_smon_wvalid),                    
+     .s_axi_wready    (axil_smon_wready),                    
+     .s_axi_bresp     (axil_smon_bresp),                    
+     .s_axi_bvalid    (axil_smon_bvalid),                    
+     .s_axi_bready    (axil_smon_bready),                    
+     .s_axi_araddr    (axil_smon_araddr),                    
+     .s_axi_arvalid   (axil_smon_arvalid),                    
+     .s_axi_arready   (axil_smon_arready),                    
+     .s_axi_rdata     (axil_smon_rdata),                    
+     .s_axi_rresp     (axil_smon_rresp),                    
+     .s_axi_rvalid    (axil_smon_rvalid),                    
+     .s_axi_rready    (axil_smon_rready)
   );
 
 endmodule: system_config
