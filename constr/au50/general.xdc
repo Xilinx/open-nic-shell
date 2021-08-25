@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 # *************************************************************************
-set_operating_conditions -design_pwer_budget 63
+set_operating_conditions -design_power_budget 63
 
 set_property CONFIG_VOLTAGE 1.8 [current_design]
 set_property BITSTREAM.CONFIG.CONFIGFALLBACK Enable [current_design]

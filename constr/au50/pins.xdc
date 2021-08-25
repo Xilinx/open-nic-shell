@@ -19,9 +19,13 @@
 # This file should be read in as unmanaged Tcl constraints to enable the usage
 # of if statement
 
-# For Dual x8 Bifrucation change to refclk1 at pi AF8(N)/AF9(P)
-set_property PACKAGE_PIN AB8 [get_ports pcie_refclk_n]
-set_property PACKAGE_PIN AB9 [get_ports pcie_refclk_p]
+# Gen3 x16 or Dual x8 Bifrucation on Lane 8-15: AB8(N)/AB9(P)
+#	Note: This pair fails timing for PCIe QDMA x16 in this design.
+#		[Place 30-739] the GT ref clock should be within 2 quads from all txvrs.
+# Dual x8 Bifrucation on Lane 0-7 AF8(N)/AF9(P)
+#	Note: The AU50 Vitis shell uses this pair, thus used here.
+set_property PACKAGE_PIN AF8 [get_ports pcie_refclk_n]
+set_property PACKAGE_PIN AF9 [get_ports pcie_refclk_p]
 
 set_property PACKAGE_PIN AW27 [get_ports pcie_rstn]
 set_property IOSTANDARD LVCMOS18 [get_ports pcie_rstn]
