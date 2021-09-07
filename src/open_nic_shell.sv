@@ -29,6 +29,8 @@ module open_nic_shell #(
 `ifdef __synthesis__
 `ifdef __au280__
   output                         hbm_cattrip, // Fix the CATTRIP issue for AU280 custom flow
+`elsif __au50__
+  output                         hbm_cattrip,
 `endif
 
   input                   [15:0] pcie_rxp,

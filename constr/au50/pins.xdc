@@ -39,3 +39,8 @@ if {$num_ports >= 2} {
     puts "Alveo U50 has only one QSFP28 port, got $num_ports . Quitting"
 	exit
 }
+
+# Fix the CATTRIP issue for custom flow
+set_property PACKAGE_PIN J18 [get_ports hbm_cattrip]
+set_property IOSTANDARD LVCMOS18 [get_ports hbm_cattrip]
+
