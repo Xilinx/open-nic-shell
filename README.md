@@ -5,7 +5,8 @@ latest version is built with Vivado 2020.2.  Currently, the supported boards
 include
 
 - Xilinx Alveo U250, and
-- Xilinx Alveo U280
+- Xilinx Alveo U280, and
+- Xilinx Alveo U50
 
 Starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no
 longer maintained.
@@ -176,10 +177,10 @@ the design parameters.
                      number of QDMA physical functions.
 
     -num_queue       [1, 2048] (default to 512)
-                     number of QDMA queues
+                     number of QDMA queues.
 
     -num_cmac_port   1 (default), 2
-                     number of CMAC ports.
+                     number of CMAC ports, subjects to the board model.
 
 ### Build Process
 
@@ -208,7 +209,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__` or `__au280__`.
+- Board name, either `__au250__`, `__au280__` or `__au50__`.
 
 ### Build without Github Access from Vivado
 
