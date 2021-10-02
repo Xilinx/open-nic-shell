@@ -123,7 +123,8 @@ the design parameters.
     -board       BOARD_NAME
                  supported boards include:
                  - au250, and
-                 - au280.
+                 - au280, and
+                 - au50.
 
     -tag         DESIGN_TAG
                  string to identify the build.  The tag, along with the board
