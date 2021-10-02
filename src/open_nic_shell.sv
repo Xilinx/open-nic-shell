@@ -29,6 +29,8 @@ module open_nic_shell #(
 `ifdef __synthesis__
 `ifdef __au280__
   output                         hbm_cattrip, // Fix the CATTRIP issue for AU280 custom flow
+`elsif __au50__
+  output                         hbm_cattrip,
 `endif
 
   input                   [15:0] pcie_rxp,
@@ -174,6 +176,9 @@ module open_nic_shell #(
   //
   // This pin must be tied to 0; otherwise the board might be unrecoverable
   // after programming
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au50__
+  // Same for AU50
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif
 
