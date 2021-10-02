@@ -17,7 +17,7 @@
 # *************************************************************************
 set qdma qdma_no_sriov
 create_ip -name qdma -vendor xilinx.com -library ip -module_name $qdma -dir ${ip_build_dir}
-set_property -dict { 
+set_property -dict {
     CONFIG.mode_selection {Advanced}
     CONFIG.pl_link_cap_max_link_width {X16}
     CONFIG.pl_link_cap_max_link_speed {8.0_GT/s}

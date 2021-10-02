@@ -179,7 +179,7 @@ module open_nic_shell #(
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au50__
   // Same for AU50
-  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip)); 
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif
 
 `ifdef __zynq_family__

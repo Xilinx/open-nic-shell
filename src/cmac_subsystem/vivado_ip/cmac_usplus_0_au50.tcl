@@ -17,7 +17,7 @@
 # *************************************************************************
 set cmac_usplus cmac_usplus_0
 create_ip -name cmac_usplus -vendor xilinx.com -library ip -module_name $cmac_usplus -dir ${ip_build_dir}
-set_property -dict { 
+set_property -dict {
     CONFIG.CMAC_CAUI4_MODE {1}
     CONFIG.NUM_LANES {4x25}
     CONFIG.GT_REF_CLK_FREQ {161.1328125}
