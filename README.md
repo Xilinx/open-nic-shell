@@ -413,6 +413,15 @@ left.  Enter "100G" in the search box.  You will see "UltraScale+ Integrated
 100G Ethernet No Charge License".  Select this and click "Add".  A screenshot
 could be found ![here](vivado_cmac.png).
 
+### Alveo U50 board files
+
+When build for an Alveo U50 board, the U50 Vivado board files are required. However,
+neither the default Vivado 2020.2 installation nor the Xilinx Board Store currently
+has these files. If you are building for Alveo U50, please contact Xilinx for a copy
+of the U50 board files. These files should be placed under
+
+    <Vivado_Installation>/2020.2/data/boards/board_files/au50/<board_file_version>/
+
 ---
 
 # Copyright Notice and Disclaimer
