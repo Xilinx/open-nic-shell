@@ -5,7 +5,8 @@ latest version is built with Vivado 2020.2.  Currently, the supported boards
 include
 
 - Xilinx Alveo U250, and
-- Xilinx Alveo U280
+- Xilinx Alveo U280, and
+- Xilinx Alveo U50
 
 Starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no
 longer maintained.
@@ -122,7 +123,8 @@ the design parameters.
     -board       BOARD_NAME
                  supported boards include:
                  - au250, and
-                 - au280.
+                 - au280, and
+                 - au50.
 
     -tag         DESIGN_TAG
                  string to identify the build.  The tag, along with the board
@@ -176,10 +178,10 @@ the design parameters.
                      number of QDMA physical functions.
 
     -num_queue       [1, 2048] (default to 512)
-                     number of QDMA queues
+                     number of QDMA queues.
 
     -num_cmac_port   1 (default), 2
-                     number of CMAC ports.
+                     number of CMAC ports, subjects to the board model.
 
 ### Build Process
 
@@ -208,7 +210,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__` or `__au280__`.
+- Board name, either `__au250__`, `__au280__` or `__au50__`.
 
 ### Build without Github Access from Vivado
 
@@ -410,6 +412,15 @@ the right side of the page.  You will see a popup with a "Search" box at top
 left.  Enter "100G" in the search box.  You will see "UltraScale+ Integrated
 100G Ethernet No Charge License".  Select this and click "Add".  A screenshot
 could be found ![here](vivado_cmac.png).
+
+### Alveo U50 board files
+
+When build for an Alveo U50 board, the U50 Vivado board files are required. However,
+neither the default Vivado 2020.2 installation nor the Xilinx Board Store currently
+has these files. If you are building for Alveo U50, please contact Xilinx for a copy
+of the U50 board files. These files should be placed under
+
+    <Vivado_Installation>/2020.2/data/boards/board_files/au50/<board_file_version>/
 
 ---
 
