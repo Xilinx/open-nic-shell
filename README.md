@@ -6,7 +6,8 @@ include
 
 - Xilinx Alveo U250, and
 - Xilinx Alveo U280, and
-- Xilinx Alveo U50
+- Xilinx Alveo U50, and
+- Xilinx Alveo U200
 
 Starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no
 longer maintained.
