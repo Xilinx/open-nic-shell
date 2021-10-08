@@ -65,6 +65,8 @@ The `open-nic-shell` repository is organized as follows.
 
     |-- open-nic-shell --
         |-- constr --
+            |-- au50 --
+            |-- au200 --
             |-- au250 --
             |-- au280 --
             |-- ... --
