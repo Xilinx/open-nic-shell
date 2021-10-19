@@ -68,6 +68,8 @@ set src_dir ${root_dir}/src
 #   impl         Run implementation after creating design project
 #   post_impl    Perform post implementation actions
 #   user_plugin  Path to the user plugin repo
+#   bitstream_userid       Bitstream.config userid
+#   bitstream_usr_access   Bitstream.config usr_access
 #
 # Design parameters
 #   build_timestamp  Timestamp to identify the build
@@ -77,6 +79,7 @@ set src_dir ${root_dir}/src
 #   num_phys_func    Number of PCI-e physical functions (1 to 4)
 #   num_queue        Number of QDMA queues (1 to 2048)
 #   num_cmac_port    Number of CMAC ports (1 or 2)
+
 array set build_options {
     -board_repo  ""
     -board       au250
@@ -88,6 +91,8 @@ array set build_options {
     -impl        0
     -post_impl   0
     -user_plugin ""
+    -bitstream_userid  "0xDEADC0DE"
+    -bitstream_usr_access "0x66669999"
 }
 set build_options(-user_plugin) ${plugin_dir}/p2p
 
@@ -371,10 +376,21 @@ foreach {key value} [array get design_params] {
 set_property -name generic -value $generic -object [current_fileset]
 set_property top $top [get_property srcset [current_run]]
 
+puts "bitstream_userid is $bitstream_userid"
+puts "bitstream_usr_acceess is $bitstream_usr_access"
+
+# generate the xdc with the run specific parameters dynamically
+set fp [open "${build_dir}/run_params.xdc" w]
+puts $fp "set_property BITSTREAM.CONFIG.USERID \"$bitstream_userid\" \[current_design\]"
+puts $fp "set_property BITSTREAM.CONFIG.USR_ACCESS $bitstream_usr_access \[current_design\]"
+close $fp
+
+
 # Read constraint files
 read_xdc -unmanaged ${constr_dir}/${board}/pins.xdc
 read_xdc -unmanaged ${constr_dir}/${board}/timing.xdc
 read_xdc ${constr_dir}/${board}/general.xdc
+read_xdc ${build_dir}/run_params.xdc
 
 # Implement design
 if {$impl} {
