@@ -56,6 +56,8 @@ module box_250mhz #(
   output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_size,
   output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_src,
   output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_dst,
+  output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_use_rss,
+  output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_c2h_qid,
   input      [NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tready,
 
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_tx_250mhz_tvalid,
@@ -74,6 +76,8 @@ module box_250mhz #(
   input   [16*NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tuser_size,
   input   [16*NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tuser_src,
   input   [16*NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tuser_dst,
+  input   [16*NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tuser_use_rss,
+  input   [16*NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tuser_c2h_qid,
   output     [NUM_CMAC_PORT-1:0] s_axis_adap_rx_250mhz_tready,
 
   input                   [15:0] mod_rstn,

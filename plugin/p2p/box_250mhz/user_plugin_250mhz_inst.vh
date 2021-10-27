@@ -67,6 +67,8 @@ p2p_250mhz #(
   .m_axis_qdma_c2h_tuser_size       (m_axis_qdma_c2h_tuser_size),
   .m_axis_qdma_c2h_tuser_src        (m_axis_qdma_c2h_tuser_src),
   .m_axis_qdma_c2h_tuser_dst        (m_axis_qdma_c2h_tuser_dst),
+  .m_axis_qdma_c2h_tuser_use_rss    (m_axis_qdma_c2h_tuser_use_rss),
+  .m_axis_qdma_c2h_tuser_c2h_qid    (m_axis_qdma_c2h_tuser_c2h_qid),
   .m_axis_qdma_c2h_tready           (m_axis_qdma_c2h_tready),
 
   .m_axis_adap_tx_250mhz_tvalid     (m_axis_adap_tx_250mhz_tvalid),
@@ -85,6 +87,8 @@ p2p_250mhz #(
   .s_axis_adap_rx_250mhz_tuser_size (s_axis_adap_rx_250mhz_tuser_size),
   .s_axis_adap_rx_250mhz_tuser_src  (s_axis_adap_rx_250mhz_tuser_src),
   .s_axis_adap_rx_250mhz_tuser_dst  (s_axis_adap_rx_250mhz_tuser_dst),
+  .s_axis_adap_rx_250mhz_tuser_use_rss  (s_axis_adap_rx_250mhz_tuser_use_rss),
+  .s_axis_adap_rx_250mhz_tuser_c2h_qid  (s_axis_adap_rx_250mhz_tuser_c2h_qid),
   .s_axis_adap_rx_250mhz_tready     (s_axis_adap_rx_250mhz_tready),
 
   .mod_rstn                         (mod_rstn[0]),

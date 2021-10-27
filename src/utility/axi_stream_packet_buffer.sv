@@ -26,7 +26,7 @@ module axi_stream_packet_buffer #(
   parameter int  TDATA_W         = 512,
   parameter int  TID_W           = 1,
   parameter int  TDEST_W         = 1,
-  parameter int  TUSER_W         = 1,
+  parameter int  TUSER_W         = 1+16+16,  
   parameter int  MIN_PKT_LEN     = 64,
   parameter int  MAX_PKT_LEN     = 9600,
   // Specify the buffer capcacity in terms of how many maximum-sized packets

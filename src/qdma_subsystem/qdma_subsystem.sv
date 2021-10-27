@@ -57,6 +57,8 @@ module qdma_subsystem #(
   input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_size,
   input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_src,
   input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_dst,
+  input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_use_rss,
+  input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_c2h_qid,
   output     [NUM_PHYS_FUNC-1:0] s_axis_c2h_tready,
 
 `ifdef __synthesis__
@@ -577,7 +579,9 @@ module qdma_subsystem #(
     wire [512*NUM_PHYS_FUNC-1:0] axis_c2h_tdata;
     wire     [NUM_PHYS_FUNC-1:0] axis_c2h_tlast;
     wire  [16*NUM_PHYS_FUNC-1:0] axis_c2h_tuser_size;
-    wire  [11*NUM_PHYS_FUNC-1:0] axis_c2h_tuser_qid;
+    wire  [16*NUM_PHYS_FUNC-1:0] axis_c2h_tuser_use_rss;
+    wire  [16*NUM_PHYS_FUNC-1:0] axis_c2h_tuser_input_qid;
+    wire  [11*NUM_PHYS_FUNC-1:0] axis_c2h_tuser_rss_qid;
     wire     [NUM_PHYS_FUNC-1:0] axis_c2h_tready;
 
     wire                         c2h_status_valid;
@@ -702,7 +706,9 @@ module qdma_subsystem #(
       .s_axis_c2h_tdata                     (axis_c2h_tdata),
       .s_axis_c2h_tlast                     (axis_c2h_tlast),
       .s_axis_c2h_tuser_size                (axis_c2h_tuser_size),
-      .s_axis_c2h_tuser_qid                 (axis_c2h_tuser_qid),
+      .s_axis_c2h_tuser_use_rss             (axis_c2h_tuser_use_rss),
+      .s_axis_c2h_tuser_input_qid           (axis_c2h_tuser_input_qid),
+      .s_axis_c2h_tuser_rss_qid             (axis_c2h_tuser_rss_qid),
       .s_axis_c2h_tready                    (axis_c2h_tready),
 
       .m_axis_qdma_c2h_tvalid               (axis_qdma_c2h_tvalid),
@@ -787,13 +793,17 @@ module qdma_subsystem #(
         .s_axis_c2h_tuser_size (s_axis_c2h_tuser_size[`getvec(16, i)]),
         .s_axis_c2h_tuser_src  (s_axis_c2h_tuser_src[`getvec(16, i)]),
         .s_axis_c2h_tuser_dst  (s_axis_c2h_tuser_dst[`getvec(16, i)]),
+        .s_axis_c2h_tuser_use_rss  (s_axis_c2h_tuser_use_rss[`getvec(16, i)]),
+        .s_axis_c2h_tuser_input_qid  (s_axis_c2h_tuser_c2h_qid[`getvec(16, i)]),
         .s_axis_c2h_tready     (s_axis_c2h_tready[i]),
 
         .m_axis_c2h_tvalid     (axis_c2h_tvalid[i]),
         .m_axis_c2h_tdata      (axis_c2h_tdata[`getvec(512, i)]),
         .m_axis_c2h_tlast      (axis_c2h_tlast[i]),
         .m_axis_c2h_tuser_size (axis_c2h_tuser_size[`getvec(16, i)]),
-        .m_axis_c2h_tuser_qid  (axis_c2h_tuser_qid[`getvec(11, i)]),
+        .m_axis_c2h_tuser_use_rss      (axis_c2h_tuser_use_rss[`getvec(16, i)]),
+        .m_axis_c2h_tuser_input_qid    (axis_c2h_tuser_input_qid[`getvec(16, i)]),
+        .m_axis_c2h_tuser_rss_qid  (axis_c2h_tuser_rss_qid[`getvec(11, i)]),
         .m_axis_c2h_tready     (axis_c2h_tready[i]),
 
         .axil_aclk             (axil_aclk),

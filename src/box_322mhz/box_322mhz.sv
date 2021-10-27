@@ -50,6 +50,8 @@ module box_322mhz #(
   output  [64*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tkeep,
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tlast,
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_err,
+  output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_use_rss,
+  output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_c2h_qid,
 
   output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tvalid,
   output [512*NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tdata,

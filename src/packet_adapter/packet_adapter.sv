@@ -59,6 +59,8 @@ module packet_adapter #(
   input   [63:0] s_axis_rx_tkeep,
   input          s_axis_rx_tlast,
   input          s_axis_rx_tuser_err,
+  input   [15:0] s_axis_rx_tuser_use_rss,
+  input   [15:0] s_axis_rx_tuser_c2h_qid,
 
   output         m_axis_rx_tvalid,
   output [511:0] m_axis_rx_tdata,
@@ -67,6 +69,8 @@ module packet_adapter #(
   output  [15:0] m_axis_rx_tuser_size,
   output  [15:0] m_axis_rx_tuser_src,
   output  [15:0] m_axis_rx_tuser_dst,
+  output  [15:0] m_axis_rx_tuser_use_rss,
+  output  [15:0] m_axis_rx_tuser_c2h_qid,
   input          m_axis_rx_tready,
 
   input          mod_rstn,
@@ -172,6 +176,8 @@ module packet_adapter #(
     .s_axis_rx_tkeep      (s_axis_rx_tkeep),
     .s_axis_rx_tlast      (s_axis_rx_tlast),
     .s_axis_rx_tuser_err  (s_axis_rx_tuser_err),
+    .s_axis_rx_tuser_use_rss  (s_axis_rx_tuser_use_rss),
+    .s_axis_rx_tuser_c2h_qid  (s_axis_rx_tuser_c2h_qid),
 
     .m_axis_rx_tvalid     (m_axis_rx_tvalid),
     .m_axis_rx_tdata      (m_axis_rx_tdata),
@@ -180,6 +186,8 @@ module packet_adapter #(
     .m_axis_rx_tuser_size (m_axis_rx_tuser_size),
     .m_axis_rx_tuser_src  (m_axis_rx_tuser_src),
     .m_axis_rx_tuser_dst  (m_axis_rx_tuser_dst),
+    .m_axis_rx_tuser_use_rss  (m_axis_rx_tuser_use_rss),
+    .m_axis_rx_tuser_c2h_qid  (m_axis_rx_tuser_c2h_qid),
     .m_axis_rx_tready     (m_axis_rx_tready),
 
     .rx_pkt_recv          (rx_pkt_recv),

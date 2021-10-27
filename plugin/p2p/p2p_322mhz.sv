@@ -49,6 +49,8 @@ module p2p_322mhz #(
   output  [64*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tkeep,
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tlast,
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_err,
+  output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_use_rss,
+  output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_c2h_qid,
 
   output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tvalid,
   output [512*NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tdata,
@@ -62,6 +64,8 @@ module p2p_322mhz #(
   input   [64*NUM_CMAC_PORT-1:0] s_axis_cmac_rx_tkeep,
   input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_tlast,
   input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_tuser_err,
+  input   [16*NUM_CMAC_PORT-1:0] s_axis_cmac_rx_tuser_use_rss,
+  input   [16*NUM_CMAC_PORT-1:0] s_axis_cmac_rx_tuser_c2h_qid,
 
   input                          mod_rstn,
   output                         mod_rst_done,
@@ -85,6 +89,8 @@ module p2p_322mhz #(
   wire  [64*NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tkeep;
   wire     [NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tlast;
   wire     [NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_err;
+  wire  [16*NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_use_rss;
+  wire  [16*NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_c2h_qid;
 
   generic_reset #(
     .NUM_INPUT_CLK  (1 + NUM_CMAC_PORT),
@@ -178,7 +184,7 @@ module p2p_322mhz #(
 
     axi_stream_register_slice #(
       .TDATA_W (512),
-      .TUSER_W (1),
+      .TUSER_W (1+16+16),
       .MODE    ("full")
     ) rx_slice_0_inst (
       .s_axis_tvalid (s_axis_cmac_rx_tvalid[i]),
@@ -196,7 +202,9 @@ module p2p_322mhz #(
       .m_axis_tlast  (axis_adap_rx_322mhz_tlast[i]),
       .m_axis_tid    (),
       .m_axis_tdest  (),
-      .m_axis_tuser  (axis_adap_rx_322mhz_tuser_err[i]),
+      .m_axis_tuser  ({axis_adap_rx_322mhz_tuser_c2h_qid[i],
+		       axis_adap_rx_322mhz_tuser_use_rss[i],
+		       axis_adap_rx_322mhz_tuser_err[i]}),
       .m_axis_tready (1'b1),
 
       .aclk          (cmac_clk[i]),
@@ -205,7 +213,7 @@ module p2p_322mhz #(
 
     axi_stream_register_slice #(
       .TDATA_W (512),
-      .TUSER_W (1),
+      .TUSER_W (1+16+16),
       .MODE    ("full")
     ) rx_slice_1_inst (
       .s_axis_tvalid (axis_adap_rx_322mhz_tvalid[i]),
@@ -223,7 +231,9 @@ module p2p_322mhz #(
       .m_axis_tlast  (m_axis_adap_rx_322mhz_tlast[i]),
       .m_axis_tid    (),
       .m_axis_tdest  (),
-      .m_axis_tuser  (m_axis_adap_rx_322mhz_tuser_err[i]),
+      .m_axis_tuser  ({m_axis_adap_rx_322mhz_tuser_c2h_qid[i],
+		       m_axis_adap_rx_322mhz_tuser_use_rss[i],
+		       m_axis_adap_rx_322mhz_tuser_err[i]}),
       .m_axis_tready (1'b1),
 
       .aclk          (cmac_clk[i]),

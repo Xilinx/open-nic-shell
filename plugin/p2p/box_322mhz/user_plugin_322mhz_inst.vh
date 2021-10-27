@@ -21,6 +21,15 @@ localparam C_NUM_USER_BLOCK = 1;
 // "mod_rst_done" are tied to 0
 assign mod_rst_done[7:C_NUM_USER_BLOCK] = {(8-C_NUM_USER_BLOCK){1'b1}};
 
+
+wire s_axis_adap_rx_tuser_use_rss;
+wire s_axis_adap_rx_tuser_c2h_qid;
+
+assign s_axis_adap_rx_tuser_use_rss = 16'd1; // use the built-in C2H RSS by default
+assign s_axis_adap_rx_tuser_c2h_qid = 16'd0; // init to zero, value is used when 
+                                             // above RSS is disabled
+
+
 p2p_322mhz #(
   .NUM_CMAC_PORT (NUM_CMAC_PORT)
 ) p2p_322mhz_inst (
@@ -53,6 +62,8 @@ p2p_322mhz #(
   .m_axis_adap_rx_322mhz_tkeep     (m_axis_adap_rx_322mhz_tkeep),
   .m_axis_adap_rx_322mhz_tlast     (m_axis_adap_rx_322mhz_tlast),
   .m_axis_adap_rx_322mhz_tuser_err (m_axis_adap_rx_322mhz_tuser_err),
+  .m_axis_adap_rx_322mhz_tuser_use_rss (m_axis_adap_rx_322mhz_tuser_use_rss),
+  .m_axis_adap_rx_322mhz_tuser_c2h_qid (m_axis_adap_rx_322mhz_tuser_c2h_qid),
 
   .m_axis_cmac_tx_tvalid           (m_axis_cmac_tx_tvalid),
   .m_axis_cmac_tx_tdata            (m_axis_cmac_tx_tdata),
@@ -66,6 +77,8 @@ p2p_322mhz #(
   .s_axis_cmac_rx_tkeep            (s_axis_cmac_rx_tkeep),
   .s_axis_cmac_rx_tlast            (s_axis_cmac_rx_tlast),
   .s_axis_cmac_rx_tuser_err        (s_axis_cmac_rx_tuser_err),
+  .s_axis_cmac_rx_tuser_use_rss    (s_axis_cmac_rx_tuser_use_rss),
+  .s_axis_cmac_rx_tuser_c2h_qid    (s_axis_cmac_rx_tuser_c2h_qid),
 
   .mod_rstn                        (mod_rstn[0]),
   .mod_rst_done                    (mod_rst_done[0]),

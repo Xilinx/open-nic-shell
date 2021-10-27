@@ -62,13 +62,17 @@ module qdma_subsystem_function #(
   input   [15:0] s_axis_c2h_tuser_size,
   input   [15:0] s_axis_c2h_tuser_src,
   input   [15:0] s_axis_c2h_tuser_dst,
+  input   [15:0] s_axis_c2h_tuser_use_rss,
+  input   [15:0] s_axis_c2h_tuser_input_qid,
   output         s_axis_c2h_tready,
 
   output         m_axis_c2h_tvalid,
   output [511:0] m_axis_c2h_tdata,
   output         m_axis_c2h_tlast,
   output  [15:0] m_axis_c2h_tuser_size,
-  output  [10:0] m_axis_c2h_tuser_qid,
+  output  [15:0] m_axis_c2h_tuser_use_rss,
+  output  [15:0] m_axis_c2h_tuser_input_qid,
+  output  [10:0] m_axis_c2h_tuser_rss_qid,
   input          m_axis_c2h_tready,
 
   input          axil_aclk,
@@ -119,6 +123,8 @@ module qdma_subsystem_function #(
   wire  [511:0] axis_c2h_buf_tdata;
   wire          axis_c2h_buf_tlast;
   wire   [15:0] axis_c2h_buf_tuser_size;
+  wire   [15:0] axis_c2h_buf_tuser_use_rss;
+  wire   [15:0] axis_c2h_buf_tuser_input_qid;
   wire          axis_c2h_buf_tready;
 
   qdma_subsystem_function_register reg_inst (
@@ -343,7 +349,7 @@ module qdma_subsystem_function #(
     .PACKET_FIFO      ("false"),
     .FIFO_DEPTH       (C_PKT_FIFO_DEPTH),
     .TDATA_WIDTH      (512),
-    .TUSER_WIDTH      (16),
+    .TUSER_WIDTH      (16+16+16),
     .ECC_MODE         ("no_ecc")
   ) buf_fifo_inst (
     .s_axis_tvalid      (axis_c2h_tvalid),
@@ -351,7 +357,9 @@ module qdma_subsystem_function #(
     .s_axis_tkeep       ({64{1'b1}}),
     .s_axis_tstrb       ({64{1'b1}}),
     .s_axis_tlast       (axis_c2h_tlast),
-    .s_axis_tuser       (axis_c2h_tuser_size),
+    .s_axis_tuser       ({axis_c2h_tuser_size,
+			  axis_c2h_tuser_use_rss,
+			  axis_c2h_tuser_input_qid}),
     .s_axis_tid         (0),
     .s_axis_tdest       (0),
     .s_axis_tready      (axis_c2h_tready),
@@ -361,7 +369,9 @@ module qdma_subsystem_function #(
     .m_axis_tkeep       (),
     .m_axis_tstrb       (),
     .m_axis_tlast       (axis_c2h_buf_tlast),
-    .m_axis_tuser       (axis_c2h_buf_tuser_size),
+    .m_axis_tuser       ({axis_c2h_buf_tuser_size,
+			  axis_c2h_buf_tuser_use_rss,
+			  axis_c2h_buf_tuser_input_qid}),
     .m_axis_tid         (),
     .m_axis_tdest       (),
     .m_axis_tready      (axis_c2h_buf_tready),
@@ -387,7 +397,9 @@ module qdma_subsystem_function #(
   assign m_axis_c2h_tdata      = axis_c2h_buf_tdata;
   assign m_axis_c2h_tlast      = axis_c2h_buf_tlast;
   assign m_axis_c2h_tuser_size = axis_c2h_buf_tuser_size;
-  assign m_axis_c2h_tuser_qid  = qid_fifo_dout;
+  assign m_axis_c2h_tuser_use_rss   = axis_c2h_buf_tuser_use_rss;
+  assign m_axis_c2h_tuser_input_qid = axis_c2h_buf_tuser_input_qid;
+  assign m_axis_c2h_tuser_rss_qid   = qid_fifo_dout;
   assign axis_c2h_buf_tready   = m_axis_c2h_tready && ~qid_fifo_empty;
 
 endmodule: qdma_subsystem_function
