@@ -329,8 +329,13 @@ foreach freq [list 250mhz 322mhz] {
     read_verilog -quiet ${box_plugin}/${box}_address_map.v
     lappend include_dirs $box_plugin
 
-    cd $user_plugin
-    source build_${box}.tcl
+    if {![file exists ${user_plugin}/build_${box}.tcl]} {
+        cd ${plugin_dir}/p2p
+        source build_${box}.tcl
+    } else {
+        cd $user_plugin
+        source build_${box}.tcl
+    }
     cd $script_dir
 }
 set_property include_dirs $include_dirs [current_fileset]
