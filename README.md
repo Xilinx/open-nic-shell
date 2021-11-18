@@ -1,5 +1,9 @@
 # OpenNIC Shell
 
+This is one of the two components of the
+[OpenNIC project](https://github.com/Xilinx/open-nic.git).  The other component is
+[OpenNIC driver](https://github.com/Xilinx/open-nic-driver.git).
+
 OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
 latest version is built with Vivado 2020.2.  Currently, the supported boards
 include
