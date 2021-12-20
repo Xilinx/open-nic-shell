@@ -176,7 +176,7 @@ module qdma_subsystem_c2h #(
       m_axis_qdma_c2h_mty <= 0;
     end
     else if (axis_c2h_tvalid && axis_c2h_tready) begin
-      m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (64 - axis_c2h_tuser_size[5:0]) : 0;
+       m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (axis_c2h_tuser_size[5:0] == 0) ? 0 : (64 - axis_c2h_tuser_size[5:0]) : 0;
     end
   end
 
