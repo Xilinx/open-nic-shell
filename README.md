@@ -117,7 +117,7 @@ proper `MODE` choice (i.e., `tcl`, `batch` or `gui`).
 
     vivado -mode MODE -source build.tcl -tclargs [-OPTION VALUE] ...
 
-A list of options are available to configure the the build process and customize
+A list of options are available to configure the build process and customize
 the design parameters.
 
     # Build options
@@ -279,7 +279,7 @@ For each box, the build script performs the following steps.
 3. Add `USER_PLUGIN_DIR/box_XXXmhz` to the `include_dirs` property.
 4. Source `build_box_XXXmhz.tcl`.
 
-To use the default plugin (i.e., `plugin/ptp`) in one of the boxes, remove the
+To use the default plugin (i.e., `plugin/p2p`) in one of the boxes, remove the
 corresponding `box_XXXmhz` directory and `build_box_XXXmhz.tcl`.
 
 ## Shell Interface
