@@ -1,4 +1,4 @@
-# OpenNIC Shell
+# AMD OpenNIC Shell
 
 This is one of the two components of the
 [OpenNIC project](https://github.com/Xilinx/open-nic.git).  The other component is
