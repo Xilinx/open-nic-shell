@@ -5,8 +5,7 @@ This is one of the two components of the
 [OpenNIC driver](https://github.com/Xilinx/open-nic-driver.git).
 
 OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
-latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported boards
-include
+latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported boards include:
 
 - Xilinx Alveo U50, and
 - Xilinx Alveo U200, and
