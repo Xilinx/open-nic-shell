@@ -188,6 +188,7 @@ close $fp
 
 # Update the board store
 if {[string equal $board_repo ""]} {
+    set_param board.repoPaths "${root_dir}/board_files"    
     xhub::refresh_catalog [xhub::get_xstores xilinx_board_store]
 } else {
     set_param board.repoPaths $board_repo

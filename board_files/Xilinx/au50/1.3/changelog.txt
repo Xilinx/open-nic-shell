@@ -1,0 +1,9 @@
+######### AU50 change log ##############
+1.0
+AU50 Initial board support
+1.1
+Update the HBM CATTRIP and GUI display
+1.2
+AU50/AU50LV Changed the CMAC and PCIe Quad location settings
+1.3
+Updated logical port type to TRI_O for HBM_CATTRIP
