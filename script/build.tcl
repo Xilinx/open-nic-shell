@@ -50,12 +50,6 @@ proc _do_post_impl {build_dir top impl_run {zynq_family 0}} {
     }
 }
 
-# Vivado version check
-set VIVADO_VERSION "2020.2"
-if {![string equal [version -short] $VIVADO_VERSION]} {
-    puts "OpenNIC shell requires Vivado version $VIVADO_VERSION"
-    exit
-}
 
 # Directory variables
 set root_dir [file normalize ..]
