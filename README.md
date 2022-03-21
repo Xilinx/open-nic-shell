@@ -15,8 +15,7 @@ latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported 
 | Notes: |
 |:---|
 |* In the Alveo U50 version only, Vivado may issue critical warnings regarding the power margin for the MGTYAVtt with respect to a margin on the 4A rail limit. While the U50's open-nic-shell MGT current (~3.97A) is still slightly below the rail's limit, this will go outside of the 10% margin described in the U50 board files.  The U50 version has worked in a lab setting but with minimal testing.  While this issue is considered to have low risk, please be aware of this condition and proceed if that risk is acceptable.
-Also, starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no
-longer maintained.*
+* Also, starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no longer maintained.
 
 
 The NIC shell consists of skeleton components which implement host and Ethernet
