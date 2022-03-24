@@ -16,5 +16,5 @@
 #
 # *************************************************************************
 set part xcu50-fsvh2104-2-e
-set board_part xilinx.com:au50:part0:1.2
+set board_part xilinx.com:au50:part0:1.3
 set zynq_family 0
