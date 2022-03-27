@@ -16,14 +16,14 @@
               "url": "www.xilinx.com"
             }
           ], 
-          "category": "Accelerator Cards/Alveo", 
+          "category": "Single Part", 
           "logo": "au200_image.jpg",
           "website": "http://www.xilinx.com/u200", 
           "search-keywords": [
             "au200", 
             "xilinx.com", 
             "board", 
-            "Accelerator Cards/Alveo"
+            "Single Part"
           ]
         }
       }
