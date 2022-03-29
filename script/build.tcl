@@ -50,7 +50,6 @@ proc _do_post_impl {build_dir top impl_run {zynq_family 0}} {
     }
 }
 
-
 # Directory variables
 set root_dir [file normalize ..]
 set constr_dir ${root_dir}/constr
@@ -63,11 +62,14 @@ set src_dir ${root_dir}/src
 #   board        Board name
 #   tag          Tag to identify the build
 #   overwrite    Overwrite existing build results
+#   rebuild      Update build directory but respect overwrite
 #   jobs         Number of jobs for synthesis and implementation
 #   synth_ip     Synthesize IPs before creating design project
 #   impl         Run implementation after creating design project
 #   post_impl    Perform post implementation actions
 #   user_plugin  Path to the user plugin repo
+#   bitstream_userid       Bitstream.config userid
+#   bitstream_usr_access   Bitstream.config usr_access
 #
 # Design parameters
 #   build_timestamp  Timestamp to identify the build
@@ -77,16 +79,20 @@ set src_dir ${root_dir}/src
 #   num_phys_func    Number of PCI-e physical functions (1 to 4)
 #   num_queue        Number of QDMA queues (1 to 2048)
 #   num_cmac_port    Number of CMAC ports (1 or 2)
+
 array set build_options {
     -board_repo  ""
     -board       au250
     -tag         ""
     -overwrite   0
+    -rebuild     0
     -jobs        8
     -synth_ip    1
     -impl        0
     -post_impl   0
     -user_plugin ""
+    -bitstream_userid  "0xDEADC0DE"
+    -bitstream_usr_access "0x66669999"
 }
 set build_options(-user_plugin) ${plugin_dir}/p2p
 
@@ -157,19 +163,24 @@ if {![string equal $tag ""]} {
 
 set build_dir [file normalize ${root_dir}/build/${build_name}]
 if {[file exists $build_dir]} {
-    puts "Found existing build directory $build_dir"
-    puts "  1. Update existing build directory (default)"
-    puts "  2. Delete existing build directory and create a new one"
-    puts "  3. Exit"
-    puts -nonewline {Choose an option: }
-    gets stdin ans
-    if {[string equal $ans "2"]} {
-        file delete -force $build_dir
-        puts "Deleted existing build directory $build_dir"
-        file mkdir $build_dir
-    } elseif {[string equal $ans "3"]} {
-        puts "Build directory existed. Try to specify a different design tag"
-        exit
+    if {!$rebuild } {
+        puts "Found existing build directory $build_dir"
+        puts "  1. Update existing build directory (default)"
+        puts "  2. Delete existing build directory and create a new one"
+        puts "  3. Exit"
+        puts -nonewline {Choose an option: }
+        gets stdin ans
+        if {[string equal $ans "2"]} {
+            file delete -force $build_dir
+            puts "Deleted existing build directory $build_dir"
+            file mkdir $build_dir
+        } elseif {[string equal $ans "3"]} {
+            puts "Build directory existed. Try to specify a different design tag"
+            exit
+        }
+    } else {
+	file delete -force $build_dir/open_nic_shell
+	puts "Deleted existing build director $build_dir/open_nic_shell"
     }
 } else {
     file mkdir $build_dir
@@ -365,10 +376,21 @@ foreach {key value} [array get design_params] {
 set_property -name generic -value $generic -object [current_fileset]
 set_property top $top [get_property srcset [current_run]]
 
+puts "bitstream_userid is $bitstream_userid"
+puts "bitstream_usr_acceess is $bitstream_usr_access"
+
+# generate the xdc with the run specific parameters dynamically
+set fp [open "${build_dir}/run_params.xdc" w]
+puts $fp "set_property BITSTREAM.CONFIG.USERID \"$bitstream_userid\" \[current_design\]"
+puts $fp "set_property BITSTREAM.CONFIG.USR_ACCESS $bitstream_usr_access \[current_design\]"
+close $fp
+
+
 # Read constraint files
 read_xdc -unmanaged ${constr_dir}/${board}/pins.xdc
 read_xdc -unmanaged ${constr_dir}/${board}/timing.xdc
 read_xdc ${constr_dir}/${board}/general.xdc
+read_xdc ${build_dir}/run_params.xdc
 
 # Implement design
 if {$impl} {

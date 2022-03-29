@@ -39,5 +39,5 @@ resize_pblock [get_pblocks pblock_qdma_subsystem] -add {SLR0}
 
 create_pblock pblock_cmac_subsystem
 add_cells_to_pblock [get_pblocks pblock_cmac_subsystem] [get_cells -quiet {cmac_port*.cmac_subsystem_inst}]
-add_cells_to_pblock [get_pblocks pblock_cmac_subsystem] [get_cells -quiet {box_322mhz_inst}]
+#add_cells_to_pblock [get_pblocks pblock_cmac_subsystem] [get_cells -quiet {box_322mhz_inst}]
 resize_pblock [get_pblocks pblock_cmac_subsystem] -add {SLR2}

@@ -5,3 +5,9 @@ vivado*.str
 
 # Ignore .Xil directory
 .Xil
+
+# Ignore emacs backup files
+*~
+
+# Ignore build directory
+build
