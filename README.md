@@ -1,8 +1,9 @@
 # AMD OpenNIC Shell
 
 This is one of the two components of the
-[OpenNIC project](https://github.com/Xilinx/open-nic.git).  The other component is
-[OpenNIC driver](https://github.com/Xilinx/open-nic-driver.git).
+[OpenNIC project](https://github.com/Xilinx/open-nic.git).  The other components are: 
+- [OpenNIC driver](https://github.com/Xilinx/open-nic-driver.git) and
+- [OpenNIC DPDK](https://github.com/Xilinx/open-nic-dpdk.git).
 
 OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
 latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported boards include:
