@@ -1,6 +1,6 @@
 # AMD OpenNIC Shell
 
-This is one of the two components of the
+This is one of the three components of the
 [OpenNIC project](https://github.com/Xilinx/open-nic.git).  The other components are: 
 - [OpenNIC driver](https://github.com/Xilinx/open-nic-driver.git) and
 - [OpenNIC DPDK](https://github.com/Xilinx/open-nic-dpdk.git).
