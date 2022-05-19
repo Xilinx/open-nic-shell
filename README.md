@@ -416,12 +416,13 @@ Some users have reported this error when trying to build the shell.
     generation.
 
 Since CMAC is hardened in Ultrascale+, `cmac_usplus` has a free license.  To get
-the CMAC license, go to [www.xilinx.com/getlicense](www.xilinx.com/getlicense).
+the CMAC license, go to [www.xilinx.com/getlicense](https://www.xilinx.com/getlicense).
 After login, click "Search Now" in the "Evaluation and No Charge Cores" box on
 the right side of the page.  You will see a popup with a "Search" box at top
 left.  Enter "100G" in the search box.  You will see "UltraScale+ Integrated
-100G Ethernet No Charge License".  Select this and click "Add".  A screenshot
-could be found ![here](vivado_cmac.png).
+100G Ethernet No Charge License".  Select this and click "Add". Then you'll be
+able to find it in the "Certificate Based Licenses" table. Select it and click
+"Generate Node-Locked License". A screenshot could be found ![here](vivado_cmac.png).
 
 ---
 
