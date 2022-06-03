@@ -31,6 +31,25 @@ if {$num_ports >= 2} {
     set_property PACKAGE_PIN P42 [get_ports qsfp_refclk_p[1]]
 }
 
+
+# Satellite Controller UART
+set_property PACKAGE_PIN E28                            [get_ports satellite_uart_rxd]
+set_property -dict {IOSTANDARD LVCMOS18}                [get_ports satellite_uart_rxd]
+set_property PACKAGE_PIN D29                            [get_ports satellite_uart_txd]
+set_property -dict {IOSTANDARD LVCMOS18 DRIVE 4}        [get_ports satellite_uart_txd]
+
+# Satellite Controller GPIO
+set_property PACKAGE_PIN K28                            [get_ports satellite_gpio[0]]
+set_property -dict {IOSTANDARD LVCMOS18}                [get_ports satellite_gpio[0]]
+set_property PACKAGE_PIN J29                            [get_ports satellite_gpio[1]]
+set_property -dict {IOSTANDARD LVCMOS18}                [get_ports satellite_gpio[1]]
+set_property PACKAGE_PIN K29                            [get_ports satellite_gpio[2]]
+set_property -dict {IOSTANDARD LVCMOS18}                [get_ports satellite_gpio[2]]
+set_property PACKAGE_PIN J31                            [get_ports satellite_gpio[3]]
+set_property -dict {IOSTANDARD LVCMOS18}                [get_ports satellite_gpio[3]]
+
+
+
 # Fix the CATTRIP issue for custom flow
 set_property PACKAGE_PIN D32 [get_ports hbm_cattrip]
 set_property IOSTANDARD LVCMOS18 [get_ports hbm_cattrip]

@@ -33,6 +33,26 @@ module open_nic_shell #(
   output                         hbm_cattrip,
 `endif
 
+
+/*
+  input                   [0:0] qsfp0_int_l,
+  output                  [0:0] qsfp0_lpmode,
+  input                   [0:0] qsfp0_modprs_l,
+  output                  [0:0] qsfp0_modsel_l,
+  output                  [0:0] qsfp0_reset_l,
+
+  input                   [0:0] qsfp1_int_l,
+  output                  [0:0] qsfp1_lpmode,
+  input                   [0:0] qsfp1_modprs_l,
+  output                  [0:0] qsfp1_modsel_l,
+  output                  [0:0] qsfp1_reset_l,
+*/
+  input                   [3:0] satellite_gpio,
+  input                         satellite_uart_rxd,
+  output                        satellite_uart_txd,
+
+
+
   input                   [15:0] pcie_rxp,
   input                   [15:0] pcie_rxn,
   output                  [15:0] pcie_txp,
@@ -47,6 +67,9 @@ module open_nic_shell #(
   output   [4*NUM_CMAC_PORT-1:0] qsfp_txn,
   input      [NUM_CMAC_PORT-1:0] qsfp_refclk_p,
   input      [NUM_CMAC_PORT-1:0] qsfp_refclk_n
+  
+  
+  
 `else // !`ifdef __synthesis__
   input                          s_axil_sim_awvalid,
   input                   [31:0] s_axil_sim_awaddr,
@@ -118,6 +141,7 @@ module open_nic_shell #(
   input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tlast,
   input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tuser_err,
 
+
   input                          powerup_rstn
 `endif
 );
@@ -158,6 +182,7 @@ module open_nic_shell #(
   wire         axil_pcie_wvalid;
   wire  [31:0] axil_pcie_wdata;
   wire         axil_pcie_wready;
+  wire   [3:0] axil_pcie_wstrb;
   wire         axil_pcie_bvalid;
   wire   [1:0] axil_pcie_bresp;
   wire         axil_pcie_bready;
@@ -193,6 +218,7 @@ module open_nic_shell #(
   wire                         axil_qdma_wvalid;
   wire                  [31:0] axil_qdma_wdata;
   wire                         axil_qdma_wready;
+  wire                   [3:0] axil_qdma_wstrb;
   wire                         axil_qdma_bvalid;
   wire                   [1:0] axil_qdma_bresp;
   wire                         axil_qdma_bready;
@@ -271,6 +297,8 @@ module open_nic_shell #(
   wire                  [31:0] axil_box1_rdata;
   wire                   [1:0] axil_box1_rresp;
   wire                         axil_box1_rready;
+
+  wire                         qspi_irq;
 
   // QDMA subsystem interfaces to the box running at 250MHz
   wire     [NUM_PHYS_FUNC-1:0] axis_qdma_h2c_tvalid;
@@ -413,6 +441,7 @@ module open_nic_shell #(
     .s_axil_wvalid       (axil_pcie_wvalid),
     .s_axil_wdata        (axil_pcie_wdata),
     .s_axil_wready       (axil_pcie_wready),
+    .s_axil_wstrb        (axil_pcie_wstrb),
     .s_axil_bvalid       (axil_pcie_bvalid),
     .s_axil_bresp        (axil_pcie_bresp),
     .s_axil_bready       (axil_pcie_bready),
@@ -423,6 +452,24 @@ module open_nic_shell #(
     .s_axil_rdata        (axil_pcie_rdata),
     .s_axil_rresp        (axil_pcie_rresp),
     .s_axil_rready       (axil_pcie_rready),
+    
+    .qsfp0_int_l         (qsfp0_int_l),
+    .qsfp0_lpmode        (qsfp0_lpmode),
+    .qsfp0_modprs_l      (qsfp0_modprs_l),
+    .qsfp0_modsel_l      (qsfp0_modsel_l),
+    .qsfp0_reset_l       (qsfp0_reset_l),
+
+    .qsfp1_int_l         (qsfp1_int_l),
+    .qsfp1_lpmode        (qsfp1_lpmode),
+    .qsfp1_modprs_l      (qsfp1_modprs_l),
+    .qsfp1_modsel_l      (qsfp1_modsel_l),
+    .qsfp1_reset_l       (qsfp1_reset_l),
+
+    .satellite_gpio      (satellite_gpio),
+    .satellite_uart_rxd  (satellite_uart_rxd),
+    .satellite_uart_txd  (satellite_uart_txd),
+  
+    
 `else // !`ifdef __synthesis__
     .s_axil_awvalid      (s_axil_sim_awvalid),
     .s_axil_awaddr       (s_axil_sim_awaddr),
@@ -430,6 +477,7 @@ module open_nic_shell #(
     .s_axil_wvalid       (s_axil_sim_wvalid),
     .s_axil_wdata        (s_axil_sim_wdata),
     .s_axil_wready       (s_axil_sim_wready),
+    .s_axil_wstrb        (s_axil_sim_wstrb),
     .s_axil_bvalid       (s_axil_sim_bvalid),
     .s_axil_bresp        (s_axil_sim_bresp),
     .s_axil_bready       (s_axil_sim_bready),
@@ -527,6 +575,8 @@ module open_nic_shell #(
     .m_axil_box1_rresp   (axil_box1_rresp),
     .m_axil_box1_rready  (axil_box1_rready),
 
+    .qspi_irq            (qspi_irq),
+
     .shell_rstn          (shell_rstn),
     .shell_rst_done      (shell_rst_done),
     .user_rstn           (user_rstn),
@@ -590,6 +640,7 @@ module open_nic_shell #(
     .m_axil_pcie_wvalid                   (axil_pcie_wvalid),
     .m_axil_pcie_wdata                    (axil_pcie_wdata),
     .m_axil_pcie_wready                   (axil_pcie_wready),
+    .m_axil_pcie_wstrb                    (axil_pcie_wstrb),
     .m_axil_pcie_bvalid                   (axil_pcie_bvalid),
     .m_axil_pcie_bresp                    (axil_pcie_bresp),
     .m_axil_pcie_bready                   (axil_pcie_bready),
@@ -600,6 +651,8 @@ module open_nic_shell #(
     .m_axil_pcie_rdata                    (axil_pcie_rdata),
     .m_axil_pcie_rresp                    (axil_pcie_rresp),
     .m_axil_pcie_rready                   (axil_pcie_rready),
+
+    .qspi_irq                             (qspi_irq),
 
     .pcie_refclk_p                        (pcie_refclk_p),
     .pcie_refclk_n                        (pcie_refclk_n),

@@ -26,6 +26,7 @@ module system_config #(
   input                         s_axil_wvalid,
   input                  [31:0] s_axil_wdata,
   output                        s_axil_wready,
+  input                  [3:0]  s_axil_wstrb,
   output                        s_axil_bvalid,
   output                  [1:0] s_axil_bresp,
   input                         s_axil_bready,
@@ -122,6 +123,24 @@ module system_config #(
   input                   [1:0] m_axil_box1_rresp,
   output                        m_axil_box1_rready,
 
+  output                        qspi_irq,
+
+  input                   [0:0] qsfp0_int_l,
+  output                  [0:0] qsfp0_lpmode,
+  input                   [0:0] qsfp0_modprs_l,
+  output                  [0:0] qsfp0_modsel_l,
+  output                  [0:0] qsfp0_reset_l,
+
+  input                   [0:0] qsfp1_int_l,
+  output                  [0:0] qsfp1_lpmode,
+  input                   [0:0] qsfp1_modprs_l,
+  output                  [0:0] qsfp1_modsel_l,
+  output                  [0:0] qsfp1_reset_l,
+
+  input                   [3:0] satellite_gpio,
+  input                         satellite_uart_rxd,
+  output                        satellite_uart_txd,
+
   output                 [31:0] shell_rstn,
   input                  [31:0] shell_rst_done,
   output                 [31:0] user_rstn,
@@ -137,6 +156,8 @@ module system_config #(
       $fatal("[%m] Number of CMACs should be within the range [1, 2]");
     end
   end
+
+  wire                        aclk_50mhz ;
 
   wire        axil_scfg_awvalid;
   wire [31:0] axil_scfg_awaddr;
@@ -172,6 +193,27 @@ module system_config #(
   wire  [1:0] axil_smon_rresp;
   wire        axil_smon_rready;
    
+  
+  wire        axil_qspi_awvalid;
+  wire [31:0] axil_qspi_awaddr;
+  wire        axil_qspi_awready;
+  wire        axil_qspi_wvalid;
+  wire [31:0] axil_qspi_wdata;
+  wire        axil_qspi_wready;
+  wire  [3:0] axil_qspi_wstrb;
+  wire        axil_qspi_bvalid;
+  wire  [1:0] axil_qspi_bresp;
+  wire        axil_qspi_bready;
+  wire        axil_qspi_arvalid;
+  wire [31:0] axil_qspi_araddr;
+  wire        axil_qspi_arready;
+  wire        axil_qspi_rvalid;
+  wire [31:0] axil_qspi_rdata;
+  wire  [1:0] axil_qspi_rresp;
+  wire        axil_qspi_rready;
+    
+  wire        qspi_irq ;  
+   
   system_config_address_map #(
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
   ) scfg_address_map_inst (
@@ -181,6 +223,7 @@ module system_config #(
     .s_axil_wvalid       (s_axil_wvalid),
     .s_axil_wdata        (s_axil_wdata),
     .s_axil_wready       (s_axil_wready),
+    .s_axil_wstrb        (s_axil_wstrb),
     .s_axil_bvalid       (s_axil_bvalid),
     .s_axil_bresp        (s_axil_bresp),
     .s_axil_bready       (s_axil_bready),
@@ -311,6 +354,24 @@ module system_config #(
     .m_axil_box1_rresp   (m_axil_box1_rresp),
     .m_axil_box1_rready  (m_axil_box1_rready),
 
+    .m_axil_qspi_awvalid (axil_qspi_awvalid),
+    .m_axil_qspi_awaddr  (axil_qspi_awaddr),
+    .m_axil_qspi_awready (axil_qspi_awready),
+    .m_axil_qspi_wvalid  (axil_qspi_wvalid),
+    .m_axil_qspi_wdata   (axil_qspi_wdata),
+    .m_axil_qspi_wready  (axil_qspi_wready),
+    .m_axil_qspi_wstrb   (axil_qspi_wstrb),
+    .m_axil_qspi_bvalid  (axil_qspi_bvalid),
+    .m_axil_qspi_bresp   (axil_qspi_bresp),
+    .m_axil_qspi_bready  (axil_qspi_bready),
+    .m_axil_qspi_arvalid (axil_qspi_arvalid),
+    .m_axil_qspi_araddr  (axil_qspi_araddr),
+    .m_axil_qspi_arready (axil_qspi_arready),
+    .m_axil_qspi_rvalid  (axil_qspi_rvalid),
+    .m_axil_qspi_rdata   (axil_qspi_rdata),
+    .m_axil_qspi_rresp   (axil_qspi_rresp),
+    .m_axil_qspi_rready  (axil_qspi_rready),
+
     .aclk                (aclk),
     .aresetn             (aresetn)
   );
@@ -367,5 +428,74 @@ module system_config #(
      .s_axi_rvalid    (axil_smon_rvalid),                    
      .s_axi_rready    (axil_smon_rready)
   );
+
+/*
+clk_wiz_0 
+clk_wiz_0_inst (
+  .clk_in1  (aclk),
+  .clk_out1 (aclk_50mhz)
+);
+
+wire aresetn_50mhz;
+
+// xpm_cdc_async_rst: Asynchronous Reset Synchronizer
+// Xilinx Parameterized Macro, version 2018.1
+xpm_cdc_async_rst #(
+.DEST_SYNC_FF(2), // DECIMAL; range: 2-10
+.INIT_SYNC_FF(0), // DECIMAL; 0=disable simulation init values, 1=enable simulation init values
+.RST_ACTIVE_HIGH(0) // DECIMAL; 0=active low reset, 1=active high reset
+)
+xpm_cdc_async_rst_inst (
+.dest_arst(aresetn_50mhz ), // 1-bit output: src_arst asynchronous reset signal synchronized to destination
+// clock domain. This output is registered. NOTE: Signal asserts asynchronously
+// but deasserts synchronously to dest_clk. Width of the reset signal is at least
+// (DEST_SYNC_FF*dest_clk) period.
+.dest_clk(aclk_50mhz ), // 1-bit input: Destination clock.
+.src_arst(aresetn) // 1-bit input: Source asynchronous reset signal.
+);
+*/
+qspi_design_1 
+qspi_design_1_inst (
+    .AXI_LITE_0_araddr  (axil_qspi_araddr),
+    .AXI_LITE_0_arready (axil_qspi_arready),
+    .AXI_LITE_0_arvalid (axil_qspi_arvalid),
+    .AXI_LITE_0_awaddr  (axil_qspi_awaddr),
+    .AXI_LITE_0_awready (axil_qspi_awready),
+    .AXI_LITE_0_awvalid (axil_qspi_awvalid),
+    .AXI_LITE_0_bready  (axil_qspi_bready),
+    .AXI_LITE_0_bresp   (axil_qspi_bresp),
+    .AXI_LITE_0_bvalid  (axil_qspi_bvalid),
+    .AXI_LITE_0_rdata   (axil_qspi_rdata),
+    .AXI_LITE_0_rready  (axil_qspi_rready),
+    .AXI_LITE_0_rresp   (axil_qspi_rresp),
+    .AXI_LITE_0_rvalid  (axil_qspi_rvalid),
+    .AXI_LITE_0_wdata   (axil_qspi_wdata),
+    .AXI_LITE_0_wready  (axil_qspi_wready),
+    .AXI_LITE_0_wstrb   (axil_qspi_wstrb ),
+    .AXI_LITE_0_wvalid  (axil_qspi_wvalid),
+    
+    .qsfp0_int_l_0    (qsfp0_int_l),
+    .qsfp0_lpmode_0   (qsfp0_lpmode),
+    .qsfp0_modprs_l_0 (qsfp0_modprs_l),
+    .qsfp0_modsel_l_0 (qsfp0_modsel_l),
+    .qsfp0_reset_l_0  (qsfp0_reset_l),
+    .qsfp1_int_l_0    (qsfp1_int_l),
+    .qsfp1_lpmode_0   (qsfp1_lpmode),
+    .qsfp1_modprs_l_0 (qsfp1_modprs_l),
+    .qsfp1_modsel_l_0 (qsfp1_modsel_l),
+    .qsfp1_reset_l_0  (qsfp1_reset_l),
+    .satellite_gpio_0 (satellite_gpio),
+
+    .satellite_uart_0_rxd (satellite_uart_rxd),
+    .satellite_uart_0_txd (satellite_uart_txd),
+
+    .usrcclkts_0      (1'b0),
+    //.ext_spi_clk_0    (aclk_50mhz ),
+    .s_axi_aclk_0     (aclk),
+    //.m_axi_aresetn_0  (aresetn_50mhz ),
+    .s_axi_aresetn_0  (aresetn),
+    .ip2intc_irpt_0   (qspi_irq)    
+);
+    
 
 endmodule: system_config

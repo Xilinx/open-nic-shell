@@ -38,6 +38,8 @@
 // --------------------------------------------------
 //   0x200000  |  0x2FFFFF |  Box1 @ 322MHz
 // --------------------------------------------------
+//     |  0x80FFF |  QSPI 
+// --------------------------------------------------
 
 `include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
@@ -50,6 +52,7 @@ module system_config_address_map #(
   input                         s_axil_wvalid,
   input                  [31:0] s_axil_wdata,
   output                        s_axil_wready,
+  input                   [3:0] s_axil_wstrb,
   output                        s_axil_bvalid,
   output                  [1:0] s_axil_bresp,
   input                         s_axil_bready,
@@ -180,11 +183,29 @@ module system_config_address_map #(
   input                   [1:0] m_axil_smon_rresp,
   output                        m_axil_smon_rready,
 
+  output                        m_axil_qspi_awvalid,
+  output                 [31:0] m_axil_qspi_awaddr,
+  input                         m_axil_qspi_awready,
+  output                        m_axil_qspi_wvalid,
+  output                 [31:0] m_axil_qspi_wdata,
+  input                         m_axil_qspi_wready,
+  output                 [3:0]  m_axil_qspi_wstrb,
+  input                         m_axil_qspi_bvalid,
+  input                   [1:0] m_axil_qspi_bresp,
+  output                        m_axil_qspi_bready,
+  output                        m_axil_qspi_arvalid,
+  output                 [31:0] m_axil_qspi_araddr,
+  input                         m_axil_qspi_arready,
+  input                         m_axil_qspi_rvalid,
+  input                  [31:0] m_axil_qspi_rdata,
+  input                   [1:0] m_axil_qspi_rresp,
+  output                        m_axil_qspi_rready,
+
   input                         aclk,
   input                         aresetn
 );
 
-  localparam C_NUM_SLAVES  = 9;
+  localparam C_NUM_SLAVES  = 10;
 
   localparam C_SCFG_INDEX  = 0;
   localparam C_QDMA_INDEX  = 1;
@@ -195,7 +216,8 @@ module system_config_address_map #(
   localparam C_SMON_INDEX  = 6;
   localparam C_BOX1_INDEX  = 7;
   localparam C_BOX0_INDEX  = 8;
-
+  localparam C_QSPI_INDEX  = 9;
+  
   localparam C_SCFG_BASE_ADDR  = 32'h0;
   localparam C_QDMA_BASE_ADDR  = 32'h01000;
   localparam C_CMAC0_BASE_ADDR = 32'h08000;
@@ -205,6 +227,7 @@ module system_config_address_map #(
   localparam C_SMON_BASE_ADDR  = 32'h10000;  // 14 bits
   localparam C_BOX1_BASE_ADDR  = 32'h200000; // 20 bits
   localparam C_BOX0_BASE_ADDR  = 32'h100000; // 20 bits
+  localparam C_QSPI_BASE_ADDR  = 32'h80000;  // 19 bits
 
   wire                [31:0] axil_scfg_awaddr;
   wire                [31:0] axil_scfg_araddr;
@@ -224,6 +247,8 @@ module system_config_address_map #(
   wire                [31:0] axil_box0_araddr;
   wire                [31:0] axil_smon_awaddr;
   wire                [31:0] axil_smon_araddr;
+  wire                [31:0] axil_qspi_awaddr;
+  wire                [31:0] axil_qspi_araddr;
 
   wire  [1*C_NUM_SLAVES-1:0] axil_awvalid;
   wire [32*C_NUM_SLAVES-1:0] axil_awaddr;
@@ -231,6 +256,7 @@ module system_config_address_map #(
   wire  [1*C_NUM_SLAVES-1:0] axil_wvalid;
   wire [32*C_NUM_SLAVES-1:0] axil_wdata;
   wire  [1*C_NUM_SLAVES-1:0] axil_wready;
+  wire  [4*C_NUM_SLAVES-1:0] axil_wstrb;
   wire  [1*C_NUM_SLAVES-1:0] axil_bvalid;
   wire  [2*C_NUM_SLAVES-1:0] axil_bresp;
   wire  [1*C_NUM_SLAVES-1:0] axil_bready;
@@ -243,10 +269,10 @@ module system_config_address_map #(
   wire  [1*C_NUM_SLAVES-1:0] axil_rready;
 
   // Adjust AXI-Lite address so that each slave can assume a base address of 0x0
-  assign axil_scfg_awaddr                      = axil_awaddr[`getvec(32, C_SCFG_INDEX)] - C_SCFG_BASE_ADDR;
-  assign axil_scfg_araddr                      = axil_araddr[`getvec(32, C_SCFG_INDEX)] - C_SCFG_BASE_ADDR;
-  assign axil_qdma_awaddr                      = axil_awaddr[`getvec(32, C_QDMA_INDEX)] - C_QDMA_BASE_ADDR;
-  assign axil_qdma_araddr                      = axil_araddr[`getvec(32, C_QDMA_INDEX)] - C_QDMA_BASE_ADDR;
+  assign axil_scfg_awaddr                      = axil_awaddr[`getvec(32, C_SCFG_INDEX)]  - C_SCFG_BASE_ADDR;
+  assign axil_scfg_araddr                      = axil_araddr[`getvec(32, C_SCFG_INDEX)]  - C_SCFG_BASE_ADDR;
+  assign axil_qdma_awaddr                      = axil_awaddr[`getvec(32, C_QDMA_INDEX)]  - C_QDMA_BASE_ADDR;
+  assign axil_qdma_araddr                      = axil_araddr[`getvec(32, C_QDMA_INDEX)]  - C_QDMA_BASE_ADDR;
   assign axil_cmac0_awaddr                     = axil_awaddr[`getvec(32, C_CMAC0_INDEX)] - C_CMAC0_BASE_ADDR;
   assign axil_cmac0_araddr                     = axil_araddr[`getvec(32, C_CMAC0_INDEX)] - C_CMAC0_BASE_ADDR;
   assign axil_adap0_awaddr                     = axil_awaddr[`getvec(32, C_ADAP0_INDEX)] - C_ADAP0_BASE_ADDR;
@@ -256,11 +282,13 @@ module system_config_address_map #(
   assign axil_adap1_awaddr                     = axil_awaddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
   assign axil_adap1_araddr                     = axil_araddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
   assign axil_smon_awddr                       = axil_awaddr[`getvec(32, C_SMON_INDEX)]  - C_SMON_BASE_ADDR;
-  assign axil_smon_araddr                      = axil_araddr[`getvec(32, C_SMON_INDEX)] - C_SMON_BASE_ADDR;
-  assign axil_box1_awaddr                      = axil_awaddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
-  assign axil_box1_araddr                      = axil_araddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
-  assign axil_box0_awaddr                      = axil_awaddr[`getvec(32, C_BOX0_INDEX)] - C_BOX0_BASE_ADDR;
-  assign axil_box0_araddr                      = axil_araddr[`getvec(32, C_BOX0_INDEX)] - C_BOX0_BASE_ADDR;
+  assign axil_smon_araddr                      = axil_araddr[`getvec(32, C_SMON_INDEX)]  - C_SMON_BASE_ADDR;
+  assign axil_qspi_awaddr                      = axil_awaddr[`getvec(32, C_QSPI_INDEX)]  - C_QSPI_BASE_ADDR;
+  assign axil_qspi_araddr                      = axil_araddr[`getvec(32, C_QSPI_INDEX)]  - C_QSPI_BASE_ADDR;
+  assign axil_box1_awaddr                      = axil_awaddr[`getvec(32, C_BOX1_INDEX)]  - C_BOX1_BASE_ADDR;
+  assign axil_box1_araddr                      = axil_araddr[`getvec(32, C_BOX1_INDEX)]  - C_BOX1_BASE_ADDR;
+  assign axil_box0_awaddr                      = axil_awaddr[`getvec(32, C_BOX0_INDEX)]  - C_BOX0_BASE_ADDR;
+  assign axil_box0_araddr                      = axil_araddr[`getvec(32, C_BOX0_INDEX)]  - C_BOX0_BASE_ADDR;
 
   assign m_axil_scfg_awvalid                   = axil_awvalid[C_SCFG_INDEX];
   assign m_axil_scfg_awaddr                    = axil_scfg_awaddr;
@@ -504,13 +532,32 @@ module system_config_address_map #(
   assign axil_rresp[`getvec(2, C_SMON_INDEX)]  = m_axil_smon_rresp;
   assign m_axil_smon_rready                    = axil_rready[C_SMON_INDEX];
 
+  assign m_axil_qspi_awvalid                   = axil_awvalid[C_QSPI_INDEX];
+  assign m_axil_qspi_awaddr                    = axil_qspi_awaddr;
+  assign axil_awready[C_QSPI_INDEX]            = m_axil_qspi_awready;
+  assign m_axil_qspi_wvalid                    = axil_wvalid[C_QSPI_INDEX];
+  assign m_axil_qspi_wdata                     = axil_wdata[`getvec(32, C_QSPI_INDEX)];
+  assign axil_wready[C_QSPI_INDEX]             = m_axil_qspi_wready;
+  assign m_axil_qspi_wstrb                     = axil_wstrb[`getvec(4, C_QSPI_INDEX)];
+  assign axil_bvalid[C_QSPI_INDEX]             = m_axil_qspi_bvalid;
+  assign axil_bresp[`getvec(2, C_QSPI_INDEX)]  = m_axil_qspi_bresp;
+  assign m_axil_qspi_bready                    = axil_bready[C_QSPI_INDEX];
+  assign m_axil_qspi_arvalid                   = axil_arvalid[C_QSPI_INDEX];
+  assign m_axil_qspi_araddr                    = axil_qspi_araddr;
+  assign axil_arready[C_QSPI_INDEX]            = m_axil_qspi_arready;
+  assign axil_rvalid[C_QSPI_INDEX]             = m_axil_qspi_rvalid;
+  assign axil_rdata[`getvec(32, C_QSPI_INDEX)] = m_axil_qspi_rdata;
+  assign axil_rresp[`getvec(2, C_QSPI_INDEX)]  = m_axil_qspi_rresp;
+  assign m_axil_qspi_rready                    = axil_rready[C_QSPI_INDEX];
+
+
   system_config_axi_crossbar xbar_inst (
     .s_axi_awaddr  (s_axil_awaddr),
     .s_axi_awprot  (0),
     .s_axi_awvalid (s_axil_awvalid),
     .s_axi_awready (s_axil_awready),
     .s_axi_wdata   (s_axil_wdata),
-    .s_axi_wstrb   (4'hF),
+    .s_axi_wstrb   (s_axil_wstrb),
     .s_axi_wvalid  (s_axil_wvalid),
     .s_axi_wready  (s_axil_wready),
     .s_axi_bresp   (s_axil_bresp),
@@ -530,7 +577,7 @@ module system_config_address_map #(
     .m_axi_awvalid (axil_awvalid),
     .m_axi_awready (axil_awready),
     .m_axi_wdata   (axil_wdata),
-    .m_axi_wstrb   (),
+    .m_axi_wstrb   (axil_wstrb),
     .m_axi_wvalid  (axil_wvalid),
     .m_axi_wready  (axil_wready),
     .m_axi_bresp   (axil_bresp),

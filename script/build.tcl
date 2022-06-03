@@ -220,6 +220,8 @@ if {![file exists ${ip_build_dir}/manage_ip/]} {
     open_project -quiet ${ip_build_dir}/manage_ip/manage_ip.xpr
 }
 
+
+
 # Run synthesis for each IP
 set ip_dict [dict create]
 dict for {module module_dir} $module_dict {
@@ -286,6 +288,11 @@ dict for {module module_dir} $module_dict {
         }
     }
 }
+
+
+# Generate the system_config's QSPI block design, while the project is open
+source ${script_dir}/generate_qspi_blocK_design.tcl
+
 
 # Close the Manage IP project
 close_project

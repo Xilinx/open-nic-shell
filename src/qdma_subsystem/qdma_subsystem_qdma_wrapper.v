@@ -25,12 +25,14 @@ module qdma_subsystem_qdma_wrapper (
   output  [15:0] pcie_txp,
   output  [15:0] pcie_txn,
 
+
   output         m_axil_awvalid,
   output  [31:0] m_axil_awaddr,
   input          m_axil_awready,
   output         m_axil_wvalid,
   output  [31:0] m_axil_wdata,
   input          m_axil_wready,
+  output   [3:0] m_axil_wstrb,
   input          m_axil_bvalid,
   input    [1:0] m_axil_bresp,
   output         m_axil_bready,
@@ -131,10 +133,12 @@ module qdma_subsystem_qdma_wrapper (
   input    [6:0] c2h_byp_in_st_csh_pfch_tag,
   output         c2h_byp_in_st_csh_rdy,
 
+  input          qspi_irq,
+
   input          pcie_refclk,
   input          pcie_refclk_gt,
   input          pcie_rstn,
-
+  
   output         user_lnk_up,
   output         phy_ready,
   input          soft_reset_n,
@@ -150,6 +154,7 @@ module qdma_subsystem_qdma_wrapper (
 
   reg   [1:0] aresetn_sync = 2'b11;
 
+
   wire        qdma_axil_awvalid;
   wire [31:0] qdma_axil_awaddr;
   wire  [2:0] qdma_axil_awprot;
@@ -157,6 +162,7 @@ module qdma_subsystem_qdma_wrapper (
   wire        qdma_axil_wvalid;
   wire [31:0] qdma_axil_wdata;
   wire        qdma_axil_wready;
+  wire  [3:0] qdma_axil_wstrb;
   wire        qdma_axil_bvalid;
   wire  [1:0] qdma_axil_bresp;
   wire        qdma_axil_bready;
@@ -169,6 +175,8 @@ module qdma_subsystem_qdma_wrapper (
   wire  [1:0] qdma_axil_rresp;
   wire        qdma_axil_rready;
 
+  wire        qspi_irq;
+  
   wire        usr_irq_in_vld;
   wire  [4:0] usr_irq_in_vec;
   wire  [7:0] usr_irq_in_fnc;
@@ -260,7 +268,7 @@ module qdma_subsystem_qdma_wrapper (
     .m_axi_aresetn (aresetn)
   );
 
-  assign usr_irq_in_vld    = 1'b0;
+  assign usr_irq_in_vld    = qspi_irq; //1'b0;
   assign usr_irq_in_vec    = 0;
   assign usr_irq_in_fnc    = 0;
 
@@ -293,7 +301,7 @@ module qdma_subsystem_qdma_wrapper (
     .m_axil_awready                       (qdma_axil_awready),
     .m_axil_wvalid                        (qdma_axil_wvalid),
     .m_axil_wdata                         (qdma_axil_wdata),
-    .m_axil_wstrb                         (),
+    .m_axil_wstrb                         (qdma_axil_wstrb),
     .m_axil_wready                        (qdma_axil_wready),
     .m_axil_bvalid                        (qdma_axil_bvalid),
     .m_axil_bresp                         (qdma_axil_bresp),

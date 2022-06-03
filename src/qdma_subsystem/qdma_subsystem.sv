@@ -59,6 +59,8 @@ module qdma_subsystem #(
   input   [16*NUM_PHYS_FUNC-1:0] s_axis_c2h_tuser_dst,
   output     [NUM_PHYS_FUNC-1:0] s_axis_c2h_tready,
 
+  input                          qspi_irq,
+
 `ifdef __synthesis__
   input                   [15:0] pcie_rxp,
   input                   [15:0] pcie_rxn,
@@ -72,6 +74,7 @@ module qdma_subsystem #(
   output                         m_axil_pcie_wvalid,
   output                  [31:0] m_axil_pcie_wdata,
   input                          m_axil_pcie_wready,
+  output                   [3:0] m_axil_pcie_wstrb,
   input                          m_axil_pcie_bvalid,
   input                    [1:0] m_axil_pcie_bresp,
   output                         m_axil_pcie_bready,
@@ -238,6 +241,9 @@ module qdma_subsystem #(
 
   wire         axil_aresetn;
 
+  wire         qspi_irq;
+  
+
   // Reset is clocked by the 125MHz AXI-Lite clock
   generic_reset #(
     .NUM_INPUT_CLK  (1),
@@ -396,6 +402,9 @@ module qdma_subsystem #(
     .c2h_byp_in_st_csh_func          (c2h_byp_in_st_csh_func),
     .c2h_byp_in_st_csh_pfch_tag      (c2h_byp_in_st_csh_pfch_tag),
     .c2h_byp_in_st_csh_rdy           (c2h_byp_in_st_csh_rdy),
+
+    .qspi_irq                        (qspi_irq),
+
 
     .pcie_refclk                     (pcie_refclk),
     .pcie_refclk_gt                  (pcie_refclk_gt),
