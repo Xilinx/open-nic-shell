@@ -344,6 +344,7 @@ module system_config #(
     .aresetn        (aresetn)
   );
 
+
    system_management_wiz
    system_management_wiz_inst (
      .s_axi_aclk      (aclk),                    
@@ -367,5 +368,7 @@ module system_config #(
      .s_axi_rvalid    (axil_smon_rvalid),                    
      .s_axi_rready    (axil_smon_rready)
   );
+
+
 
 endmodule: system_config

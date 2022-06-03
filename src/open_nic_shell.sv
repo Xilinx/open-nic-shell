@@ -31,6 +31,8 @@ module open_nic_shell #(
   output                         hbm_cattrip, // Fix the CATTRIP issue for AU280 custom flow
 `elsif __au50__
   output                         hbm_cattrip,
+`elsif __au55c__
+  output                         hbm_cattrip,
 `endif
 
   input                   [15:0] pcie_rxp,
@@ -169,7 +171,13 @@ module open_nic_shell #(
   wire   [1:0] axil_pcie_rresp;
   wire         axil_pcie_rready;
 
+
+`ifdef __au55c__
+  assign pcie_rstn_int = pcie_rstn;
+`else
   IBUF pcie_rstn_ibuf_inst (.I(pcie_rstn), .O(pcie_rstn_int));
+`endif
+
 
 `ifdef __au280__
   // Fix the CATTRIP issue for AU280 custom flow
@@ -178,6 +186,9 @@ module open_nic_shell #(
   // after programming
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au50__
+  // Same for AU50
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au55c__
   // Same for AU50
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif

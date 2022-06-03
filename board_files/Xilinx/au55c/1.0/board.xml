@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<board schema_version="2.2" vendor="xilinx.com" name="au55c" display_name="Alveo U55C Data Center Accelerator Card" url="http://www.xilinx.com/U55C" supports_ced="false">
+  <images>
+    <image name="au55c_image.png" display_name="Alveo U55C Data Center Accelerator Card" sub_type="board" resolution="high">
+      <description>Alveo U55C Data Center Accelerator Card</description>
+    </image>
+  </images>
+
+  <compatible_board_revisions>
+    <revision id="0">1.0</revision>
+  </compatible_board_revisions>
+
+  <file_version>1.0</file_version>
+
+  <description>Alveo U55C Data Center Accelerator Card </description>
+
+  <parameters>
+    <parameter name="heat_sink_type" value="medium" value_type="string"/>
+    <parameter name="heat_sink_temperature" value_type="range" value_min="20.0" value_max="30.0"/>
+  </parameters>
+
+  <jumpers>
+  </jumpers>
+
+  <power_rails>
+    <power_rail name="0V85_VCCINT" is_direct="TRUE">
+      <supply name="VCCINT"/>
+    </power_rail>
+    <power_rail name="0V85_VCCINT_IO" is_direct="TRUE">
+      <supply name="VCCINT_IO"/>
+      <supply name="VCCBRAM"/>
+    </power_rail>
+    <power_rail name="0V9_AVCC" is_direct="TRUE">
+      <supply name="MGTYAVCC"/>
+    </power_rail>
+    <power_rail name="1V2_AVTT" is_direct="TRUE">
+      <supply name="MGTYAVTT"/>
+    </power_rail>
+    <power_rail name="1V2_HBM" is_direct="TRUE">
+      <supply name="VCC_HBM"/>
+    </power_rail>
+    <power_rail name="2V5_VPP" is_direct="TRUE">
+      <supply name="VCCAUX_HBM"/>
+    </power_rail>
+    <power_rail name="1V8" is_direct="TRUE">
+      <supply name="VCCAUX"/>
+      <supply name="VCCAUX_IO"/>
+      <supply name="MGTYVCCAUX"/>
+      <supply name="VCCO18"/>
+      <supply name="VCCADC"/>
+    </power_rail>
+  </power_rails>
+
+  <data_properties>
+    <data_property_group name="OPERATING_CONDITIONS">
+      <data_property_group name="VOLTAGE">
+        <data_property name="0V85_VCCINT" value="0.85"/>
+        <data_property name="0V85_VCCINT_IO" value="0.85"/>
+        <data_property name="0V9_AVCC" value="0.9"/>
+        <data_property name="1V2_AVTT" value="1.2"/>
+        <data_property name="1V8" value="1.8"/>
+        <data_property name="1V2_HBM" value="1.2"/>
+        <data_property name="2V5_VPP" value="2.5"/>
+      </data_property_group>
+      <data_property_group name="SUPPLY_CURRENT_BUDGET">
+        <data_property name="0V85_VCCINT" value="100"/>
+        <data_property name="0V85_VCCINT_IO" value="30"/>
+        <data_property name="0V9_AVCC " value="4"/>
+        <data_property name="1V2_AVTT " value="12"/>
+        <data_property name="1V2_HBM " value="80"/>
+        <data_property name="2V5_VPP" value="0.3"/>				
+        <data_property name="1V8" value="4"/>
+      </data_property_group> 
+      <data_property name="THETAJA" value="0.75"/>
+      <data_property name="AMBIENT_TEMP" value="55"/>
+      <data_property name="DESIGN_POWER_BUDGET" value="123"/>
+    </data_property_group>
+  </data_properties>
+  <components>
+
+
+    <component name="part0" display_name="XCU55C FPGA" type="fpga" part_name="xcu55c-fsvh2892-2L-e" pin_map_file="part0_pins.xml" vendor="xilinx" spec_url="http://www.xilinx.com/u55c">
+      <description>XCU55C FPGA</description>
+
+
+    <interfaces>
+
+		 <interface mode="slave" name="pcie_perstn" type="xilinx.com:signal:reset_rtl:1.0" of_component="pci_express">
+          <port_maps>
+            <port_map logical_port="RST" physical_port="pcie_perstn_rst" dir="in">
+            </port_map>
+          </port_maps>
+          <parameters>
+            <parameter name="rst_polarity" value="0" />
+            <parameter name="type" value="PCIE_PERST" />
+          </parameters>
+        </interface>
+
+		<interface mode="master" name="rs232_fpga_msp" type="xilinx.com:interface:uart_rtl:1.0" of_component="rs232_fpga_msp">
+          <port_maps>
+            <port_map logical_port="TxD" physical_port="rs232_uart_msp_txd" dir="out">
+            </port_map>
+            <port_map logical_port="RxD" physical_port="rs232_uart_msp_rxd" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+        
+		<interface mode="master" name="fpga_uart0" type="xilinx.com:interface:uart_rtl:1.0" of_component="fpga_uart0">
+          <port_maps>
+            <port_map logical_port="TxD" physical_port="rs232_uart_msp_txd" dir="out">
+            </port_map>
+            <port_map logical_port="RxD" physical_port="rs232_uart_msp_rxd" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+        
+
+	    <interface mode="slave" name="qsfp0_refclk0" type="xilinx.com:interface:diff_clock_rtl:1.0" of_component="qsfp0_refclk0">
+          <parameters>
+            <parameter name="frequency" value="161132812"/>
+          </parameters>
+          <port_maps>
+            <port_map logical_port="CLK_P" physical_port="qsfp0_refclk0_P" dir="in">
+            </port_map>
+            <port_map logical_port="CLK_N" physical_port="qsfp0_refclk0_N" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+
+	    <interface mode="slave" name="qsfp1_refclk0" type="xilinx.com:interface:diff_clock_rtl:1.0" of_component="qsfp1_refclk0">
+          <parameters>
+            <parameter name="frequency" value="161132812"/>
+          </parameters>
+          <port_maps>
+            <port_map logical_port="CLK_P" physical_port="qsfp1_refclk0_P" dir="in">
+            </port_map>
+            <port_map logical_port="CLK_N" physical_port="qsfp1_refclk0_N" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+
+		<interface mode="slave" name="slr0_freerun_clk" type="xilinx.com:interface:diff_clock_rtl:1.0" of_component="slr0_freerun_clk">
+		 <parameters>
+            <parameter name="frequency" value="100000000"/>
+          </parameters>
+          <port_maps>
+            <port_map logical_port="CLK_P" physical_port="slr0_freerun_clk_p" dir="in">
+            </port_map>
+            <port_map logical_port="CLK_N" physical_port="slr0_freerun_clk_n" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+
+		<interface mode="slave" name="slr1_freerun_clk" type="xilinx.com:interface:diff_clock_rtl:1.0" of_component="slr1_freerun_clk">
+		 <parameters>
+            <parameter name="frequency" value="100000000"/>
+          </parameters>
+          <port_maps>
+            <port_map logical_port="CLK_P" physical_port="slr1_freerun_clk_p" dir="in">
+            </port_map>
+            <port_map logical_port="CLK_N" physical_port="slr1_freerun_clk_n" dir="in">
+            </port_map>
+          </port_maps>
+        </interface>
+
+	    <interface mode="slave" name="pcie_refclk" type="xilinx.com:interface:diff_clock_rtl:1.0" of_component="pcie_refclk">
+	    <parameters>
+	      <parameter name="frequency" value="100000000"/>
+	    </parameters>
+	    <port_maps>
+	      <port_map logical_port="CLK_P" physical_port="pcie_mgt_clk_p" dir="in">
+	      </port_map>
+	      <port_map logical_port="CLK_N" physical_port="pcie_mgt_clk_n" dir="in">
+	      </port_map>
+	    </port_maps>
+	    </interface>
+
+		<interface mode="master" name="pci_express_x4" type="xilinx.com:interface:pcie_7x_mgt_rtl:1.0" of_component="pci_express">
+          <port_maps>
+            <port_map logical_port="txn" physical_port="pcie_tx0_nx4" dir="out" left="3" right="0">
+            </port_map>
+            <port_map logical_port="rxn" physical_port="pcie_rx0_nx4" dir="in" left="3" right="0">
+            </port_map>
+            <port_map logical_port="txp" physical_port="pcie_tx0_px4" dir="out" left="3" right="0">
+            </port_map>
+            <port_map logical_port="rxp" physical_port="pcie_rx0_px4" dir="in" left="3" right="0">
+            </port_map>
+          </port_maps>
+          <parameters>
+            <parameter name="block_location" value="PCIE4C_X1Y1" />
+          </parameters>
+        </interface>
+
+		<interface mode="master" name="pci_express_x8" type="xilinx.com:interface:pcie_7x_mgt_rtl:1.0" of_component="pci_express">
+          <port_maps>
+            <port_map logical_port="txn" physical_port="pcie_tx0_nx8" dir="out" left="7" right="0">
+            </port_map>
+            <port_map logical_port="rxn" physical_port="pcie_rx0_nx8" dir="in" left="7" right="0">
+            </port_map>
+            <port_map logical_port="txp" physical_port="pcie_tx0_px8" dir="out" left="7" right="0">
+            </port_map>
+            <port_map logical_port="rxp" physical_port="pcie_rx0_px8" dir="in" left="7" right="0">
+            </port_map>
+          </port_maps>
+          <parameters>
+            <parameter name="block_location" value="PCIE4C_X1Y1" />
+          </parameters>
+        </interface>
+
+
+		<interface mode="master" name="pci_express_x16" type="xilinx.com:interface:pcie_7x_mgt_rtl:1.0" of_component="pci_express">
+          <port_maps>
+            <port_map logical_port="txn" physical_port="pcie_tx0_nx16" dir="out" left="15" right="0">
+            </port_map>
+
+            <port_map logical_port="rxn" physical_port="pcie_rx0_nx16" dir="in" left="15" right="0">
+            </port_map>
+
+            <port_map logical_port="txp" physical_port="pcie_tx0_px16" dir="out" left="15" right="0">
+            </port_map>
+
+            <port_map logical_port="rxp" physical_port="pcie_rx0_px16" dir="in" left="15" right="0">
+            </port_map>
+          </port_maps>
+          <parameters>
+            <parameter name="block_location" value="PCIE4C_X1Y1" />
+          </parameters>
+        </interface>
+
+          
+
+    		<interface mode="master" name="qsfp0_4x" type="xilinx.com:interface:gt_rtl:1.0" of_component="qsfp0">
+    		<description>4-lane GT interface over QSFP</description>
+    		<port_maps>
+                <port_map logical_port="GTX_N" physical_port="qsfp0_txn4" dir="out" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GTX_P" physical_port="qsfp0_txp4" dir="out" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GRX_N" physical_port="qsfp0_rxn4" dir="in" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GRX_P" physical_port="qsfp0_rxp4" dir="in" left="3" right="0">
+                </port_map>
+              </port_maps>
+            </interface>
+
+    		<interface mode="master" name="qsfp1_4x" type="xilinx.com:interface:gt_rtl:1.0" of_component="qsfp1">
+    		<description>4-lane GT interface over QSFP</description>
+    		<port_maps>
+                <port_map logical_port="GTX_N" physical_port="qsfp1_txn4" dir="out" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GTX_P" physical_port="qsfp1_txp4" dir="out" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GRX_N" physical_port="qsfp1_rxn4" dir="in" left="3" right="0">
+                </port_map>
+                <port_map logical_port="GRX_P" physical_port="qsfp1_rxp4" dir="in" left="3" right="0">
+                </port_map>
+              </port_maps>
+            </interface>
+
+    </interfaces>
+
+    </component>
+
+
+	<component name="rs232_fpga_msp" display_name="MSP_UART" type="chip" sub_type="uart" major_group="Miscellaneous">
+      <description>SC-to-UART Bridge, which allows serial communication to SC </description>
+      <pins>
+        <pin index="0" name="rs232_fpga_uart_msp_TX" iostandard="LVCMOS18"/>
+        <pin index="1" name="rs232_fpga_uart_msp_RX" iostandard="LVCMOS18"/>
+      </pins>
+    </component>
+
+	<component name="fpga_uart0" display_name="FPGA_UART0" type="chip" sub_type="uart" major_group="Miscellaneous">
+      <description>FPGA UART0 </description>
+      <pins>
+        <pin index="0" name="fpga_uart0_TX" iostandard="LVCMOS18"/>
+        <pin index="1" name="fpga_uart0_RX" iostandard="LVCMOS18"/>
+      </pins>
+    </component>    
+    
+	<component name="qsfp0_refclk0" display_name="QSFP reference differential clock input 0" type="chip" sub_type="system_clock" major_group="High Speed Tranceivers" part_name="SI5394" vendor="Silicon Labs" spec_url="www.silabs.com">
+      <description>1.2V LVDS differential 161 MHz oscillator used as a GT reference clock on the board</description>
+      <parameters>
+        <parameter name="frequency" value="161132812"/>
+      </parameters>
+    </component>
+
+	<component name="qsfp1_refclk0" display_name="QSFP reference differential clock input 1" type="chip" sub_type="system_clock" major_group="High Speed Tranceivers" part_name="SI5394" vendor="Silicon Labs" spec_url="www.silabs.com">
+      <description>1.2V LVDS differential 161 MHz oscillator used as a GT reference clock on the board</description>
+      <parameters>
+        <parameter name="frequency" value="161132812"/>
+      </parameters>
+    </component>
+
+	<component name="slr0_freerun_clk" display_name="100MHz differential clock input" type="chip" sub_type="system_clock" major_group="Clock Sources" part_name="SI53306-B-GM" vendor="Silicon Labs" spec_url="www.silabs.com">
+      <description>1.2V LVDS differential 100 MHz oscillator used as Freerunning differential clock on the board</description>
+      <parameters>
+        <parameter name="frequency" value="100000000"/>
+      </parameters>
+    </component>
+
+    <component name="slr1_freerun_clk" display_name="100MHz differential clock input" type="chip" sub_type="system_clock" major_group="Clock Sources" part_name="SI53306-B-GM" vendor="Silicon Labs" spec_url="www.silabs.com">
+      <description>1.2V LVDS differential 100 MHz oscillator used as Freerunning differential clock on the board</description>
+      <parameters>
+        <parameter name="frequency" value="100000000"/>
+      </parameters>
+    </component>
+
+	<component name="pcie_refclk" display_name="PCIe MGT reference Clock" type="chip" sub_type="mgt_clock" major_group="High Speed Tranceivers" part_name="pcie_8lane_edge" vendor="Clock" spec_url="">
+      <description>Clock input from PCI Express edge connector</description>
+      <parameters>
+        <parameter name="frequency" value="100000000"/>
+      </parameters>
+    </component>
+
+	<component name="pci_express" display_name="PCI Express" type="chip" sub_type="chip" major_group="High Speed Tranceivers">
+      <description>PCI Express</description>
+
+      <component_modes>
+
+		<component_mode name="pci_express_x4" display_name="pci_express x4 ">
+          <interfaces>
+            <interface name="pci_express_x4"/>
+            <interface name="pcie_perstn" optional="true"/>
+          </interfaces>
+        </component_mode>
+
+		<component_mode name="pci_express_x8" display_name="pci_express x8 ">
+          <interfaces>
+            <interface name="pci_express_x8"/>
+            <interface name="pcie_perstn" optional="true"/>
+          </interfaces>
+        </component_mode>
+
+
+		<component_mode name="pci_express_x16" display_name="pci_express x16 ">
+          <interfaces>
+            <interface name="pci_express_x16"/>
+            <interface name="pcie_perstn" optional="true"/>
+          </interfaces>
+        </component_mode>
+
+      </component_modes>
+
+    </component>
+
+    <component name="qsfp0" display_name="QSFP Connector" type="chip" sub_type="sfp" major_group="High Speed Tranceivers" part_name="M88E1111_BAB1C000" vendor="Marvell" spec_url="www.marvell.com">
+          <description>QSFP Connector 0</description>
+
+    	  <component_modes>
+
+    		<component_mode name="qsfp0_4x_161" display_name="qsfp0_4x_161">
+              <interfaces>
+    				<interface name="qsfp0_4x"/>
+    				<interface name="qsfp0_refclk0" optional="true"/>
+              </interfaces>
+            </component_mode>
+            
+        </component_modes>
+        </component>            
+            
+    <component name="qsfp1" display_name="QSFP Connector" type="chip" sub_type="sfp" major_group="High Speed Tranceivers" part_name="M88E1111_BAB1C000" vendor="Marvell" spec_url="www.marvell.com">
+          <description>QSFP Connector 1</description>
+
+    	  <component_modes>            
+
+    		<component_mode name="qsfp1_4x_161" display_name="qsfp1_4x_161">
+              <interfaces>
+    				<interface name="qsfp1_4x"/>
+    				<interface name="qsfp1_refclk0" optional="true"/>
+              </interfaces>
+            </component_mode>
+
+        </component_modes>
+        </component>
+
+ </components>
+
+
+  <jtag_chains>
+    <jtag_chain name="chain1">
+      <position name="0" component="part0"/>
+    </jtag_chain>
+  </jtag_chains>
+
+  <connections>
+
+  <connection name="part0_pcie_perstn" component1="part0" component2="pcie_perstn">
+      <connection_map name="part0_pcie_perstn_1" c1_st_index="0" c1_end_index="0" c2_st_index="0" c2_end_index="0"/>
+    </connection>
+
+  <connection name="part0_rs232_uart_msp" component1="part0" component2="rs232_fpga_msp">
+      <connection_map name="part0_rs232_uart_msp" typical_delay="5" c1_st_index="20" c1_end_index="21" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+    
+  <connection name="part0_fpga_uart0" component1="part0" component2="fpga_uart0">
+      <connection_map name="part0_fpga_uart0" typical_delay="5" c1_st_index="22" c1_end_index="23" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+    
+  <connection name="part0_slr0_freerun_clk_100MHZ" component1="part0" component2="slr0_freerun_clk">
+      <connection_map name="part0_slr0_freerun_clk_100MHZ" typical_delay="5" c1_st_index="102" c1_end_index="103" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+
+   <connection name="part0_slr1_freerun_clk_100MHZ" component1="part0" component2="slr1_freerun_clk">
+      <connection_map name="part0_slr1_freerun_clk_100MHZ" typical_delay="5" c1_st_index="104" c1_end_index="105" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+
+  <connection name="part0_pcie_refclk" component1="part0" component2="pcie_refclk">
+      <connection_map name="part0_pcie_refclk" typical_delay="5" c1_st_index="700" c1_end_index="701" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+
+  <connection name="part0_pci_express" component1="part0" component2="pci_express">
+      <connection_map name="part0_pcie_express_1" c1_st_index="702" c1_end_index="765" c2_st_index="0" c2_end_index="63"/>
+    </connection>
+
+   <connection name="part0_qsfp0_refclk0" component1="part0" component2="qsfp0_refclk0">
+      <connection_map name="part0_qsfp0_refclk0" typical_delay="5" c1_st_index="800" c1_end_index="801" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+
+   <connection name="part0_qsfp1_refclk0" component1="part0" component2="qsfp1_refclk0">
+      <connection_map name="part0_qsfp1_refclk0" typical_delay="5" c1_st_index="802" c1_end_index="803" c2_st_index="0" c2_end_index="1"/>
+    </connection>
+
+  <connection name="part0_qsfp0_gt" component1="part0" component2="qsfp0">
+      <connection_map name="part0_qsfp0_gt" typical_delay="5" c1_st_index="804" c1_end_index="819" c2_st_index="0" c2_end_index="15"/>
+    </connection>
+    
+  <connection name="part0_qsfp1_gt" component1="part0" component2="qsfp1">
+      <connection_map name="part0_qsfp1_gt" typical_delay="5" c1_st_index="820" c1_end_index="835" c2_st_index="0" c2_end_index="15"/>
+    </connection>    
+
+  </connections>
+
+</board>

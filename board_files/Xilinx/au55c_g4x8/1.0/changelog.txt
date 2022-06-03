@@ -1,0 +1,3 @@
+######### AU55C change log ##############
+1.0
+AU55C Initial board support
