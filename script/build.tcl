@@ -291,7 +291,7 @@ dict for {module module_dir} $module_dict {
 
 
 # Generate the system_config's QSPI block design, while the project is open
-source ${script_dir}/generate_qspi_blocK_design.tcl
+source ${script_dir}/generate_qspi_block_design.tcl
 
 
 # Close the Manage IP project
