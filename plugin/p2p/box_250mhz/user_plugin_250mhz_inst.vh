@@ -91,5 +91,11 @@ p2p_250mhz #(
   .mod_rst_done                     (mod_rst_done[0]),
 
   .axil_aclk                        (axil_aclk),
-  .axis_aclk                        (axis_aclk)
+  .axis_aclk                        (axis_aclk),
+
+  `ifdef DB_BCAM_HBM  // HBM based database.
+  .ref_clk_100mhz (ref_clk_100mhz)
+  `else  // non-HBM based database.
+  .ref_clk_100mhz ()
+  `endif
 );

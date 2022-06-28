@@ -11,7 +11,8 @@ latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported 
 - Xilinx Alveo U50, and
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
-- Xilinx Alveo U280
+- Xilinx Alveo U280, and
+- Xilinx Alveo U55
 
 | Notes: |
 |:---|
@@ -76,6 +77,7 @@ The `open-nic-shell` repository is organized as follows.
             |-- au200 --
             |-- au250 --
             |-- au280 --
+	    |-- au55
             |-- ... --
         |-- plugin --
             |-- p2p --
@@ -220,7 +222,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__` or `__au50__`.
+- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55__`.
 
 ### Build without Github Access from Vivado
 
