@@ -77,7 +77,7 @@ The `open-nic-shell` repository is organized as follows.
             |-- au200 --
             |-- au250 --
             |-- au280 --
-	    |-- au55
+	    |-- au55n --
             |-- ... --
         |-- plugin --
             |-- p2p --
@@ -222,7 +222,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55__`.
+- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55n__`.
 
 ### Build without Github Access from Vivado
 

@@ -42,6 +42,6 @@ set_false_path -through [get_ports pcie_rstn]
 # resize_pblock [get_pblocks pblock_2] -add {CLOCKREGION_X4Y0:CLOCKREGION_X7Y3}
 
 # Create pblocks for BCAMs
-create_pblock pblk_bcams
-add_cells_to_pblock [get_pblocks pblk_bcams] [get_cells -hierarchical -quiet [list gen_addr_stores[*].bcam_addr_store_inst bcam_kv_store_inst]]
-resize_pblock [get_pblocks pblk_bcams] -add {CLOCKREGION_X5Y0:CLOCKREGION_X7Y3}
+# create_pblock pblk_bcams
+# add_cells_to_pblock [get_pblocks pblk_bcams] [get_cells -hierarchical -quiet [list gen_addr_stores[*].bcam_addr_store_inst bcam_kv_store_inst]]
+# resize_pblock [get_pblocks pblk_bcams] -add {CLOCKREGION_X5Y0:CLOCKREGION_X7Y3}

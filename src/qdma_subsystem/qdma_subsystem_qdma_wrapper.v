@@ -141,6 +141,7 @@ module qdma_subsystem_qdma_wrapper (
 
   output         axis_aclk,
   output         axil_aclk,
+  output         ref_clk_100mhz,
   output         aresetn
 );
 
@@ -202,7 +203,8 @@ module qdma_subsystem_qdma_wrapper (
   qdma_subsystem_clk_div clk_div_inst (
     .clk_in1  (axis_aclk),
     .clk_out1 (axil_aclk),
-    .locked   ()
+    // .locked   ()
+    .clk_out2 (ref_clk_100mhz)
   );
 
   // Generate reset w.r.t. the 125MHz clock
