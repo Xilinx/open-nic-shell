@@ -93,7 +93,7 @@ p2p_250mhz #(
   .axil_aclk                        (axil_aclk),
   .axis_aclk                        (axis_aclk),
 
-  `ifdef DB_BCAM_HBM  // HBM based database.
+  `ifdef __au55n__  // HBM based database.
   .ref_clk_100mhz (ref_clk_100mhz)
   `else  // non-HBM based database.
   .ref_clk_100mhz ()

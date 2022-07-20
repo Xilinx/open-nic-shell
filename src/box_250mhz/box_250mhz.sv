@@ -83,8 +83,13 @@ module box_250mhz #(
   output                         box_rst_done,
 
   input                          axil_aclk,
+
+  `ifdef __au55n__
   input                          axis_aclk,
   input                          ref_clk_100mhz
+  `else
+  input                          axis_aclk
+  `endif
 );
 
   wire internal_box_rstn;

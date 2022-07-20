@@ -360,7 +360,9 @@ module open_nic_shell #(
 
   wire                         axil_aclk;
   wire                         axis_aclk;
+  `ifdef __au55n__
   wire                         ref_clk_100mhz;
+  `endif
   wire     [NUM_CMAC_PORT-1:0] cmac_clk;
 
   // Unused reset pairs must have their "reset_done" tied to 1
@@ -654,8 +656,13 @@ module open_nic_shell #(
     .mod_rst_done                         (qdma_rst_done),
 
     .axil_aclk                            (axil_aclk),
+    `ifdef __au55n__
     .axis_aclk                            (axis_aclk),
     .ref_clk_100mhz                       (ref_clk_100mhz)
+    `else
+    .axis_aclk                            (axis_aclk)
+    `endif
+
 
   );
 
@@ -856,8 +863,12 @@ module open_nic_shell #(
     .box_rst_done                     (box_250mhz_rst_done),
 
     .axil_aclk                        (axil_aclk),
+    `ifdef __au55n__
     .axis_aclk                        (axis_aclk),
-    .ref_clk_100mhz                   (ref_clk_100mhz) 
+    .ref_clk_100mhz                   (ref_clk_100mhz)
+    `else
+    .axis_aclk                        (axis_aclk)
+    `endif
   );
 
   box_322mhz #(

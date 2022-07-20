@@ -140,12 +140,20 @@ module qdma_subsystem #(
 
 `ifdef __synthesis__
   output                         axil_aclk,
+  `ifdef __au55n__
   output                         axis_aclk,
   output                         ref_clk_100mhz
+  `else
+  output                         axis_aclk
+  `endif
 `else
   output reg                     axil_aclk,
+  `ifdef __au55n__
   output reg                     axis_aclk,
   output reg                     ref_clk_100mhz
+  `else
+  output reg                     axis_aclk
+  `endif
 `endif
 );
 
@@ -409,19 +417,25 @@ module qdma_subsystem #(
 
     .axil_aclk                       (axil_aclk),
     .axis_aclk                       (axis_aclk),
+    `ifdef __au55n__
     .ref_clk_100mhz                  (ref_clk_100mhz),
+    `endif
     .aresetn                         (powerup_rstn)
   );
 `else // !`ifdef __synthesis__
   initial begin
     axil_aclk = 1'b1;
     axis_aclk = 1'b1;
+    `ifdef __au55n__
     ref_clk_100mhz = 1'b1;
+    `endif
   end
 
   always #4000ps axil_aclk = ~axil_aclk;
   always #2000ps axis_aclk = ~axis_aclk;
+  `ifdef __au55n__
   always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
+  `endif
 
   assign axis_qdma_h2c_tvalid                 = s_axis_qdma_h2c_tvalid;
   assign axis_qdma_h2c_tdata                  = s_axis_qdma_h2c_tdata;
