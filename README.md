@@ -9,10 +9,10 @@ OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
 latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported boards include:
 
 - Xilinx Alveo U50, and
+- Xilinx Alveo U55N, and
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
-- Xilinx Alveo U280, and
-- Xilinx Alveo U55
+- Xilinx Alveo U280
 
 | Notes: |
 |:---|

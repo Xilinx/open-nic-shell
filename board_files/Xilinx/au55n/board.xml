@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <board schema_version="2.2" vendor="xilinx.com" name="au55n" display_name="Alveo U55N Data Center Accelerator Card" url="http://www.xilinx.com/U55N" supports_ced="false" preset_file = "preset.xml">
   <images>
-    <image name="au280_image.jpg" display_name="Alveo U55N Data Center Accelerator Card" sub_type="board" resolution="high">
+    <image name="varium_image.png" display_name="Alveo U55N Data Center Accelerator Card" sub_type="board" resolution="high">
       <description>Alveo U55N Data Center Accelerator Card</description>
     </image>
   </images>

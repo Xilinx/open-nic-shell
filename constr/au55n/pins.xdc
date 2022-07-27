@@ -1,6 +1,6 @@
 # *************************************************************************
 #
-# Copyright 2020 Xilinx, Inc.
+# Copyright 2021 Xilinx, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ set_property PACKAGE_PIN AR14 [get_ports pcie_refclk_n]
 set_property PACKAGE_PIN AR15 [get_ports pcie_refclk_p]
 
 # Fix the CATTRIP issue for custom flow
-# set_property PACKAGE_PIN BE45 [get_ports hbm_cattrip]
-# set_property IOSTANDARD LVCMOS18 [get_ports hbm_cattrip]
+# Read AR72926 for details.
+set_property PACKAGE_PIN BE45 [get_ports hbm_cattrip]
+set_property IOSTANDARD LVCMOS18 [get_ports hbm_cattrip]
 
 set num_ports [llength [get_ports qsfp_refclk_p]]
 if {$num_ports >= 1} {

@@ -52,5 +52,3 @@ set_property -dict {
 } [get_ips $qdma]
 set_property CONFIG.tl_pf_enable_reg $num_phys_func [get_ips $qdma]
 set_property CONFIG.num_queues $num_queue [get_ips $qdma]
-
-

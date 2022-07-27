@@ -27,9 +27,13 @@ module open_nic_shell #(
   parameter int    NUM_CMAC_PORT   = 1
 ) (
 `ifdef __synthesis__
+
+// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
 `ifdef __au280__
-  output                         hbm_cattrip, // Fix the CATTRIP issue for AU280 custom flow
+  output                         hbm_cattrip,
 `elsif __au50__
+  output                         hbm_cattrip,
+`elsif __au55n__
   output                         hbm_cattrip,
 `endif
 
@@ -171,14 +175,15 @@ module open_nic_shell #(
 
   IBUF pcie_rstn_ibuf_inst (.I(pcie_rstn), .O(pcie_rstn_int));
 
+// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+//
+// This pin must be tied to 0; otherwise the board might be unrecoverable
+// after programming
 `ifdef __au280__
-  // Fix the CATTRIP issue for AU280 custom flow
-  //
-  // This pin must be tied to 0; otherwise the board might be unrecoverable
-  // after programming
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au50__
-  // Same for AU50
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au55n__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif
 
@@ -360,9 +365,11 @@ module open_nic_shell #(
 
   wire                         axil_aclk;
   wire                         axis_aclk;
-  `ifdef __au55n__
+
+`ifdef __au55n__
   wire                         ref_clk_100mhz;
-  `endif
+`endif
+
   wire     [NUM_CMAC_PORT-1:0] cmac_clk;
 
   // Unused reset pairs must have their "reset_done" tied to 1
@@ -656,14 +663,13 @@ module open_nic_shell #(
     .mod_rst_done                         (qdma_rst_done),
 
     .axil_aclk                            (axil_aclk),
-    `ifdef __au55n__
+
+  `ifdef __au55n__
     .axis_aclk                            (axis_aclk),
     .ref_clk_100mhz                       (ref_clk_100mhz)
-    `else
+  `else
     .axis_aclk                            (axis_aclk)
-    `endif
-
-
+  `endif
   );
 
   generate for (genvar i = 0; i < NUM_CMAC_PORT; i++) begin: cmac_port
@@ -863,12 +869,13 @@ module open_nic_shell #(
     .box_rst_done                     (box_250mhz_rst_done),
 
     .axil_aclk                        (axil_aclk),
-    `ifdef __au55n__
+
+  `ifdef __au55n__
     .axis_aclk                        (axis_aclk),
     .ref_clk_100mhz                   (ref_clk_100mhz)
-    `else
+  `else
     .axis_aclk                        (axis_aclk)
-    `endif
+  `endif
   );
 
   box_322mhz #(
