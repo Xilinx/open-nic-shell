@@ -141,6 +141,14 @@ module qdma_subsystem_qdma_wrapper (
 
   output         axis_aclk,
   output         axil_aclk,
+
+// For AU55N, we generate 100MHz reference clock which is needed when HBM IP is instantiated 
+// in user-defined logic.
+// TODO: This should be done for all boards that have HBM.
+`ifdef __au55n__
+  output         ref_clk_100mhz,
+`endif
+
   output         aresetn
 );
 
@@ -198,11 +206,11 @@ module qdma_subsystem_qdma_wrapper (
 
   assign axis_aclk = aclk_250mhz;
 
-  // Generate 125MHz 'axil_aclk'
+  // Generate 125MHz 'axil_aclk' and 100MHz 'ref_clk_100mhz'.
   qdma_subsystem_clk_div clk_div_inst (
     .clk_in1  (axis_aclk),
     .clk_out1 (axil_aclk),
-    .locked   ()
+    .clk_out2 (ref_clk_100mhz)
   );
 
   // Generate reset w.r.t. the 125MHz clock

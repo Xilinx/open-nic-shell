@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- Copyright (C) 2021, Xilinx Inc - All rights reserved
+ Licensed under the Apache License, Version 2.0 (the "License"). You may
+ not use this file except in compliance with the License. A copy of the
+ License is located at
+     http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ License for the specific language governing permissions and limitations
+ under the License. -->
+
+<part_info part_name="xcu55n-fsvh2892-2l-e">
+
+  <pins>
+    
+    <pin index="0" name="PCIE_PERST_LS_65"    iostandard="LVCMOS18" loc="BF41"/>
+    <pin index="1" name="PEX_PWRBRKN_FPGA_65" iostandard="LVCMOS18" loc="BG43"/>
+    <pin index="2" name="HBM_CATTRIP_LS"      iostandard="LVCMOS18" loc="BE45"/>
+
+    <!-- QSFP28 Activity LED pins -->
+    <pin index="3" name="QSFP28_0_ACTIVITY_LED"    iostandard="LVCMOS18" loc="BL13" drive="8"/>
+    <pin index="4" name="QSFP28_0_LINK_STAT_LEDG"  iostandard="LVCMOS18" loc="BK11" drive="8"/>
+    <pin index="5" name="QSFP28_0_LINK_STAT_LEDY"  iostandard="LVCMOS18" loc="BJ11" drive="8"/>
+    <pin index="6" name="QSFP28_1_ACTIVITY_LED"    iostandard="LVCMOS18" loc="BK14" drive="8"/>
+    <pin index="7" name="QSFP28_1_LINK_STAT_LEDG"  iostandard="LVCMOS18" loc="BK15" drive="8"/>
+    <pin index="8" name="QSFP28_1_LINK_STAT_LEDY"  iostandard="LVCMOS18" loc="BL12" drive="8"/>
+
+    <!-- FPGA to Sattellite Controller CMS UART Interface Pins-->
+    <pin index="9"  name="FPGA_TXD_MSP_65" iostandard="LVCMOS18" loc="BH42"/>
+    <pin index="10" name="FPGA_RXD_MSP_65" iostandard="LVCMOS18" loc="BJ42"/>
+
+    <!-- Si5394B pins-->
+    <pin index="11" name="SI_RSTBB"    iostandard="LVCMOS18" loc="BM8" />
+    <pin index="12" name="SI_INTRB"    iostandard="LVCMOS18" loc="BM9" />
+    <pin index="13" name="SI_PLL_LOCK" iostandard="LVCMOS18" loc="BN10"/>
+    <pin index="14" name="SI_IN_LOS"   iostandard="LVCMOS18" loc="BM10"/>
+    <pin index="15" name="I2C_SI5394_SCL" iostandard="LVCMOS18" loc="BM14"/>
+    <pin index="16" name="I2C_SI5394_SDA" iostandard="LVCMOS18" loc="BN14"/>
+
+    <!-- General perpose IO interconnect pins -->
+    <pin index="17" name="MSP_GPIO0" iostandard="LVCMOS18" loc="BE46"/>
+    <pin index="18" name="MSP_GPIO1" iostandard="LVCMOS18" loc="BH46"/>
+    <pin index="19" name="MSP_GPIO2" iostandard="LVCMOS18" loc="BF45"/>
+    <pin index="20" name="MSP_GPIO3" iostandard="LVCMOS18" loc="BF46"/>
+
+    <pin index="21"  name ="CPU_RESET_FPGA"    iostandard="LVCMOS18" loc="BG45"/>
+    <pin index="22"  name ="RSTN_68"           iostandard="LVCMOS18" loc="BM12"/>
+    
+    <!-- Onboard Clocks -->
+    <pin index="100"  name ="SYNCE_CLK0_N" loc="AD43"/>
+    <pin index="101"  name ="SYNCE_CLK0_P" loc="AD42"/>	
+    <pin index="102"  name ="SYNCE_CLK1_N" loc="AB43"/>
+    <pin index="103"  name ="SYNCE_CLK1_P" loc="AB42"/>
+	
+    <pin index="104"  name ="SYSCLK2_P" iostandard="LVDS" loc="BK10"  dqs_bias="TRUE"/>
+    <pin index="105"  name ="SYSCLK2_N" iostandard="LVDS" loc="BL10"  dqs_bias="TRUE"/>
+    <pin index="106"  name ="SYSCLK3_P" iostandard="LVDS" loc="BK43"  dqs_bias="TRUE"/>
+    <pin index="107"  name ="SYSCLK3_N" iostandard="LVDS" loc="BK44"  dqs_bias="TRUE"/>
+
+    <pin index="108"  name ="PPS_IN_FPGA" iostandard="LVCMOS18" loc="BJ33"/>
+    <pin index="109"  name ="PPS_IN_FPGA" iostandard="LVCMOS18" loc="BH32"/>
+
+    <pin index="110"  name ="NS1_REFCLK0_N" loc="AL41"/>
+    <pin index="111"  name ="NS1_REFCLK0_P" loc="AL40"/>	
+    <pin index="112"  name ="NS1_SYSCLK5_N" loc="AK43"/>
+    <pin index="113"  name ="NS1_SYSCLK5_P" loc="AK42"/>
+    <pin index="114"  name ="NS2_REFCLK0_N" loc="AR41"/>
+    <pin index="115"  name ="NS2_REFCLK0_P" loc="AR40"/>	
+    <pin index="116"  name ="NS2_SYSCLK6_N" loc="AP43"/>
+    <pin index="117"  name ="NS2_SYSCLK6_P" loc="AP42"/>
+    
+    <pin index="118"  name ="TESTCLK_OUT" iostandard="LVCMOS18" loc="BN42"/>
+    
+    <!-- PCIe Clocks-->
+    <pin index="694" name ="PCIE_SYSCLK0_N" loc="AK12"/>
+    <pin index="695" name ="PCIE_SYSCLK0_P" loc="AK13"/>
+    <pin index="696" name ="PCIE_SYSCLK1_N" loc="AP12"/>
+    <pin index="697" name ="PCIE_SYSCLK1_P" loc="AP13"/>
+
+    <pin index="698" name ="PCIE_REFCLK0_N" loc="AL14"/>
+    <pin index="699" name ="PCIE_REFCLK0_P" loc="AL15"/>
+    <pin index="700" name ="PCIE_REFCLK1_N" loc="AR14"/>
+    <pin index="701" name ="PCIE_REFCLK1_P" loc="AR15"/>
+    
+    <!-- PCIe Connector -->
+
+    <pin index="702" name ="pcie_rx0_n"    loc="AL1" />
+    <pin index="703" name ="pcie_rx0_p"    loc="AL2" />
+    <pin index="704" name ="pcie_rx1_n"    loc="AM3" />
+    <pin index="705" name ="pcie_rx1_p"    loc="AM4" />
+    <pin index="706" name ="pcie_rx2_n"    loc="AN5" />
+    <pin index="707" name ="pcie_rx2_p"    loc="AN6" />	
+    <pin index="708" name ="pcie_rx3_n"    loc="AN1" />
+    <pin index="709" name ="pcie_rx3_p"    loc="AN2" />
+    <pin index="710" name ="pcie_rx4_n"    loc="AP3" />
+    <pin index="711" name ="pcie_rx4_p"    loc="AP4" />	
+    <pin index="712" name ="pcie_rx5_n"    loc="AR1" />
+    <pin index="713" name ="pcie_rx5_p"    loc="AR2" />	
+    <pin index="714" name ="pcie_rx6_n"    loc="AT3" />
+    <pin index="715" name ="pcie_rx6_p"    loc="AT4" />	
+    <pin index="716" name ="pcie_rx7_n"    loc="AU1" />
+    <pin index="717" name ="pcie_rx7_p"    loc="AU2" />	
+    <pin index="718" name ="pcie_rx8_n"    loc="AV3" />
+    <pin index="719" name ="pcie_rx8_p"    loc="AV4" />	
+    <pin index="720" name ="pcie_rx9_n"    loc="AW5" />
+    <pin index="721" name ="pcie_rx9_p"    loc="AW6" />	
+    <pin index="722" name ="pcie_rx10_n"   loc="AW1" />
+    <pin index="723" name ="pcie_rx10_p"   loc="AW2" />	
+    <pin index="724" name ="pcie_rx11_n"   loc="AY3" />
+    <pin index="725" name ="pcie_rx11_p"   loc="AY4" />	
+    <pin index="726" name ="pcie_rx12_n"   loc="BA5" />
+    <pin index="727" name ="pcie_rx12_p"   loc="BA6" />	
+    <pin index="728" name ="pcie_rx13_n"   loc="BA1" />
+    <pin index="729" name ="pcie_rx13_p"   loc="BA2" />	
+    <pin index="730" name ="pcie_rx14_n"   loc="BB3" />
+    <pin index="731" name ="pcie_rx14_p"   loc="BB4" />
+    <pin index="732" name ="pcie_rx15_n"   loc="BC1" />	
+    <pin index="733" name ="pcie_rx15_p"   loc="BC2" />	
+    	
+    <pin index="734" name ="pcie_tx0_n"    loc="AL10"/>
+    <pin index="735" name ="pcie_tx0_p"    loc="AL11"/>	
+    <pin index="736" name ="pcie_tx1_n"    loc="AM8" />
+    <pin index="737" name ="pcie_tx1_p"    loc="AM9" />	
+    <pin index="738" name ="pcie_tx2_n"    loc="AN10"/>
+    <pin index="739" name ="pcie_tx2_p"    loc="AN11"/>    
+    <pin index="740" name ="pcie_tx3_n"    loc="AP8" />
+    <pin index="741" name ="pcie_tx3_p"    loc="AP9" />   
+    <pin index="742" name ="pcie_tx4_n"    loc="AR10"/>
+    <pin index="743" name ="pcie_tx4_p"    loc="AR11"/>    
+    <pin index="744" name ="pcie_tx5_n"    loc="AR6" />
+    <pin index="745" name ="pcie_tx5_p"    loc="AR7" />   
+    <pin index="746" name ="pcie_tx6_n"    loc="AT8" />
+    <pin index="747" name ="pcie_tx6_p"    loc="AT9" />    
+    <pin index="748" name ="pcie_tx7_n"    loc="AU10"/>
+    <pin index="749" name ="pcie_tx7_p"    loc="AU11"/>
+    <pin index="750" name ="pcie_tx8_n"    loc="AU6" />
+    <pin index="751" name ="pcie_tx8_p"    loc="AU7" />   
+    <pin index="752" name ="pcie_tx9_n"    loc="AV8" />
+    <pin index="753" name ="pcie_tx9_p"    loc="AV9" />    
+    <pin index="754" name ="pcie_tx10_n"   loc="AW10"/>
+    <pin index="755" name ="pcie_tx10_p"   loc="AW11"/>    
+    <pin index="756" name ="pcie_tx11_n"   loc="AY8" />
+    <pin index="757" name ="pcie_tx11_p"   loc="AY9" /> 
+    <pin index="758" name ="pcie_tx12_n"   loc="BA10"/>
+    <pin index="759" name ="pcie_tx12_p"   loc="BA11"/>    
+    <pin index="760" name ="pcie_tx13_n"   loc="BB8" />
+    <pin index="761" name ="pcie_tx13_p"   loc="BB9" />    
+    <pin index="762" name ="pcie_tx14_n"   loc="BC10"/>
+    <pin index="763" name ="pcie_tx14_p"   loc="BC11"/>    
+    <pin index="764" name ="pcie_tx15_n"   loc="BC6" />	
+    <pin index="765" name ="pcie_tx15_p"   loc="BC7" />		
+
+
+    <!-- QSFP28 Connector 0 -->
+    <pin index="800" name ="QSFP28_0_RX1_N" loc="AD52"/>
+    <pin index="801" name ="QSFP28_0_RX2_N" loc="AC54"/>
+    <pin index="802" name ="QSFP28_0_RX3_N" loc="AC50"/>
+    <pin index="803" name ="QSFP28_0_RX4_N" loc="AB52"/>
+
+    <pin index="804" name ="QSFP28_0_RX1_P" loc="AD51"/>
+    <pin index="805" name ="QSFP28_0_RX2_P" loc="AC53"/>
+    <pin index="806" name ="QSFP28_0_RX3_P" loc="AC49"/>
+    <pin index="807" name ="QSFP28_0_RX4_P" loc="AB51"/>
+    
+    <pin index="808" name ="QSFP28_0_TX1_N" loc="AD47"/>
+    <pin index="809" name ="QSFP28_0_TX2_N" loc="AC45"/>
+    <pin index="810" name ="QSFP28_0_TX3_N" loc="AB47"/>
+    <pin index="811" name ="QSFP28_0_TX4_N" loc="AA49"/>
+    
+    <pin index="812" name ="QSFP28_0_TX1_P" loc="AD46"/>
+    <pin index="813" name ="QSFP28_0_TX2_P" loc="AC44"/>
+    <pin index="814" name ="QSFP28_0_TX3_P" loc="AB46"/>
+    <pin index="815" name ="QSFP28_0_TX4_P" loc="AA48"/>
+
+    <!-- QSFP28 Connector 1 -->
+    <pin index="850" name ="QSFP28_1_RX1_N" loc="AA54"/>
+    <pin index="851" name ="QSFP28_1_RX2_N" loc="Y52"/>
+    <pin index="852" name ="QSFP28_1_RX3_N" loc="W54"/>
+    <pin index="853" name ="QSFP28_1_RX4_N" loc="V52"/>
+    
+    <pin index="854" name ="QSFP28_1_RX1_P" loc="AA53"/>
+    <pin index="855" name ="QSFP28_1_RX2_P" loc="Y51"/>
+    <pin index="856" name ="QSFP28_1_RX3_P" loc="W53"/>
+    <pin index="857" name ="QSFP28_1_RX4_P" loc="V51"/>
+    
+    <pin index="858" name ="QSFP28_1_TX1_N" loc="AA45"/>
+    <pin index="859" name ="QSFP28_1_TX2_N" loc="Y47"/>
+    <pin index="860" name ="QSFP28_1_TX3_N" loc="W49"/>
+    <pin index="861" name ="QSFP28_1_TX4_N" loc="W45"/>
+    
+    <pin index="862" name ="QSFP28_1_TX1_P" loc="AA44"/>
+    <pin index="863" name ="QSFP28_1_TX2_P" loc="Y46"/>
+    <pin index="864" name ="QSFP28_1_TX3_P" loc="W48"/>
+    <pin index="865" name ="QSFP28_1_TX4_P" loc="W44"/>
+
+  
+  </pins>
+  
+</part_info>
