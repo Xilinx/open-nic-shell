@@ -227,7 +227,7 @@ module qdma_subsystem_c2h #(
   end
 
   // This FIFO stores completion information, including packet length, packet ID
-  // and queue ID.  When the FIFO becomes full, the arbitration is paused.
+  // and queue ID.  When the FIFO becomes nearly full, the arbitration is paused.
   xpm_fifo_sync #(
     .DOUT_RESET_VALUE    ("0"),
     .ECC_MODE            ("no_ecc"),
@@ -236,7 +236,12 @@ module qdma_subsystem_c2h #(
     .FIFO_WRITE_DEPTH    (512),
     .READ_DATA_WIDTH     (43), // {qid, pkt_id, size}
     .READ_MODE           ("fwft"),
-    .WRITE_DATA_WIDTH    (43)
+    .WRITE_DATA_WIDTH    (43),
+    .PROG_FULL_THRESH    (512-5) // Note that there is a one cycle delay along the datapath due to the 
+		                 // AXI register slice instantiated above.  The prog_full here is 
+		                 // used instead to provide necessary early reaction time in case this
+		                 // fifo nears full.  DEPTH-5 is specied for the prog_full threshold 
+		                 // based on the values that are allowed when using FWFT mode of xpm_fifo_sync.
   ) cpl_fifo_inst (
     .wr_en         (cpl_fifo_wr_en),
     .din           (cpl_fifo_din),
@@ -249,13 +254,13 @@ module qdma_subsystem_c2h #(
     .rd_data_count (),
 
     .empty         (cpl_fifo_empty),
-    .full          (cpl_fifo_full),
+    .full          (), // Moved to prog_full (see note above)
     .almost_empty  (),
     .almost_full   (),
     .overflow      (),
     .underflow     (),
     .prog_empty    (),
-    .prog_full     (),
+    .prog_full     (cpl_fifo_full),
     .sleep         (1'b0),
 
     .sbiterr       (),
