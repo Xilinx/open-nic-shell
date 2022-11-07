@@ -25,13 +25,13 @@ set_property -dict {
     CONFIG.dsc_byp_mode {Descriptor_bypass_and_internal} 
     CONFIG.testname {st} CONFIG.dma_reset_source_sel {Phy_Ready} 
     CONFIG.pf0_bar2_scale_qdma {Megabytes} 
-    CONFIG.pf0_bar2_size_qdma {1} 
+    CONFIG.pf0_bar2_size_qdma {4} 
     CONFIG.pf1_bar2_scale_qdma {Megabytes} 
-    CONFIG.pf1_bar2_size_qdma {1} 
+    CONFIG.pf1_bar2_size_qdma {4} 
     CONFIG.pf2_bar2_scale_qdma {Megabytes} 
-    CONFIG.pf2_bar2_size_qdma {1} 
+    CONFIG.pf2_bar2_size_qdma {4} 
     CONFIG.pf3_bar2_scale_qdma {Megabytes} 
-    CONFIG.pf3_bar2_size_qdma {1} 
+    CONFIG.pf3_bar2_size_qdma {4} 
     CONFIG.pf0_device_id {903F} 
     CONFIG.pf2_device_id {923F} 
     CONFIG.pf3_device_id {933F} 
