@@ -453,6 +453,11 @@ For the above two cases, the safest workaround is to use a different server to
 program the FPGA.  For configuration memory programming, do a cold reboot to
 trigger the FPGA boot process.
 
+For the "Program the device directly" way, consider using/referring to
+`script/program_fpga.sh`. Note, if this is the first time programming FPGA with
+the bitstream then the server needs to be warm rebooted. No reboot is required
+for later programming (unless a cold reboot is issued).
+
 ## Known Issues
 
 ### Server Boot Failure after FPGA Programming
