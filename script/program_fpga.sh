@@ -18,6 +18,7 @@ bridge_bdf=""
 bitstream_path=$1
 board=$2
 probes_path="${3:-}"
+# ^^ Probes are used for specifying hardware debugger symbols.
 
 echo "Make sure that the netdev iface for open nic shell is down before running this script!"
 echo "Example: sudo ifconfig enp134s0f0 down."
