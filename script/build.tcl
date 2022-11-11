@@ -58,18 +58,19 @@ set script_dir ${root_dir}/script
 set src_dir ${root_dir}/src
 
 # Build options
-#   board_repo   Path to the Xilinx board store repository
-#   board        Board name
-#   tag          Tag to identify the build
-#   overwrite    Overwrite existing build results
-#   rebuild      Update build directory but respect overwrite
-#   jobs         Number of jobs for synthesis and implementation
-#   synth_ip     Synthesize IPs before creating design project
-#   impl         Run implementation after creating design project
-#   post_impl    Perform post implementation actions
-#   user_plugin  Path to the user plugin repo
+#   board_repo             Path to the Xilinx board store repository
+#   board                  Board name
+#   tag                    Tag to identify the build
+#   overwrite              Overwrite existing build results
+#   rebuild                Update build directory but respect overwrite
+#   jobs                   Number of jobs for synthesis and implementation
+#   synth_ip               Synthesize IPs before creating design project
+#   impl                   Run implementation after creating design project
+#   post_impl              Perform post implementation actions
+#   user_plugin            Path to the user plugin repo
 #   bitstream_userid       Bitstream.config userid
 #   bitstream_usr_access   Bitstream.config usr_access
+#   sim                    Build design for simulation
 #
 # Design parameters
 #   build_timestamp  Timestamp to identify the build
@@ -79,6 +80,11 @@ set src_dir ${root_dir}/src
 #   num_phys_func    Number of PCI-e physical functions (1 to 4)
 #   num_queue        Number of QDMA queues (1 to 2048)
 #   num_cmac_port    Number of CMAC ports (1 or 2)
+#
+# Simulation parameters
+#   sim_exec_path  Path to directory containing simulator executable
+#   sim_lib_path   Path where simulation libraries should be compiled
+#   sim_top        Top level module to simulate
 
 array set build_options {
     -board_repo  ""
@@ -93,6 +99,7 @@ array set build_options {
     -user_plugin ""
     -bitstream_userid  "0xDEADC0DE"
     -bitstream_usr_access "0x66669999"
+    -sim  0
 }
 set build_options(-user_plugin) ${plugin_dir}/p2p
 
@@ -107,6 +114,12 @@ array set design_params {
 }
 set design_params(-build_timestamp) [clock format [clock seconds] -format %m%d%H%M]
 
+array set sim_params {
+    -sim_exec_path    ""
+    -sim_lib_path     ""
+    -sim_top          ""
+}
+
 # Expect arguments in the form of `-argument value`
 for {set i 0} {$i < $argc} {incr i 2} {
     set arg [lindex $argv $i]
@@ -117,6 +130,9 @@ for {set i 0} {$i < $argc} {incr i 2} {
     } elseif {[info exists design_params($arg)]} {
         set design_params($arg) $val
         puts "Set design parameter $arg to $val"
+    } elseif {[info exists sim_params($arg)]} {
+        set sim_params($arg) $val
+        puts "Set sim parameter $arg to $val"
     } else {
         puts "Skip unknown argument $arg and its value $val"
     }
@@ -385,12 +401,32 @@ puts $fp "set_property BITSTREAM.CONFIG.USERID \"$bitstream_userid\" \[current_d
 puts $fp "set_property BITSTREAM.CONFIG.USR_ACCESS $bitstream_usr_access \[current_design\]"
 close $fp
 
-
 # Read constraint files
 read_xdc -unmanaged ${constr_dir}/${board}/pins.xdc
 read_xdc -unmanaged ${constr_dir}/${board}/timing.xdc
 read_xdc ${constr_dir}/${board}/general.xdc
 read_xdc ${build_dir}/run_params.xdc
+
+# Simulate design
+if {$sim} {
+    # Generate simulation libraries
+    set modelsim_lib_path ${sim_params(-sim_lib_path)}/modelsim
+    if {[file exists ${modelsim_lib_path}]} {
+        puts "Skipping compilation of simulation libraries as directory ${modelsim_lib_path} exists."
+    } else {
+        puts "Compiling simulation libraries in directory ${modelsim_lib_path}."
+        compile_simlib -simulator modelsim -simulator_exec_path ${sim_params(-sim_exec_path)} \
+            -family all -language all -library all \
+            -dir ${modelsim_lib_path}
+    }
+
+    # Export simulation
+    set_property target_simulator ModelSim [current_project]
+    set_property top $sim_params(-sim_top) [get_filesets sim_1]
+    set_property top_lib xil_defaultlib [get_filesets sim_1]
+    set_property compxlib.modelsim_compiled_library_dir ${modelsim_lib_path} [current_project]
+    launch_simulation -scripts_only
+}
 
 # Implement design
 if {$impl} {
