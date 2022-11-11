@@ -368,7 +368,7 @@ Currently, cocotb (https://www.cocotb.org/) and modelsim (https://eda.sw.siemens
 - Quick tutorial on modelsim: https://users.ece.cmu.edu/~jhoe/doku/doku.php?id=a_short_intro_to_modelsim_verilog_simulator
 - Reference testbenches using cocotb: https://github.com/alexforencich/verilog-axis/blob/master/tb/axis_switch/test_axis_switch.py
 
-### Building for simulation:
+### Building for simulation
 Example command:
 ```
 vivado -mode tcl -source ./build.tcl -tclargs \
@@ -390,12 +390,13 @@ This command will create simulation sources in `build/<board>_<tag>/open_nic_she
 
 ```
 cd build/<board>_<tag>/open_nic_shell/open_nic_shell.sim/sim_1/behav/modelsim
-# Link over helper scripts
+
+# Symlink helper scripts
 ln -s ../../../../../../../script/tb/* ./
 # Example:
 ln -s <path-to>/open-nic-shell/script/tb/* ./
 
-# Link over the test bench files
+# Symlink the test bench files
 ln -s <path-to>/open-nic-shell/plugin/p2p/box_250mhz/tb/<module-to-test>/* ./
 # Example:
 ln -s ../../../../../../../plugin/p2p/box_250mhz/tb/* ./
@@ -405,8 +406,11 @@ ln -s ../../../../../../../plugin/p2p/box_250mhz/tb/* ./
 
 # Run the simulation
 DUT=<module-to-test> GUI=0 DEBUG=0 ./run.sh  # run.sh is linked from the script/tb directory
+# Example
+DUT=p2p_250mhz_wrapper ./run.sh
 ## Set GUI=1 to see waveform
 ```
+Note, in the above example, the top level module specified to Vivado was `p2p_250mhz`, while the top module being simulated is `p2p_250mhz_wrapper`. This can be done since we also copied `p2p_250mhz_wrapper.sv`. In general any module that is included in the top module specified to Vivado can be simulated with the exported sources.
 
 ### How the simulation works
 #### Simulation setup
