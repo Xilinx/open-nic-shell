@@ -62,18 +62,18 @@ module qdma_subsystem_function #(
   input   [15:0] s_axis_c2h_tuser_size,
   input   [15:0] s_axis_c2h_tuser_src,
   input   [15:0] s_axis_c2h_tuser_dst,
-  input   [15:0] s_axis_c2h_tuser_use_rss,
-  input   [15:0] s_axis_c2h_tuser_input_qid,
+(* mark_debug = "true" *)  input   [15:0] s_axis_c2h_tuser_use_rss,
+(* mark_debug = "true" *)  input   [15:0] s_axis_c2h_tuser_input_qid,
   output         s_axis_c2h_tready,
 
-  output         m_axis_c2h_tvalid,
+(* mark_debug = "true" *)  output         m_axis_c2h_tvalid,
   output [511:0] m_axis_c2h_tdata,
   output         m_axis_c2h_tlast,
   output  [15:0] m_axis_c2h_tuser_size,
-  output  [15:0] m_axis_c2h_tuser_use_rss,
-  output  [15:0] m_axis_c2h_tuser_input_qid,
-  output  [10:0] m_axis_c2h_tuser_rss_qid,
-  input          m_axis_c2h_tready,
+(* mark_debug = "true" *)   output  [15:0] m_axis_c2h_tuser_use_rss,
+(* mark_debug = "true" *)   output  [15:0] m_axis_c2h_tuser_input_qid,
+(* mark_debug = "true" *)   output  [10:0] m_axis_c2h_tuser_rss_qid,
+(* mark_debug = "true" *)   input          m_axis_c2h_tready,
 
   input          axil_aclk,
   input          axis_aclk,
@@ -86,8 +86,8 @@ module qdma_subsystem_function #(
   // using the same depth to handle the case of 64B frames   
   localparam C_QID_FIFO_DEPTH = C_PKT_FIFO_DEPTH; 
 
-  wire   [15:0] q_base;
-  wire   [15:0] num_q;
+(* mark_debug = "true" *)    wire   [15:0] q_base;
+(* mark_debug = "true" *)    wire   [15:0] num_q;
   wire [2047:0] indir_table;
   wire  [319:0] hash_key;
 
@@ -107,24 +107,26 @@ module qdma_subsystem_function #(
   wire  [511:0] axis_c2h_tdata;
   wire          axis_c2h_tlast;
   wire   [15:0] axis_c2h_tuser_size;
+  wire   [15:0] axis_c2h_tuser_use_rss;
+  wire   [15:0] axis_c2h_tuser_input_qid;
   wire          axis_c2h_tready;
 
-  wire          hash_result_valid;
-  wire   [31:0] hash_result;
+  (* mark_debug = "true" *)  wire          hash_result_valid;
+  (* mark_debug = "true" *)   wire   [31:0] hash_result;
 
-  reg           qid_fifo_wr_en;
-  reg    [10:0] qid_fifo_din;
+  (* mark_debug = "true" *)   reg           qid_fifo_wr_en;
+  (* mark_debug = "true" *)    reg    [10:0] qid_fifo_din;
   wire          qid_fifo_rd_en;
   wire   [10:0] qid_fifo_dout;
-  wire          qid_fifo_empty;
-  wire          qid_fifo_full;
+  (* mark_debug = "true" *)    wire          qid_fifo_empty;
+  (* mark_debug = "true" *)    wire          qid_fifo_full;
 
-  wire          axis_c2h_buf_tvalid;
+  (* mark_debug = "true" *)    wire          axis_c2h_buf_tvalid;
   wire  [511:0] axis_c2h_buf_tdata;
   wire          axis_c2h_buf_tlast;
-  wire   [15:0] axis_c2h_buf_tuser_size;
-  wire   [15:0] axis_c2h_buf_tuser_use_rss;
-  wire   [15:0] axis_c2h_buf_tuser_input_qid;
+  (* mark_debug = "true" *) wire   [15:0] axis_c2h_buf_tuser_size;
+  (* mark_debug = "true" *) wire   [15:0] axis_c2h_buf_tuser_use_rss;
+  (* mark_debug = "true" *) wire   [15:0] axis_c2h_buf_tuser_input_qid;
   wire          axis_c2h_buf_tready;
 
   qdma_subsystem_function_register reg_inst (
@@ -242,14 +244,18 @@ module qdma_subsystem_function #(
   // RX packets should have valid `tuser_size` interpreted as packet size.
   axi_stream_register_slice #(
     .TDATA_W (512),
-    .TUSER_W (16),
+    .TUSER_W (16+16+16),
     .MODE    ("full")
   ) c2h_slice_inst (
     .s_axis_tvalid    (s_axis_c2h_tvalid),
     .s_axis_tdata     (s_axis_c2h_tdata),
     .s_axis_tkeep     ({64{1'b1}}),
     .s_axis_tlast     (s_axis_c2h_tlast),
-    .s_axis_tuser     (s_axis_c2h_tuser_size),
+    .s_axis_tuser     (
+		       {s_axis_c2h_tuser_size,
+			s_axis_c2h_tuser_use_rss,
+			s_axis_c2h_tuser_input_qid+q_base}
+		       ),
     .s_axis_tid       (0),
     .s_axis_tdest     (0),
     .s_axis_tready    (s_axis_c2h_tready),
@@ -258,7 +264,11 @@ module qdma_subsystem_function #(
     .m_axis_tdata     (axis_c2h_tdata),
     .m_axis_tkeep     (),
     .m_axis_tlast     (axis_c2h_tlast),
-    .m_axis_tuser     (axis_c2h_tuser_size),
+    .m_axis_tuser     (
+		       {axis_c2h_tuser_size,
+			axis_c2h_tuser_use_rss,
+			axis_c2h_tuser_input_qid}
+		       ),
     .m_axis_tid       (),
     .m_axis_tdest     (),
     .m_axis_tready    (axis_c2h_tready),
@@ -302,6 +312,7 @@ module qdma_subsystem_function #(
 
   assign qid_fifo_rd_en = m_axis_c2h_tvalid && m_axis_c2h_tlast && m_axis_c2h_tready;
 
+
   xpm_fifo_sync #(
     .DOUT_RESET_VALUE    ("0"),
     .ECC_MODE            ("no_ecc"),
@@ -310,7 +321,7 @@ module qdma_subsystem_function #(
     .READ_DATA_WIDTH     (11),
     .READ_MODE           ("fwft"),
     .WRITE_DATA_WIDTH    (11)
-  ) qid_fifo_inst (
+  ) rss_qid_fifo_inst (
     .wr_en         (qid_fifo_wr_en),
     .din           (qid_fifo_din),
     .wr_ack        (),
@@ -341,7 +352,7 @@ module qdma_subsystem_function #(
     .rd_rst_busy   (),
     .wr_rst_busy   ()
   );
-
+   
   // Buffer the input stream until queue ID is computed
   xpm_fifo_axis #(
     .CLOCKING_MODE    ("common_clock"),
@@ -393,13 +404,13 @@ module qdma_subsystem_function #(
     .s_aresetn          (axil_aresetn)
   );
 
-  assign m_axis_c2h_tvalid     = axis_c2h_buf_tvalid && ~qid_fifo_empty;
-  assign m_axis_c2h_tdata      = axis_c2h_buf_tdata;
-  assign m_axis_c2h_tlast      = axis_c2h_buf_tlast;
-  assign m_axis_c2h_tuser_size = axis_c2h_buf_tuser_size;
+  assign m_axis_c2h_tvalid          = axis_c2h_buf_tvalid && ~qid_fifo_empty;
+  assign m_axis_c2h_tdata           = axis_c2h_buf_tdata;
+  assign m_axis_c2h_tlast           = axis_c2h_buf_tlast;
+  assign m_axis_c2h_tuser_size      = axis_c2h_buf_tuser_size;
   assign m_axis_c2h_tuser_use_rss   = axis_c2h_buf_tuser_use_rss;
   assign m_axis_c2h_tuser_input_qid = axis_c2h_buf_tuser_input_qid;
   assign m_axis_c2h_tuser_rss_qid   = qid_fifo_dout;
-  assign axis_c2h_buf_tready   = m_axis_c2h_tready && ~qid_fifo_empty;
+  assign axis_c2h_buf_tready        = m_axis_c2h_tready && ~qid_fifo_empty;
 
 endmodule: qdma_subsystem_function

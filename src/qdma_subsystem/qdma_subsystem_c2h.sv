@@ -75,7 +75,7 @@ module qdma_subsystem_c2h #(
   reg              [511:0] axis_c2h_tdata;
   reg                      axis_c2h_tlast;
   reg               [15:0] axis_c2h_tuser_size;
-  reg               [10:0] axis_c2h_tuser_qid;
+  reg               [15:0] axis_c2h_tuser_qid_padded;
   wire                     axis_c2h_tready;
 
   wire                     crc32_en;
@@ -132,7 +132,7 @@ module qdma_subsystem_c2h #(
     axis_c2h_tdata      = 0;
     axis_c2h_tlast      = 1'b0;
     axis_c2h_tuser_size = 0;
-    axis_c2h_tuser_qid  = 0;
+    axis_c2h_tuser_qid_padded  = 0;
 
     for (int i = 0; i < NUM_PHYS_FUNC; i += 1) begin
       if (arb_grant[i]) begin
@@ -140,9 +140,10 @@ module qdma_subsystem_c2h #(
         axis_c2h_tdata      = s_axis_c2h_tdata[`getvec(512, i)];
         axis_c2h_tlast      = s_axis_c2h_tlast[i];
         axis_c2h_tuser_size = s_axis_c2h_tuser_size[`getvec(16, i)];
-        axis_c2h_tuser_qid  = s_axis_c2h_tuser_use_rss[`getvec(1, i)]? 
-			      s_axis_c2h_tuser_input_qid[`getvec(11, i)] : 
-			      s_axis_c2h_tuser_rss_qid[`getvec(11, i)];
+        axis_c2h_tuser_qid_padded  = s_axis_c2h_tuser_use_rss[`getvec(16, i)] == 16'd1 ? 
+			      {5'd0, s_axis_c2h_tuser_rss_qid[`getvec(11, i)]} :
+			      s_axis_c2h_tuser_input_qid[`getvec(16, i)] ;
+ 
         break;
       end
     end
@@ -160,7 +161,7 @@ module qdma_subsystem_c2h #(
     .s_axis_tid    (0),
     .s_axis_tdest  (0),
     .s_axis_tuser  ({axis_c2h_tuser_size, 
-		     axis_c2h_tuser_qid}),
+		     axis_c2h_tuser_qid_padded[10:0]}),
     .s_axis_tready (axis_c2h_tready),
 
     .m_axis_tvalid (m_axis_qdma_c2h_tvalid),
@@ -182,7 +183,7 @@ module qdma_subsystem_c2h #(
       m_axis_qdma_c2h_mty <= 0;
     end
     else if (axis_c2h_tvalid && axis_c2h_tready) begin
-      m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (64 - axis_c2h_tuser_size[5:0]) : 0;
+       m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (axis_c2h_tuser_size[5:0] == 0) ? 0 : (64 - axis_c2h_tuser_size[5:0]) : 0;
     end
   end
 
@@ -208,7 +209,7 @@ module qdma_subsystem_c2h #(
   assign c2h_ecc_data[31]    = 1'b0;  // c2h_ctrl_marker
   assign c2h_ecc_data[30:28] = 3'h0;  // c2h_ctrl_port_id
   assign c2h_ecc_data[27]    = 1'b0;  // reserved
-  assign c2h_ecc_data[26:16] = axis_c2h_tuser_qid;
+  assign c2h_ecc_data[26:16] = axis_c2h_tuser_qid_padded[10:0];
   assign c2h_ecc_data[15:0]  = axis_c2h_tuser_size;
 
   qdma_subsystem_c2h_ecc ecc_inst (

@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 // *************************************************************************
+`include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
 module box_250mhz #(
   parameter int MIN_PKT_LEN   = 64,
@@ -104,20 +105,26 @@ module box_250mhz #(
 
   `include "box_250mhz_address_map_inst.vh"
 
+   
   generate if (USE_PHYS_FUNC == 0) begin
     // Terminate H2C and C2H interfaces of the box
     assign s_axis_qdma_h2c_tready     = {NUM_PHYS_FUNC{1'b1}};
 
-    assign m_axis_qdma_c2h_tvalid     = 0;
-    assign m_axis_qdma_c2h_tdata      = 0;
-    assign m_axis_qdma_c2h_tkeep      = 0;
-    assign m_axis_qdma_c2h_tlast      = 0;
-    assign m_axis_qdma_c2h_tuser_size = 0;
-    assign m_axis_qdma_c2h_tuser_src  = 0;
-    assign m_axis_qdma_c2h_tuser_dst  = 0;
+    assign m_axis_qdma_c2h_tvalid         = 0;
+    assign m_axis_qdma_c2h_tdata          = 0;
+    assign m_axis_qdma_c2h_tkeep          = 0;
+    assign m_axis_qdma_c2h_tlast          = 0;
+    assign m_axis_qdma_c2h_tuser_size     = 0;
+    assign m_axis_qdma_c2h_tuser_src      = 0;
+    assign m_axis_qdma_c2h_tuser_dst      = 0;
+    assign m_axis_qdma_c2h_tuser_use_rss  = 0;
+    assign m_axis_qdma_c2h_tuser_c2h_qid  = 0;
   end
   endgenerate
 
-  `include "user_plugin_250mhz_inst.vh"
+
+  `include "user_plugin_250mhz_inst.vh"    // user_plugin_250mhz was separately modified to 
+                                           // instantiate a new five_tuple_p4 version
+
 
 endmodule: box_250mhz

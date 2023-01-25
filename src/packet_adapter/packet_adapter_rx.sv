@@ -22,34 +22,35 @@ module packet_adapter_rx #(
   parameter int  MAX_PKT_LEN = 1518,
   parameter real PKT_CAP     = 1.5
 ) (
-  input          s_axis_rx_tvalid,
-  input  [511:0] s_axis_rx_tdata,
-  input   [63:0] s_axis_rx_tkeep,
-  input          s_axis_rx_tlast,
-  input          s_axis_rx_tuser_err,
-  input   [15:0] s_axis_rx_tuser_use_rss,
-  input   [15:0] s_axis_rx_tuser_c2h_qid,
-
-  output         m_axis_rx_tvalid,
+  input 	 s_axis_rx_tvalid,
+  input [511:0]  s_axis_rx_tdata,
+  input [63:0] 	 s_axis_rx_tkeep,
+  input 	 s_axis_rx_tlast,
+  input 	 s_axis_rx_tuser_err,
+  input [15:0] 	 s_axis_rx_tuser_use_rss,
+  input [15:0] 	 s_axis_rx_tuser_c2h_qid,
+  output 	 s_axis_rx_tready,
+   
+  output 	 m_axis_rx_tvalid,
   output [511:0] m_axis_rx_tdata,
-  output  [63:0] m_axis_rx_tkeep,
-  output         m_axis_rx_tlast,
-  output  [15:0] m_axis_rx_tuser_size,
-  output  [15:0] m_axis_rx_tuser_src,
-  output  [15:0] m_axis_rx_tuser_dst,
-  output  [15:0] m_axis_rx_tuser_use_rss,
-  output  [15:0] m_axis_rx_tuser_c2h_qid,
-  input          m_axis_rx_tready,
+  output [63:0]  m_axis_rx_tkeep,
+  output 	 m_axis_rx_tlast,
+  output [15:0]  m_axis_rx_tuser_size,
+  output [15:0]  m_axis_rx_tuser_src,
+  output [15:0]  m_axis_rx_tuser_dst,
+  output [15:0]  m_axis_rx_tuser_use_rss,
+  output [15:0]  m_axis_rx_tuser_c2h_qid,
+  input 	 m_axis_rx_tready,
 
   // Synchronized to axis_aclk (250MHz)
-  output         rx_pkt_recv,
-  output         rx_pkt_drop,
-  output         rx_pkt_err,
-  output  [15:0] rx_bytes,
+  output 	 rx_pkt_recv,
+  output 	 rx_pkt_drop,
+  output 	 rx_pkt_err,
+  output [15:0]  rx_bytes,
 
-  input          axis_aclk,
-  input          cmac_clk,
-  input          cmac_rstn
+  input 	 axis_aclk,
+  input 	 cmac_clk,
+  input 	 cmac_rstn
 );
 
   // FIFO is large enough to fit in at least 1.5 largest packets
@@ -88,7 +89,7 @@ module packet_adapter_rx #(
     .s_axis_tuser     ({s_axis_rx_tuser_c2h_qid,
 			s_axis_rx_tuser_use_rss,
 			s_axis_rx_tuser_err}),
-    .s_axis_tready    (),
+    .s_axis_tready    (s_axis_rx_tready),
     
     .m_axis_tvalid    (axis_buf_tvalid),
     .m_axis_tdata     (axis_buf_tdata),
@@ -99,7 +100,7 @@ module packet_adapter_rx #(
     .m_axis_tuser     ({axis_buf_tuser_c2h_qid,
 			axis_buf_tuser_use_rss,
 			axis_buf_tuser_err}),
-    .m_axis_tready    (1'b1),
+    .m_axis_tready    (axis_buf_tready),
 
     .aclk             (cmac_clk),
     .aresetn          (cmac_rstn)

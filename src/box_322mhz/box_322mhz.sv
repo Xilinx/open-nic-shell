@@ -52,6 +52,7 @@ module box_322mhz #(
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_err,
   output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_use_rss,
   output  [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_c2h_qid,
+  input      [NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tready,
 
   output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tvalid,
   output [512*NUM_CMAC_PORT-1:0] m_axis_cmac_tx_tdata,
@@ -94,4 +95,15 @@ module box_322mhz #(
   `include "box_322mhz_address_map_inst.vh"
   `include "user_plugin_322mhz_inst.vh"
 
+wire [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_use_rss;
+wire [16*NUM_CMAC_PORT-1:0] m_axis_adap_rx_322mhz_tuser_c2h_qid;
+
+
+// the following two are assigned within p2p_322mhz      
+//assign m_axis_adap_rx_322mhz_tuser_use_rss = 16'd1; // use the built-in C2H RSS by default
+//assign m_axis_adap_rx_322mhz_tuser_c2h_qid = 16'd0; // init to zero, value is used when 
+                                                    // above RSS is disabled
+
+
+   
 endmodule: box_322mhz

@@ -29,13 +29,13 @@ set_property -dict {
     CONFIG.pf3_pciebar2axibar_2 {0x0000000000000000}
     CONFIG.dma_reset_source_sel {Phy_Ready}
     CONFIG.pf0_bar2_scale_qdma {Megabytes}
-    CONFIG.pf0_bar2_size_qdma {1}
+    CONFIG.pf0_bar2_size_qdma {4}
     CONFIG.pf1_bar2_scale_qdma {Megabytes}
-    CONFIG.pf1_bar2_size_qdma {1}
+    CONFIG.pf1_bar2_size_qdma {4}
     CONFIG.pf2_bar2_scale_qdma {Megabytes}
-    CONFIG.pf2_bar2_size_qdma {1}
+    CONFIG.pf2_bar2_size_qdma {4}
     CONFIG.pf3_bar2_scale_qdma {Megabytes}
-    CONFIG.pf3_bar2_size_qdma {1}
+    CONFIG.pf3_bar2_size_qdma {4}
     CONFIG.PF0_MSIX_CAP_TABLE_SIZE_qdma {009}
     CONFIG.PF1_MSIX_CAP_TABLE_SIZE_qdma {008}
     CONFIG.PF2_MSIX_CAP_TABLE_SIZE_qdma {008}

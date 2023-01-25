@@ -329,6 +329,7 @@ module open_nic_shell #(
   wire     [NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_err;
   wire  [16*NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_use_rss;
   wire  [16*NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tuser_c2h_qid;
+  wire     [NUM_CMAC_PORT-1:0] axis_adap_rx_322mhz_tready;
 
   // CMAC subsystem interfaces to the box running at 322MHz
   wire     [NUM_CMAC_PORT-1:0] axis_cmac_tx_tvalid;
@@ -714,13 +715,14 @@ module open_nic_shell #(
       .m_axis_tx_tuser_err  (axis_adap_tx_322mhz_tuser_err[i]),
       .m_axis_tx_tready     (axis_adap_tx_322mhz_tready[i]),
 
-      .s_axis_rx_tvalid     (axis_adap_rx_322mhz_tvalid[i]),
-      .s_axis_rx_tdata      (axis_adap_rx_322mhz_tdata[`getvec(512, i)]),
-      .s_axis_rx_tkeep      (axis_adap_rx_322mhz_tkeep[`getvec(64, i)]),
-      .s_axis_rx_tlast      (axis_adap_rx_322mhz_tlast[i]),
-      .s_axis_rx_tuser_err  (axis_adap_rx_322mhz_tuser_err[i]),
+      .s_axis_rx_tvalid        (axis_adap_rx_322mhz_tvalid[i]),
+      .s_axis_rx_tdata         (axis_adap_rx_322mhz_tdata[`getvec(512, i)]),
+      .s_axis_rx_tkeep         (axis_adap_rx_322mhz_tkeep[`getvec(64, i)]),
+      .s_axis_rx_tlast         (axis_adap_rx_322mhz_tlast[i]),
+      .s_axis_rx_tuser_err     (axis_adap_rx_322mhz_tuser_err[i]),
       .s_axis_rx_tuser_use_rss (axis_adap_rx_322mhz_tuser_use_rss[`getvec(16, i)]),
       .s_axis_rx_tuser_c2h_qid (axis_adap_rx_322mhz_tuser_c2h_qid[`getvec(16, i)]),
+      .s_axis_rx_tready        (axis_adap_rx_322mhz_tready[i]),
 
       .mod_rstn             (adap_rstn[i]),
       .mod_rst_done         (adap_rst_done[i]),
@@ -851,16 +853,16 @@ module open_nic_shell #(
     .m_axis_adap_tx_250mhz_tuser_dst  (axis_adap_tx_250mhz_tuser_dst),
     .m_axis_adap_tx_250mhz_tready     (axis_adap_tx_250mhz_tready),
 
-    .s_axis_adap_rx_250mhz_tvalid     (axis_adap_rx_250mhz_tvalid),
-    .s_axis_adap_rx_250mhz_tdata      (axis_adap_rx_250mhz_tdata),
-    .s_axis_adap_rx_250mhz_tkeep      (axis_adap_rx_250mhz_tkeep),
-    .s_axis_adap_rx_250mhz_tlast      (axis_adap_rx_250mhz_tlast),
-    .s_axis_adap_rx_250mhz_tuser_size (axis_adap_rx_250mhz_tuser_size),
-    .s_axis_adap_rx_250mhz_tuser_src  (axis_adap_rx_250mhz_tuser_src),
-    .s_axis_adap_rx_250mhz_tuser_dst  (axis_adap_rx_250mhz_tuser_dst),
-    .s_axis_adap_rx_250mhz_tuser_use_rss  (axis_adap_rx_250mhz_tuser_use_rss),
-    .s_axis_adap_rx_250mhz_tuser_c2h_qid  (axis_adap_rx_250mhz_tuser_c2h_qid),
-    .s_axis_adap_rx_250mhz_tready     (axis_adap_rx_250mhz_tready),
+    .s_axis_adap_rx_250mhz_tvalid        (axis_adap_rx_250mhz_tvalid),
+    .s_axis_adap_rx_250mhz_tdata         (axis_adap_rx_250mhz_tdata),
+    .s_axis_adap_rx_250mhz_tkeep         (axis_adap_rx_250mhz_tkeep),
+    .s_axis_adap_rx_250mhz_tlast         (axis_adap_rx_250mhz_tlast),
+    .s_axis_adap_rx_250mhz_tuser_size    (axis_adap_rx_250mhz_tuser_size),
+    .s_axis_adap_rx_250mhz_tuser_src     (axis_adap_rx_250mhz_tuser_src),
+    .s_axis_adap_rx_250mhz_tuser_dst     (axis_adap_rx_250mhz_tuser_dst),
+    .s_axis_adap_rx_250mhz_tuser_use_rss (axis_adap_rx_250mhz_tuser_use_rss),
+    .s_axis_adap_rx_250mhz_tuser_c2h_qid (axis_adap_rx_250mhz_tuser_c2h_qid),
+    .s_axis_adap_rx_250mhz_tready        (axis_adap_rx_250mhz_tready),
 
     .mod_rstn                         (user_250mhz_rstn),
     .mod_rst_done                     (user_250mhz_rst_done),
@@ -901,13 +903,14 @@ module open_nic_shell #(
     .s_axis_adap_tx_322mhz_tuser_err (axis_adap_tx_322mhz_tuser_err),
     .s_axis_adap_tx_322mhz_tready    (axis_adap_tx_322mhz_tready),
 
-    .m_axis_adap_rx_322mhz_tvalid    (axis_adap_rx_322mhz_tvalid),
-    .m_axis_adap_rx_322mhz_tdata     (axis_adap_rx_322mhz_tdata),
-    .m_axis_adap_rx_322mhz_tkeep     (axis_adap_rx_322mhz_tkeep),
-    .m_axis_adap_rx_322mhz_tlast     (axis_adap_rx_322mhz_tlast),
-    .m_axis_adap_rx_322mhz_tuser_err (axis_adap_rx_322mhz_tuser_err),
+    .m_axis_adap_rx_322mhz_tvalid        (axis_adap_rx_322mhz_tvalid),
+    .m_axis_adap_rx_322mhz_tdata         (axis_adap_rx_322mhz_tdata),
+    .m_axis_adap_rx_322mhz_tkeep         (axis_adap_rx_322mhz_tkeep),
+    .m_axis_adap_rx_322mhz_tlast         (axis_adap_rx_322mhz_tlast),
+    .m_axis_adap_rx_322mhz_tuser_err     (axis_adap_rx_322mhz_tuser_err),
     .m_axis_adap_rx_322mhz_tuser_use_rss (axis_adap_rx_322mhz_tuser_use_rss),
     .m_axis_adap_rx_322mhz_tuser_c2h_qid (axis_adap_rx_322mhz_tuser_c2h_qid),
+    .m_axis_adap_rx_322mhz_tready        (axis_adap_rx_322mhz_tready),
 
     .m_axis_cmac_tx_tvalid           (axis_cmac_tx_tvalid),
     .m_axis_cmac_tx_tdata            (axis_cmac_tx_tdata),
