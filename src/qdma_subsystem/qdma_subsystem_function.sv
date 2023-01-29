@@ -79,8 +79,7 @@ module qdma_subsystem_function #(
   // The value of `C_PKT_FIFO_DEPTH` should be at least the latency of queue ID
   // computation.  The FIFO is not operated in packet mode.
   localparam C_PKT_FIFO_DEPTH = 32;
-  // using the same depth to handle the case of 64B frames   
-  localparam C_QID_FIFO_DEPTH = C_PKT_FIFO_DEPTH; 
+  localparam C_QID_FIFO_DEPTH = 16;
 
   wire   [15:0] q_base;
   wire   [15:0] num_q;
@@ -172,10 +171,10 @@ module qdma_subsystem_function #(
     if (~axil_aresetn) begin
       h2c_matched <= 1'b0;
     end
-    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast && s_axis_h2c_tready) begin
+    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast) begin
       h2c_matched <= h2c_q_in_range;
     end
-    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast && s_axis_h2c_tready) begin
+    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast) begin
       h2c_matched <= 1'b0;
     end
   end

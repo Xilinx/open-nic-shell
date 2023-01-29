@@ -19,12 +19,13 @@
 // data path running at 250MHz, and the other for the AXI-Lite register
 // interface running at 125MHz.
 `timescale 1ns/1ps
-module qdma_subsystem_qdma_wrapper (
-  input   [15:0] pcie_rxp,
-  input   [15:0] pcie_rxn,
-  output  [15:0] pcie_txp,
-  output  [15:0] pcie_txn,
-
+module qdma_subsystem_qdma_wrapper
+#(parameter pcie_type = 1) // 1-x86. 0-arm
+ (
+  input   [pcie_type*8+7:0] pcie_rxp,
+  input   [pcie_type*8+7:0] pcie_rxn,
+  output  [pcie_type*8+7:0] pcie_txp,
+  output  [pcie_type*8+7:0] pcie_txn,
   output         m_axil_awvalid,
   output  [31:0] m_axil_awaddr,
   input          m_axil_awready,
@@ -141,14 +142,7 @@ module qdma_subsystem_qdma_wrapper (
 
   output         axis_aclk,
   output         axil_aclk,
-
-// For AU55N, we generate 100MHz reference clock which is needed when HBM IP is instantiated 
-// in user-defined logic.
-// TODO: This should be done for all boards that have HBM.
-`ifdef __au55n__
-  output         ref_clk_100mhz,
-`endif
-
+  output         clk_100M,
   output         aresetn
 );
 
@@ -206,11 +200,12 @@ module qdma_subsystem_qdma_wrapper (
 
   assign axis_aclk = aclk_250mhz;
 
-  // Generate 125MHz 'axil_aclk' and 100MHz 'ref_clk_100mhz'.
+  // Generate 100MHz 'axil_aclk'
   qdma_subsystem_clk_div clk_div_inst (
     .clk_in1  (axis_aclk),
     .clk_out1 (axil_aclk),
-    .clk_out2 (ref_clk_100mhz)
+    .clk_out2 (clk_100M)//,
+//    .locked   ()
   );
 
   // Generate reset w.r.t. the 125MHz clock
@@ -220,7 +215,7 @@ module qdma_subsystem_qdma_wrapper (
     aresetn_sync[1] <= aresetn_sync[0];
   end
 
-  // Convert the 250MHz QDMA output AXI-Lite interface to a 125MHz one
+  // Convert the 250MHz QDMA output AXI-Lite interface to a 100MHz one
   qdma_subsystem_axi_cdc axi_cdc_inst (
     .s_axi_awvalid (qdma_axil_awvalid),
     .s_axi_awaddr  (qdma_axil_awaddr),
@@ -279,7 +274,179 @@ module qdma_subsystem_qdma_wrapper (
   assign dsc_crdt_in_qid   = 0;
   assign dsc_crdt_in_dir   = 1'b0;
   assign dsc_crdt_in_fence = 1'b0;
+generate if (pcie_type == 0)
+  qdma_no_sriov_arm qdma_no_sriov_arm_inst (
+    .pci_exp_rxp                          (pcie_rxp),
+    .pci_exp_rxn                          (pcie_rxn),
+    .pci_exp_txp                          (pcie_txp),
+    .pci_exp_txn                          (pcie_txn),
 
+    .sys_clk                              (pcie_refclk),
+    .sys_clk_gt                           (pcie_refclk_gt),
+    .sys_rst_n                            (pcie_rstn),
+    .user_lnk_up                          (user_lnk_up),
+
+    .axi_aclk                             (aclk_250mhz),
+    .axi_aresetn                          (aresetn_250mhz),
+
+    .m_axil_awvalid                       (qdma_axil_awvalid),
+    .m_axil_awaddr                        (qdma_axil_awaddr),
+    .m_axil_awuser                        (),
+    .m_axil_awprot                        (),
+    .m_axil_awready                       (qdma_axil_awready),
+    .m_axil_wvalid                        (qdma_axil_wvalid),
+    .m_axil_wdata                         (qdma_axil_wdata),
+    .m_axil_wstrb                         (),
+    .m_axil_wready                        (qdma_axil_wready),
+    .m_axil_bvalid                        (qdma_axil_bvalid),
+    .m_axil_bresp                         (qdma_axil_bresp),
+    .m_axil_bready                        (qdma_axil_bready),
+    .m_axil_arvalid                       (qdma_axil_arvalid),
+    .m_axil_araddr                        (qdma_axil_araddr),
+    .m_axil_aruser                        (),
+    .m_axil_arprot                        (),
+    .m_axil_arready                       (qdma_axil_arready),
+    .m_axil_rvalid                        (qdma_axil_rvalid),
+    .m_axil_rdata                         (qdma_axil_rdata),
+    .m_axil_rresp                         (qdma_axil_rresp),
+    .m_axil_rready                        (qdma_axil_rready),
+
+    .h2c_byp_out_vld                      (h2c_byp_out_vld),
+    .h2c_byp_out_dsc                      (h2c_byp_out_dsc),
+    .h2c_byp_out_st_mm                    (h2c_byp_out_st_mm),
+    .h2c_byp_out_dsc_sz                   (h2c_byp_out_dsc_sz),
+    .h2c_byp_out_qid                      (h2c_byp_out_qid),
+    .h2c_byp_out_error                    (h2c_byp_out_error),
+    .h2c_byp_out_func                     (h2c_byp_out_func),
+    .h2c_byp_out_cidx                     (h2c_byp_out_cidx),
+    .h2c_byp_out_port_id                  (h2c_byp_out_port_id),
+    .h2c_byp_out_fmt                      (h2c_byp_out_fmt),
+    .h2c_byp_out_rdy                      (h2c_byp_out_rdy),
+
+    .h2c_byp_in_st_vld                    (h2c_byp_in_st_vld),
+    .h2c_byp_in_st_addr                   (h2c_byp_in_st_addr),
+    .h2c_byp_in_st_len                    (h2c_byp_in_st_len),
+    .h2c_byp_in_st_eop                    (h2c_byp_in_st_eop),
+    .h2c_byp_in_st_sop                    (h2c_byp_in_st_sop),
+    .h2c_byp_in_st_mrkr_req               (h2c_byp_in_st_mrkr_req),
+    .h2c_byp_in_st_port_id                (h2c_byp_in_st_port_id),
+    .h2c_byp_in_st_sdi                    (h2c_byp_in_st_sdi),
+    .h2c_byp_in_st_qid                    (h2c_byp_in_st_qid),
+    .h2c_byp_in_st_error                  (h2c_byp_in_st_error),
+    .h2c_byp_in_st_func                   (h2c_byp_in_st_func),
+    .h2c_byp_in_st_cidx                   (h2c_byp_in_st_cidx),
+    .h2c_byp_in_st_no_dma                 (h2c_byp_in_st_no_dma),
+    .h2c_byp_in_st_rdy                    (h2c_byp_in_st_rdy),
+
+    .c2h_byp_out_vld                      (c2h_byp_out_vld),
+    .c2h_byp_out_dsc                      (c2h_byp_out_dsc),
+    .c2h_byp_out_st_mm                    (c2h_byp_out_st_mm),
+    .c2h_byp_out_qid                      (c2h_byp_out_qid),
+    .c2h_byp_out_dsc_sz                   (c2h_byp_out_dsc_sz),
+    .c2h_byp_out_error                    (c2h_byp_out_error),
+    .c2h_byp_out_func                     (c2h_byp_out_func),
+    .c2h_byp_out_cidx                     (c2h_byp_out_cidx),
+    .c2h_byp_out_port_id                  (c2h_byp_out_port_id),
+    .c2h_byp_out_fmt                      (c2h_byp_out_fmt),
+    .c2h_byp_out_pfch_tag                 (c2h_byp_out_pfch_tag),
+    .c2h_byp_out_rdy                      (c2h_byp_out_rdy),
+
+    .c2h_byp_in_st_csh_vld                (c2h_byp_in_st_csh_vld),
+    .c2h_byp_in_st_csh_addr               (c2h_byp_in_st_csh_addr),
+    .c2h_byp_in_st_csh_port_id            (c2h_byp_in_st_csh_port_id),
+    .c2h_byp_in_st_csh_qid                (c2h_byp_in_st_csh_qid),
+    .c2h_byp_in_st_csh_error              (c2h_byp_in_st_csh_error),
+    .c2h_byp_in_st_csh_func               (c2h_byp_in_st_csh_func),
+    .c2h_byp_in_st_csh_pfch_tag           (c2h_byp_in_st_csh_pfch_tag),
+    .c2h_byp_in_st_csh_rdy                (c2h_byp_in_st_csh_rdy),
+
+    .usr_irq_in_vld                       (usr_irq_in_vld),
+    .usr_irq_in_vec                       (usr_irq_in_vec),
+    .usr_irq_in_fnc                       (usr_irq_in_fnc),
+    .usr_irq_out_ack                      (usr_irq_out_ack),
+    .usr_irq_out_fail                     (usr_irq_out_fail),
+
+    .tm_dsc_sts_vld                       (tm_dsc_sts_vld),
+    .tm_dsc_sts_port_id                   (tm_dsc_sts_port_id),
+    .tm_dsc_sts_qen                       (tm_dsc_sts_qen),
+    .tm_dsc_sts_byp                       (tm_dsc_sts_byp),
+    .tm_dsc_sts_dir                       (tm_dsc_sts_dir),
+    .tm_dsc_sts_mm                        (tm_dsc_sts_mm),
+    .tm_dsc_sts_error                     (tm_dsc_sts_error),
+    .tm_dsc_sts_qid                       (tm_dsc_sts_qid),
+    .tm_dsc_sts_avl                       (tm_dsc_sts_avl),
+    .tm_dsc_sts_qinv                      (tm_dsc_sts_qinv),
+    .tm_dsc_sts_irq_arm                   (tm_dsc_sts_irq_arm),
+    .tm_dsc_sts_pidx                      (tm_dsc_sts_pidx),
+    .tm_dsc_sts_rdy                       (tm_dsc_sts_rdy),
+
+    .dsc_crdt_in_vld                      (dsc_crdt_in_vld),
+    .dsc_crdt_in_crdt                     (dsc_crdt_in_crdt),
+    .dsc_crdt_in_qid                      (dsc_crdt_in_qid),
+    .dsc_crdt_in_dir                      (dsc_crdt_in_dir),
+    .dsc_crdt_in_fence                    (dsc_crdt_in_fence),
+    .dsc_crdt_in_rdy                      (dsc_crdt_in_rdy),
+
+    .m_axis_h2c_tvalid                    (m_axis_h2c_tvalid),
+    .m_axis_h2c_tdata                     (m_axis_h2c_tdata),
+    .m_axis_h2c_tcrc                      (m_axis_h2c_tcrc),
+    .m_axis_h2c_tlast                     (m_axis_h2c_tlast),
+    .m_axis_h2c_tuser_qid                 (m_axis_h2c_tuser_qid),
+    .m_axis_h2c_tuser_port_id             (m_axis_h2c_tuser_port_id),
+    .m_axis_h2c_tuser_err                 (m_axis_h2c_tuser_err),
+    .m_axis_h2c_tuser_mdata               (m_axis_h2c_tuser_mdata),
+    .m_axis_h2c_tuser_mty                 (m_axis_h2c_tuser_mty),
+    .m_axis_h2c_tuser_zero_byte           (m_axis_h2c_tuser_zero_byte),
+    .m_axis_h2c_tready                    (m_axis_h2c_tready),
+
+    .s_axis_c2h_tvalid                    (s_axis_c2h_tvalid),
+    .s_axis_c2h_tdata                     (s_axis_c2h_tdata),
+    .s_axis_c2h_tcrc                      (s_axis_c2h_tcrc),
+    .s_axis_c2h_tlast                     (s_axis_c2h_tlast),
+    .s_axis_c2h_ctrl_marker               (s_axis_c2h_ctrl_marker),
+    .s_axis_c2h_ctrl_port_id              (s_axis_c2h_ctrl_port_id),
+    .s_axis_c2h_ctrl_ecc                  (s_axis_c2h_ctrl_ecc),
+    .s_axis_c2h_ctrl_len                  (s_axis_c2h_ctrl_len),
+    .s_axis_c2h_ctrl_qid                  (s_axis_c2h_ctrl_qid),
+    .s_axis_c2h_ctrl_has_cmpt             (s_axis_c2h_ctrl_has_cmpt),
+    .s_axis_c2h_mty                       (s_axis_c2h_mty),
+    .s_axis_c2h_tready                    (s_axis_c2h_tready),
+
+    .s_axis_c2h_cmpt_tvalid               (s_axis_cpl_tvalid),
+    .s_axis_c2h_cmpt_tdata                (s_axis_cpl_tdata),
+    .s_axis_c2h_cmpt_size                 (s_axis_cpl_size),
+    .s_axis_c2h_cmpt_dpar                 (s_axis_cpl_dpar),
+    .s_axis_c2h_cmpt_ctrl_qid             (s_axis_cpl_ctrl_qid),
+    .s_axis_c2h_cmpt_ctrl_cmpt_type       (s_axis_cpl_ctrl_cmpt_type),
+    .s_axis_c2h_cmpt_ctrl_wait_pld_pkt_id (s_axis_cpl_ctrl_wait_pld_pkt_id),
+    .s_axis_c2h_cmpt_ctrl_port_id         (s_axis_cpl_ctrl_port_id),
+    .s_axis_c2h_cmpt_ctrl_marker          (s_axis_cpl_ctrl_marker),
+    .s_axis_c2h_cmpt_ctrl_user_trig       (s_axis_cpl_ctrl_user_trig),
+    .s_axis_c2h_cmpt_ctrl_col_idx         (s_axis_cpl_ctrl_col_idx),
+    .s_axis_c2h_cmpt_ctrl_err_idx         (s_axis_cpl_ctrl_err_idx),
+    .s_axis_c2h_cmpt_ctrl_no_wrb_marker   (s_axis_cpl_ctrl_no_wrb_marker),
+    .s_axis_c2h_cmpt_tready               (s_axis_cpl_tready),
+
+    .axis_c2h_status_drop                 (),     // output wire axis_c2h_status_drop
+    .axis_c2h_status_valid                (),     // output wire axis_c2h_status_valid
+    .axis_c2h_status_cmp                  (),     // output wire axis_c2h_status_cmp
+    .axis_c2h_status_error                (),     // output wire axis_c2h_status_error
+    .axis_c2h_status_last                 (),     // output wire axis_c2h_status_last
+    .axis_c2h_status_qid                  (),     // output wire [10 : 0] axis_c2h_status_qid
+    .axis_c2h_dmawr_cmp                   (),     // output wire axis_c2h_dmawr_cmp
+
+    .qsts_out_op                          (),     // output wire [7 : 0] qsts_out_op
+    .qsts_out_data                        (),     // output wire [63 : 0] qsts_out_data
+    .qsts_out_port_id                     (),     // output wire [2 : 0] qsts_out_port_id
+    .qsts_out_qid                         (),     // output wire [12 : 0] qsts_out_qid
+    .qsts_out_vld                         (),     // output wire qsts_out_vld
+    .qsts_out_rdy                         (1'b1), // input wire qsts_out_rdy
+
+    .soft_reset_n                         (soft_reset_n),
+    .phy_ready                            (phy_ready)
+  );
+  
+  else //generate if (pcie_type == 1)
   qdma_no_sriov qdma_inst (
     .pci_exp_rxp                          (pcie_rxp),
     .pci_exp_rxn                          (pcie_rxn),
@@ -450,5 +617,8 @@ module qdma_subsystem_qdma_wrapper (
     .soft_reset_n                         (soft_reset_n),
     .phy_ready                            (phy_ready)
   );
+
+
+endgenerate  
 
 endmodule: qdma_subsystem_qdma_wrapper

@@ -27,15 +27,24 @@ module open_nic_shell #(
   parameter int    NUM_CMAC_PORT   = 1
 ) (
 `ifdef __synthesis__
-
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
 `ifdef __au280__
-  output                         hbm_cattrip,
-`elsif __au50__
-  output                         hbm_cattrip,
-`elsif __au55n__
-  output                         hbm_cattrip,
+//  output                         hbm_cattrip, // Fix the CATTRIP issue for AU280 custom flow
 `endif
+
+`ifdef __au55n__
+//  output                         hbm_cattrip, // Fix the CATTRIP issue for AU55N custom flow
+`endif
+
+// ARM PCIe Interface
+
+    input arm_pcie_refclk_p,
+    input arm_pcie_refclk_n,
+    input [7:0] arm_pcie_mgt_0_rxn,
+    input [7:0] arm_pcie_mgt_0_rxp,
+    output [7:0] arm_pcie_mgt_0_txn,
+    output [7:0] arm_pcie_mgt_0_txp,
+    input arm_pcie_rstn,
+
 
   input                   [15:0] pcie_rxp,
   input                   [15:0] pcie_rxn,
@@ -49,8 +58,25 @@ module open_nic_shell #(
   input    [4*NUM_CMAC_PORT-1:0] qsfp_rxn,
   output   [4*NUM_CMAC_PORT-1:0] qsfp_txp,
   output   [4*NUM_CMAC_PORT-1:0] qsfp_txn,
-  input      [NUM_CMAC_PORT-1:0] qsfp_refclk_p,
-  input      [NUM_CMAC_PORT-1:0] qsfp_refclk_n
+  input      qsfp_refclk_p,
+  input      qsfp_refclk_n,
+  input      dual0_gt_ref_clk_p,
+  input      dual0_gt_ref_clk_n,
+  input      dual1_gt_ref_clk_p,
+  input      dual1_gt_ref_clk_n,
+      // CMS Ports
+  input                          [1:0]satellite_gpio,
+  input                          satellite_uart_rxd,
+  output                         satellite_uart_txd
+  
+//   inout spi_flash_io0_io,
+//  inout spi_flash_io1_io,
+//  inout spi_flash_io2_io,
+//  inout spi_flash_io3_io,
+//  inout spi_flash_sck_io,
+//  inout [0:0]spi_flash_ss_io
+
+
 `else // !`ifdef __synthesis__
   input                          s_axil_sim_awvalid,
   input                   [31:0] s_axil_sim_awaddr,
@@ -156,35 +182,39 @@ module open_nic_shell #(
   wire         pcie_phy_ready;
 
   // BAR2-mapped master AXI-Lite feeding into system configuration block
-  wire         axil_pcie_awvalid;
-  wire  [31:0] axil_pcie_awaddr;
-  wire         axil_pcie_awready;
-  wire         axil_pcie_wvalid;
-  wire  [31:0] axil_pcie_wdata;
-  wire         axil_pcie_wready;
-  wire         axil_pcie_bvalid;
-  wire   [1:0] axil_pcie_bresp;
-  wire         axil_pcie_bready;
-  wire         axil_pcie_arvalid;
-  wire  [31:0] axil_pcie_araddr;
-  wire         axil_pcie_arready;
-  wire         axil_pcie_rvalid;
-  wire  [31:0] axil_pcie_rdata;
-  wire   [1:0] axil_pcie_rresp;
-  wire         axil_pcie_rready;
+   wire         axil_pcie_awvalid;
+   wire  [31:0] axil_pcie_awaddr;
+   wire         axil_pcie_awready;
+   wire         axil_pcie_wvalid;
+   wire  [31:0] axil_pcie_wdata;
+   wire         axil_pcie_wready;
+   wire         axil_pcie_bvalid;
+   wire   [1:0] axil_pcie_bresp;
+   wire         axil_pcie_bready;
+   wire         axil_pcie_arvalid;
+   wire  [31:0] axil_pcie_araddr;
+   wire         axil_pcie_arready;
+   wire         axil_pcie_rvalid;
+   wire  [31:0] axil_pcie_rdata;
+   wire   [1:0] axil_pcie_rresp;
+   wire         axil_pcie_rready;
 
   IBUF pcie_rstn_ibuf_inst (.I(pcie_rstn), .O(pcie_rstn_int));
 
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
-//
-// This pin must be tied to 0; otherwise the board might be unrecoverable
-// after programming
 `ifdef __au280__
-  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
-`elsif __au50__
-  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
-`elsif __au55n__
-  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+  // Fix the CATTRIP issue for AU280 custom flow
+  //
+  // This pin must be tied to 0; otherwise the board might be unrecoverable
+  // after programming
+//  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`endif
+
+`ifdef __au55n__
+  // Fix the CATTRIP issue for AU55N custom flow
+  //
+  // This pin must be tied to 0; otherwise the board might be unrecoverable
+  // after programming
+//  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif
 
 `ifdef __zynq_family__
@@ -365,11 +395,6 @@ module open_nic_shell #(
 
   wire                         axil_aclk;
   wire                         axis_aclk;
-
-`ifdef __au55n__
-  wire                         ref_clk_100mhz;
-`endif
-
   wire     [NUM_CMAC_PORT-1:0] cmac_clk;
 
   // Unused reset pairs must have their "reset_done" tied to 1
@@ -593,6 +618,16 @@ module open_nic_shell #(
     .pcie_rxn                             (pcie_rxn),
     .pcie_txp                             (pcie_txp),
     .pcie_txn                             (pcie_txn),
+    
+    // ARM PCIe Interface
+
+    .arm_pcie_refclk_p                      (arm_pcie_refclk_p),
+    .arm_pcie_refclk_n                      (arm_pcie_refclk_n),
+    .arm_pcie_mgt_0_rxn                     (arm_pcie_mgt_0_rxn),
+    .arm_pcie_mgt_0_rxp                     (arm_pcie_mgt_0_rxp),
+    .arm_pcie_mgt_0_txn                     (arm_pcie_mgt_0_txn),
+    .arm_pcie_mgt_0_txp                     (arm_pcie_mgt_0_txp),
+    .arm_pcie_rstn                          (arm_pcie_rstn),
 
     .m_axil_pcie_awvalid                  (axil_pcie_awvalid),
     .m_axil_pcie_awaddr                   (axil_pcie_awaddr),
@@ -663,13 +698,16 @@ module open_nic_shell #(
     .mod_rst_done                         (qdma_rst_done),
 
     .axil_aclk                            (axil_aclk),
-
-  `ifdef __au55n__
     .axis_aclk                            (axis_aclk),
-    .ref_clk_100mhz                       (ref_clk_100mhz)
-  `else
-    .axis_aclk                            (axis_aclk)
-  `endif
+    .satellite_gpio                       (satellite_gpio),
+    .satellite_uart_rxd                   (satellite_uart_rxd),
+    .satellite_uart_txd                   (satellite_uart_txd)
+//    .spi_flash_io0_io                     (spi_flash_io0_io),
+//    .spi_flash_io1_io                     (spi_flash_io1_io),
+//    .spi_flash_io2_io                     (spi_flash_io2_io),
+//    .spi_flash_io3_io                     (spi_flash_io3_io),
+//    .spi_flash_sck_io                     (spi_flash_sck_io),
+//    .spi_flash_ss_io                      (spi_flash_ss_io)
   );
 
   generate for (genvar i = 0; i < NUM_CMAC_PORT; i++) begin: cmac_port
@@ -774,8 +812,12 @@ module open_nic_shell #(
       .gt_rxn                       (qsfp_rxn[`getvec(4, i)]),
       .gt_txp                       (qsfp_txp[`getvec(4, i)]),
       .gt_txn                       (qsfp_txn[`getvec(4, i)]),
-      .gt_refclk_p                  (qsfp_refclk_p[i]),
-      .gt_refclk_n                  (qsfp_refclk_n[i]),
+      .gt_refclk_p                  (qsfp_refclk_p),
+      .gt_refclk_n                  (qsfp_refclk_n),
+      .dual0_gt_ref_clk_p           (dual0_gt_ref_clk_p),
+      .dual0_gt_ref_clk_n           (dual0_gt_ref_clk_n),
+      .dual1_gt_ref_clk_p           (dual1_gt_ref_clk_p),
+      .dual1_gt_ref_clk_n           (dual1_gt_ref_clk_n),
 
       .cmac_clk                     (cmac_clk[i]),
 `else
@@ -869,13 +911,7 @@ module open_nic_shell #(
     .box_rst_done                     (box_250mhz_rst_done),
 
     .axil_aclk                        (axil_aclk),
-
-  `ifdef __au55n__
-    .axis_aclk                        (axis_aclk),
-    .ref_clk_100mhz                   (ref_clk_100mhz)
-  `else
     .axis_aclk                        (axis_aclk)
-  `endif
   );
 
   box_322mhz #(

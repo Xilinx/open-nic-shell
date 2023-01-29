@@ -401,6 +401,12 @@ puts $fp "set_property BITSTREAM.CONFIG.USERID \"$bitstream_userid\" \[current_d
 puts $fp "set_property BITSTREAM.CONFIG.USR_ACCESS $bitstream_usr_access \[current_design\]"
 close $fp
 
+# Card Management for SN1022
+if {$board == "sn1022"} {
+    source $src_dir/qdma_subsystem/vivado_ip/cms_qspi_sn1022.tcl
+}
+
+
 # Read constraint files
 read_xdc -unmanaged ${constr_dir}/${board}/pins.xdc
 read_xdc -unmanaged ${constr_dir}/${board}/timing.xdc

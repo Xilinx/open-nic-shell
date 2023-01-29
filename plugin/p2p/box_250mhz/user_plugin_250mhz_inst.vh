@@ -90,16 +90,6 @@ p2p_250mhz #(
   .mod_rstn                         (mod_rstn[0]),
   .mod_rst_done                     (mod_rst_done[0]),
 
-// For AU55N, we generate 100MHz reference clock which is needed when HBM IP is instantiated 
-// in user-defined logic.
-// TODO: This should be done for all boards that have HBM.
-`ifdef __au55n__
-  .ref_clk_100mhz                   (ref_clk_100mhz),
-`else
-//  .ref_clk_100mhz                   ()
-`endif
-
   .axil_aclk                        (axil_aclk),
   .axis_aclk                        (axis_aclk)
-
 );

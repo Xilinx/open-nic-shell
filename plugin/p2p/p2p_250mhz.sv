@@ -77,13 +77,7 @@ module p2p_250mhz #(
   output                    mod_rst_done,
 
   input                     axil_aclk,
-
-`ifdef __au55n__
-  input                     axis_aclk,
-  input                     ref_clk_100mhz
-`else
   input                     axis_aclk
-`endif
 );
 
   wire axil_aresetn;

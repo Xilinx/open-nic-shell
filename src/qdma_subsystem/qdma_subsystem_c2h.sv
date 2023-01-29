@@ -176,7 +176,7 @@ module qdma_subsystem_c2h #(
       m_axis_qdma_c2h_mty <= 0;
     end
     else if (axis_c2h_tvalid && axis_c2h_tready) begin
-       m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (axis_c2h_tuser_size[5:0] == 0) ? 0 : (64 - axis_c2h_tuser_size[5:0]) : 0;
+      m_axis_qdma_c2h_mty <= (axis_c2h_tlast) ? (64 - axis_c2h_tuser_size[5:0]) : 0;
     end
   end
 
@@ -227,7 +227,7 @@ module qdma_subsystem_c2h #(
   end
 
   // This FIFO stores completion information, including packet length, packet ID
-  // and queue ID.  When the FIFO becomes nearly full, the arbitration is paused.
+  // and queue ID.  When the FIFO becomes full, the arbitration is paused.
   xpm_fifo_sync #(
     .DOUT_RESET_VALUE    ("0"),
     .ECC_MODE            ("no_ecc"),
@@ -236,12 +236,7 @@ module qdma_subsystem_c2h #(
     .FIFO_WRITE_DEPTH    (512),
     .READ_DATA_WIDTH     (43), // {qid, pkt_id, size}
     .READ_MODE           ("fwft"),
-    .WRITE_DATA_WIDTH    (43),
-    .PROG_FULL_THRESH    (512-5) // Note that there is a one cycle delay along the datapath due to the 
-		                 // AXI register slice instantiated above.  The prog_full here is 
-		                 // used instead to provide necessary early reaction time in case this
-		                 // fifo nears full.  DEPTH-5 is specied for the prog_full threshold 
-		                 // based on the values that are allowed when using FWFT mode of xpm_fifo_sync.
+    .WRITE_DATA_WIDTH    (43)
   ) cpl_fifo_inst (
     .wr_en         (cpl_fifo_wr_en),
     .din           (cpl_fifo_din),
@@ -254,13 +249,13 @@ module qdma_subsystem_c2h #(
     .rd_data_count (),
 
     .empty         (cpl_fifo_empty),
-    .full          (), // Moved to prog_full (see note above)
+    .full          (cpl_fifo_full),
     .almost_empty  (),
     .almost_full   (),
     .overflow      (),
     .underflow     (),
     .prog_empty    (),
-    .prog_full     (cpl_fifo_full),
+    .prog_full     (),
     .sleep         (1'b0),
 
     .sbiterr       (),
@@ -288,8 +283,8 @@ module qdma_subsystem_c2h #(
   assign m_axis_qdma_cpl_tdata[15:0]          = 0;
 
   assign m_axis_qdma_cpl_ctrl_no_wrb_marker   = 1'b0;
-  assign m_axis_qdma_cpl_ctrl_col_idx         = 0;
-  assign m_axis_qdma_cpl_ctrl_err_idx         = 0;
+  assign m_axis_qdma_cpl_ctrl_col_idx         = 1'b0;
+  assign m_axis_qdma_cpl_ctrl_err_idx         = 1'b0;
   assign m_axis_qdma_cpl_ctrl_qid             = cpl_fifo_dout[42:32];
   assign m_axis_qdma_cpl_ctrl_marker          = 1'b0;
   assign m_axis_qdma_cpl_ctrl_cmpt_type       = 2'b11;  //regular mode

@@ -1,7 +1,6 @@
 # *************************************************************************
 #
 # Copyright 2023 Advanced Micro Devices
-# Copyright 2020 Xilinx, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,18 +15,25 @@
 # limitations under the License.
 #
 # *************************************************************************
-set ips {
-    qdma_no_sriov
-    qdma_subsystem_clk_div
-    qdma_subsystem_axi_cdc
-    qdma_subsystem_axi_crossbar
-    qdma_subsystem_c2h_ecc
-}
-if {$board == "sn1022"} {
-    lappend ips "qdma_no_sriov_arm"
-    lappend ips "c2h_axis_interconnect_1"
-    lappend ips "h2c_axis_interconnect_1"
-    lappend ips "cpl_axis_interconnect_1"
-    lappend ips "vio_0_1"
-#    lappend ips "cms_qspi_sn1022"
-}
+
+##################################################################
+# CREATE IP vio_0_1
+##################################################################
+
+set vio_0_1 vio_0_1
+create_ip -name vio -vendor xilinx.com -library ip -module_name vio_0_1 -dir ${ip_build_dir}
+
+# User Parameters
+set_property -dict [list \
+  CONFIG.C_EN_PROBE_IN_ACTIVITY {0} \
+  CONFIG.C_NUM_PROBE_IN {0} \
+  CONFIG.C_PROBE_OUT0_INIT_VAL {0x1} \
+] [get_ips vio_0_1]
+
+# Runtime Parameters
+#set_property -dict { 
+#  GENERATE_SYNTH_CHECKPOINT {1}
+#} $vio_0_1
+
+##################################################################
+
