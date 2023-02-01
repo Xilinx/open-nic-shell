@@ -28,12 +28,14 @@ module open_nic_shell #(
 ) (
 `ifdef __synthesis__
 
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C, and AU55N custom flow
 `ifdef __au280__
   output                         hbm_cattrip,
 `elsif __au50__
   output                         hbm_cattrip,
 `elsif __au55n__
+  output                         hbm_cattrip,
+`elsif __au55c__
   output                         hbm_cattrip,
 `endif
 
@@ -175,7 +177,7 @@ module open_nic_shell #(
 
   IBUF pcie_rstn_ibuf_inst (.I(pcie_rstn), .O(pcie_rstn_int));
 
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C, and AU55N custom flow
 //
 // This pin must be tied to 0; otherwise the board might be unrecoverable
 // after programming
@@ -184,6 +186,8 @@ module open_nic_shell #(
 `elsif __au50__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au55n__
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au55c__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `endif
 
@@ -367,6 +371,8 @@ module open_nic_shell #(
   wire                         axis_aclk;
 
 `ifdef __au55n__
+  wire                         ref_clk_100mhz;
+`elsif __au55c__
   wire                         ref_clk_100mhz;
 `endif
 
@@ -664,12 +670,12 @@ module open_nic_shell #(
 
     .axil_aclk                            (axil_aclk),
 
-  `ifdef __au55n__
-    .axis_aclk                            (axis_aclk),
-    .ref_clk_100mhz                       (ref_clk_100mhz)
-  `else
+    `ifdef __au55n__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au55c__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `endif
     .axis_aclk                            (axis_aclk)
-  `endif
   );
 
   generate for (genvar i = 0; i < NUM_CMAC_PORT; i++) begin: cmac_port
@@ -870,12 +876,12 @@ module open_nic_shell #(
 
     .axil_aclk                        (axil_aclk),
 
-  `ifdef __au55n__
-    .axis_aclk                        (axis_aclk),
-    .ref_clk_100mhz                   (ref_clk_100mhz)
-  `else
+    `ifdef __au55n__
+      .ref_clk_100mhz                   (ref_clk_100mhz),
+    `elsif __au55c__
+      .ref_clk_100mhz                   (ref_clk_100mhz),
+    `endif
     .axis_aclk                        (axis_aclk)
-  `endif
   );
 
   box_322mhz #(
