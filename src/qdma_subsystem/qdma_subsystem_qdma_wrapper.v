@@ -147,6 +147,8 @@ module qdma_subsystem_qdma_wrapper (
 // TODO: This should be done for all boards that have HBM.
 `ifdef __au55n__
   output         ref_clk_100mhz,
+`elsif __au55c__
+  output         ref_clk_100mhz,
 `endif
 
   output         aresetn

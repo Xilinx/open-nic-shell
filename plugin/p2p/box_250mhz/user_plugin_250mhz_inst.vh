@@ -95,6 +95,8 @@ p2p_250mhz #(
 // TODO: This should be done for all boards that have HBM.
 `ifdef __au55n__
   .ref_clk_100mhz                   (ref_clk_100mhz),
+`elsif __au55c__
+  .ref_clk_100mhz                   (ref_clk_100mhz),
 `else
 //  .ref_clk_100mhz                   ()
 `endif
