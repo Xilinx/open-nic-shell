@@ -127,6 +127,45 @@ module system_config #(
   output                 [31:0] user_rstn,
   input                  [31:0] user_rst_done,
 
+  input                         satellite_uart_0_rxd,
+  output                        satellite_uart_0_txd,
+
+`ifdef __au280__
+  input                   [3:0] satellite_gpio_0,
+  input                   [6:0] hbm_temp_1_0,
+  input                   [6:0] hbm_temp_2_0,
+  input                         interrupt_hbm_cattrip_0,
+`elsif __au50__
+  input                   [1:0] satellite_gpio_0,
+  input                   [6:0] hbm_temp_1_0,
+  input                   [6:0] hbm_temp_2_0,
+  input                         interrupt_hbm_cattrip_0,
+`elsif __au55n__
+  input                   [3:0] satellite_gpio_0,
+  input                   [6:0] hbm_temp_1_0,
+  input                   [6:0] hbm_temp_2_0,
+  input                         interrupt_hbm_cattrip_0,
+`elsif __au55c__
+  input                   [3:0] satellite_gpio_0,
+  input                   [6:0] hbm_temp_1_0,
+  input                   [6:0] hbm_temp_2_0,
+  input                         interrupt_hbm_cattrip_0,  
+`elsif __au200__
+  input                   [3:0] satellite_gpio_0,
+  output                  [1:0] qsfp_resetl, 
+  input                   [1:0] qsfp_modprsl,
+  input                   [1:0] qsfp_intl,   
+  output                  [1:0] qsfp_lpmode,
+  output                  [1:0] qsfp_modsell,
+`elsif __au250__
+  input                   [3:0] satellite_gpio_0,
+  output                  [1:0] qsfp_resetl, 
+  input                   [1:0] qsfp_modprsl,
+  input                   [1:0] qsfp_intl,   
+  output                  [1:0] qsfp_lpmode,
+  output                  [1:0] qsfp_modsell,  
+`endif
+
   input                         aclk,
   input                         aresetn
 );
@@ -171,6 +210,86 @@ module system_config #(
   wire [31:0] axil_smon_rdata;
   wire  [1:0] axil_smon_rresp;
   wire        axil_smon_rready;
+
+  wire        axil_cms_awvalid;
+  wire [31:0] axil_cms_awaddr;
+  wire        axil_cms_awready;
+  wire        axil_cms_wvalid;
+  wire [31:0] axil_cms_wdata;
+  wire        axil_cms_wready;
+  wire        axil_cms_bvalid;
+  wire  [1:0] axil_cms_bresp;
+  wire        axil_cms_bready;
+  wire        axil_cms_arvalid;
+  wire [31:0] axil_cms_araddr;
+  wire        axil_cms_arready;
+  wire        axil_cms_rvalid;
+  wire [31:0] axil_cms_rdata;
+  wire  [1:0] axil_cms_rresp;
+  wire        axil_cms_rready;
+  wire  [2:0] axil_cms_awprot;
+  wire  [2:0] axil_cms_arprot;
+  wire  [3:0] axil_cms_wstrb;
+  
+  wire        axil_cms_int_awvalid;
+  wire [31:0] axil_cms_int_awaddr;
+  wire        axil_cms_int_awready;
+  wire        axil_cms_int_wvalid;
+  wire [31:0] axil_cms_int_wdata;
+  wire        axil_cms_int_wready;
+  wire        axil_cms_int_bvalid;
+  wire  [1:0] axil_cms_int_bresp;
+  wire        axil_cms_int_bready;
+  wire        axil_cms_int_arvalid;
+  wire [31:0] axil_cms_int_araddr;
+  wire        axil_cms_int_arready;
+  wire        axil_cms_int_rvalid;
+  wire [31:0] axil_cms_int_rdata;
+  wire  [1:0] axil_cms_int_rresp;
+  wire        axil_cms_int_rready;
+  wire  [2:0] axil_cms_int_awprot;
+  wire  [2:0] axil_cms_int_arprot;
+  wire  [3:0] axil_cms_int_wstrb;
+
+  wire        axil_qspi_awvalid;
+  wire [31:0] axil_qspi_awaddr;
+  wire        axil_qspi_awready;
+  wire        axil_qspi_wvalid;
+  wire [31:0] axil_qspi_wdata;
+  wire        axil_qspi_wready;
+  wire        axil_qspi_bvalid;
+  wire  [1:0] axil_qspi_bresp;
+  wire        axil_qspi_bready;
+  wire        axil_qspi_arvalid;
+  wire [31:0] axil_qspi_araddr;
+  wire        axil_qspi_arready;
+  wire        axil_qspi_rvalid;
+  wire [31:0] axil_qspi_rdata;
+  wire  [1:0] axil_qspi_rresp;
+  wire        axil_qspi_rready;
+  wire  [2:0] axil_qspi_awprot;
+  wire  [2:0] axil_qspi_arprot;
+  wire  [3:0] axil_qspi_wstrb;
+  
+  wire        axil_qspi_int_awvalid;
+  wire [31:0] axil_qspi_int_awaddr;
+  wire        axil_qspi_int_awready;
+  wire        axil_qspi_int_wvalid;
+  wire [31:0] axil_qspi_int_wdata;
+  wire        axil_qspi_int_wready;
+  wire        axil_qspi_int_bvalid;
+  wire  [1:0] axil_qspi_int_bresp;
+  wire        axil_qspi_int_bready;
+  wire        axil_qspi_int_arvalid;
+  wire [31:0] axil_qspi_int_araddr;
+  wire        axil_qspi_int_arready;
+  wire        axil_qspi_int_rvalid;
+  wire [31:0] axil_qspi_int_rdata;
+  wire  [1:0] axil_qspi_int_rresp;
+  wire        axil_qspi_int_rready;
+  wire  [2:0] axil_qspi_int_awprot;
+  wire  [2:0] axil_qspi_int_arprot;
+  wire  [3:0] axil_qspi_int_wstrb;
    
   system_config_address_map #(
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
@@ -311,6 +430,46 @@ module system_config #(
     .m_axil_box1_rresp   (m_axil_box1_rresp),
     .m_axil_box1_rready  (m_axil_box1_rready),
 
+    .m_axil_cms_awvalid (axil_cms_awvalid),
+    .m_axil_cms_awaddr  (axil_cms_awaddr),
+    .m_axil_cms_awready (axil_cms_awready),
+    .m_axil_cms_wvalid  (axil_cms_wvalid),
+    .m_axil_cms_wdata   (axil_cms_wdata),
+    .m_axil_cms_wready  (axil_cms_wready),
+    .m_axil_cms_bvalid  (axil_cms_bvalid),
+    .m_axil_cms_bresp   (axil_cms_bresp),
+    .m_axil_cms_bready  (axil_cms_bready),
+    .m_axil_cms_arvalid (axil_cms_arvalid),
+    .m_axil_cms_araddr  (axil_cms_araddr),
+    .m_axil_cms_arready (axil_cms_arready),
+    .m_axil_cms_rvalid  (axil_cms_rvalid),
+    .m_axil_cms_rdata   (axil_cms_rdata),
+    .m_axil_cms_rresp   (axil_cms_rresp),
+    .m_axil_cms_rready  (axil_cms_rready),
+    .m_axil_cms_arprot  (axil_cms_arprot),
+    .m_axil_cms_awprot  (axil_cms_awprot),
+    .m_axil_cms_wstrb   (axil_cms_wstrb),
+
+    .m_axil_qspi_awvalid (axil_qspi_awvalid),
+    .m_axil_qspi_awaddr  (axil_qspi_awaddr),
+    .m_axil_qspi_awready (axil_qspi_awready),
+    .m_axil_qspi_wvalid  (axil_qspi_wvalid),
+    .m_axil_qspi_wdata   (axil_qspi_wdata),
+    .m_axil_qspi_wready  (axil_qspi_wready),
+    .m_axil_qspi_bvalid  (axil_qspi_bvalid),
+    .m_axil_qspi_bresp   (axil_qspi_bresp),
+    .m_axil_qspi_bready  (axil_qspi_bready),
+    .m_axil_qspi_arvalid (axil_qspi_arvalid),
+    .m_axil_qspi_araddr  (axil_qspi_araddr),
+    .m_axil_qspi_arready (axil_qspi_arready),
+    .m_axil_qspi_rvalid  (axil_qspi_rvalid),
+    .m_axil_qspi_rdata   (axil_qspi_rdata),
+    .m_axil_qspi_rresp   (axil_qspi_rresp),
+    .m_axil_qspi_rready  (axil_qspi_rready),
+    .m_axil_qspi_arprot  (axil_qspi_arprot),
+    .m_axil_qspi_awprot  (axil_qspi_awprot),
+    .m_axil_qspi_wstrb   (axil_qspi_wstrb),
+
     .aclk                (aclk),
     .aresetn             (aresetn)
   );
@@ -366,6 +525,225 @@ module system_config #(
      .s_axi_rresp     (axil_smon_rresp),                    
      .s_axi_rvalid    (axil_smon_rvalid),                    
      .s_axi_rready    (axil_smon_rready)
+  );
+
+  wire        cms_clk;
+  wire        cms_aresetn;
+  wire        cms_locked;
+  
+  wire        clk_50mhz_wiz_out;
+
+  // Generate 50MHz 'cms_clk'
+clk_wiz_50Mhz clk_wiz_cms_inst (
+    .clk_in1  (aclk),
+    .resetn   (aresetn),
+    .clk_out1 (clk_50mhz_wiz_out),
+    .locked   (cms_locked)
+  );
+
+BUFG
+clk_50mhz_bufg_inst (
+    .I(clk_50mhz_wiz_out),
+    .O(cms_clk)
+);
+
+  // generate synchronous reset to 50MHz with asynchronous assertion  
+localparam sync_stages = 2;
+reg [sync_stages-1:0] cms_aresetn_sync = {sync_stages{1'b0}};
+assign cms_aresetn = cms_locked && cms_aresetn_sync[sync_stages-1];
+  
+always @(posedge cms_clk) begin
+    if (cms_locked == 1'b0) begin
+        cms_aresetn_sync <= {sync_stages{1'b0}};
+    end
+    else begin
+        cms_aresetn_sync <= {cms_aresetn_sync[sync_stages-2:0], 1'b1};
+    end
+end    
+
+  axi_lite_clock_converter axi_clock_conv_qspi_inst (
+      .s_axi_awaddr  (axil_qspi_awaddr),
+      .s_axi_awprot  (axil_qspi_awprot),
+      .s_axi_awvalid (axil_qspi_awvalid),
+      .s_axi_awready (axil_qspi_awready),
+      .s_axi_wdata   (axil_qspi_wdata),
+      .s_axi_wstrb   (axil_qspi_wstrb),
+      .s_axi_wvalid  (axil_qspi_wvalid),
+      .s_axi_wready  (axil_qspi_wready),
+      .s_axi_bvalid  (axil_qspi_bvalid),
+      .s_axi_bresp   (axil_qspi_bresp),
+      .s_axi_bready  (axil_qspi_bready),
+      .s_axi_araddr  (axil_qspi_araddr),
+      .s_axi_arprot  (axil_qspi_arprot),
+      .s_axi_arvalid (axil_qspi_arvalid),
+      .s_axi_arready (axil_qspi_arready),
+      .s_axi_rdata   (axil_qspi_rdata),
+      .s_axi_rresp   (axil_qspi_rresp),
+      .s_axi_rvalid  (axil_qspi_rvalid),
+      .s_axi_rready  (axil_qspi_rready),
+
+      .m_axi_awaddr  (axil_qspi_int_awaddr),
+      .m_axi_awprot  (axil_qspi_int_awprot),
+      .m_axi_awvalid (axil_qspi_int_awvalid),
+      .m_axi_awready (axil_qspi_int_awready),
+      .m_axi_wdata   (axil_qspi_int_wdata),
+      .m_axi_wstrb   (axil_qspi_int_wstrb),
+      .m_axi_wvalid  (axil_qspi_int_wvalid),
+      .m_axi_wready  (axil_qspi_int_wready),
+      .m_axi_bvalid  (axil_qspi_int_bvalid),
+      .m_axi_bresp   (axil_qspi_int_bresp),
+      .m_axi_bready  (axil_qspi_int_bready),
+      .m_axi_araddr  (axil_qspi_int_araddr),
+      .m_axi_arprot  (axil_qspi_int_arprot),
+      .m_axi_arvalid (axil_qspi_int_arvalid),
+      .m_axi_arready (axil_qspi_int_arready),
+      .m_axi_rdata   (axil_qspi_int_rdata),
+      .m_axi_rresp   (axil_qspi_int_rresp),
+      .m_axi_rvalid  (axil_qspi_int_rvalid),
+      .m_axi_rready  (axil_qspi_int_rready),
+
+      .s_axi_aclk    (aclk),
+      .s_axi_aresetn (aresetn),
+      .m_axi_aclk    (cms_clk),
+      .m_axi_aresetn (cms_aresetn)
+    );
+
+  axi_quad_spi_0 quad_spi_inst (
+    .s_axi_awvalid (axil_qspi_int_awvalid),
+    .s_axi_awaddr  (axil_qspi_int_awaddr[6:0]),
+    .s_axi_awready (axil_qspi_int_awready),
+    .s_axi_wvalid  (axil_qspi_int_wvalid),
+    .s_axi_wdata   (axil_qspi_int_wdata),
+    .s_axi_wready  (axil_qspi_int_wready),
+    .s_axi_bvalid  (axil_qspi_int_bvalid),
+    .s_axi_bresp   (axil_qspi_int_bresp),
+    .s_axi_bready  (axil_qspi_int_bready),
+    .s_axi_arvalid (axil_qspi_int_arvalid),
+    .s_axi_araddr  (axil_qspi_int_araddr[6:0]),
+    .s_axi_arready (axil_qspi_int_arready),
+    .s_axi_rvalid  (axil_qspi_int_rvalid),
+    .s_axi_rdata   (axil_qspi_int_rdata),
+    .s_axi_rresp   (axil_qspi_int_rresp),
+    .s_axi_rready  (axil_qspi_int_rready),
+    .s_axi_wstrb   (4'b1111),
+    .s_axi_aclk    (cms_clk),
+    .s_axi_aresetn (cms_aresetn),
+    .gsr           (1'b0),
+    .gts           (1'b0),
+    .usrcclkts     (1'b0),
+    .keyclearb     (1'b1),
+    .usrdoneo      (1'b0),
+    .usrdonets     (1'b1),
+    .ext_spi_clk   (cms_clk)
+  );
+
+axi_lite_clock_converter axi_clock_conv_cms_inst (
+      .s_axi_awaddr  (axil_cms_awaddr),
+      .s_axi_awprot  (axil_cms_awprot),
+      .s_axi_awvalid (axil_cms_awvalid),
+      .s_axi_awready (axil_cms_awready),
+      .s_axi_wdata   (axil_cms_wdata),
+      .s_axi_wstrb   (axil_cms_wstrb),
+      .s_axi_wvalid  (axil_cms_wvalid),
+      .s_axi_wready  (axil_cms_wready),
+      .s_axi_bvalid  (axil_cms_bvalid),
+      .s_axi_bresp   (axil_cms_bresp),
+      .s_axi_bready  (axil_cms_bready),
+      .s_axi_araddr  (axil_cms_araddr),
+      .s_axi_arprot  (axil_cms_arprot),
+      .s_axi_arvalid (axil_cms_arvalid),
+      .s_axi_arready (axil_cms_arready),
+      .s_axi_rdata   (axil_cms_rdata),
+      .s_axi_rresp   (axil_cms_rresp),
+      .s_axi_rvalid  (axil_cms_rvalid),
+      .s_axi_rready  (axil_cms_rready),
+
+      .m_axi_awaddr  (axil_cms_int_awaddr),
+      .m_axi_awprot  (axil_cms_int_awprot),
+      .m_axi_awvalid (axil_cms_int_awvalid),
+      .m_axi_awready (axil_cms_int_awready),
+      .m_axi_wdata   (axil_cms_int_wdata),
+      .m_axi_wstrb   (axil_cms_int_wstrb),
+      .m_axi_wvalid  (axil_cms_int_wvalid),
+      .m_axi_wready  (axil_cms_int_wready),
+      .m_axi_bvalid  (axil_cms_int_bvalid),
+      .m_axi_bresp   (axil_cms_int_bresp),
+      .m_axi_bready  (axil_cms_int_bready),
+      .m_axi_araddr  (axil_cms_int_araddr),
+      .m_axi_arprot  (axil_cms_int_arprot),
+      .m_axi_arvalid (axil_cms_int_arvalid),
+      .m_axi_arready (axil_cms_int_arready),
+      .m_axi_rdata   (axil_cms_int_rdata),
+      .m_axi_rresp   (axil_cms_int_rresp),
+      .m_axi_rvalid  (axil_cms_int_rvalid),
+      .m_axi_rready  (axil_cms_int_rready),
+
+      .s_axi_aclk    (aclk),
+      .s_axi_aresetn (aresetn),
+      .m_axi_aclk    (cms_clk),
+      .m_axi_aresetn (cms_aresetn)
+    );
+
+
+cms_subsystem_wrapper
+  cms_subsystem_wrapper_inst (
+    .aclk_ctrl_0             (cms_clk),
+    .aresetn_ctrl_0          (cms_aresetn),
+
+    .interrupt_host_0        (),
+    .s_axi_ctrl_0_araddr     (axil_cms_int_araddr[17:0]),     
+    .s_axi_ctrl_0_arprot     (axil_cms_int_arprot),
+    .s_axi_ctrl_0_arready    (axil_cms_int_arready),
+    .s_axi_ctrl_0_arvalid    (axil_cms_int_arvalid),
+    .s_axi_ctrl_0_awaddr     (axil_cms_int_awaddr[17:0]),
+    .s_axi_ctrl_0_awprot     (axil_cms_int_awprot),
+    .s_axi_ctrl_0_awready    (axil_cms_int_awready),
+    .s_axi_ctrl_0_awvalid    (axil_cms_int_awvalid),
+    .s_axi_ctrl_0_bready     (axil_cms_int_bready),
+    .s_axi_ctrl_0_bresp      (axil_cms_int_bresp),
+    .s_axi_ctrl_0_bvalid     (axil_cms_int_bvalid),
+    .s_axi_ctrl_0_rdata      (axil_cms_int_rdata),
+    .s_axi_ctrl_0_rready     (axil_cms_int_rready),
+    .s_axi_ctrl_0_rresp      (axil_cms_int_rresp),
+    .s_axi_ctrl_0_rvalid     (axil_cms_int_rvalid),
+    .s_axi_ctrl_0_wdata      (axil_cms_int_wdata),
+    .s_axi_ctrl_0_wready     (axil_cms_int_wready),
+    .s_axi_ctrl_0_wstrb      (axil_cms_int_wstrb),
+    .s_axi_ctrl_0_wvalid     (axil_cms_int_wvalid),
+  
+  `ifdef __au280__
+    .hbm_temp_1_0            (hbm_temp_1_0),
+    .hbm_temp_2_0            (hbm_temp_2_0),
+    .interrupt_hbm_cattrip_0 (interrupt_hbm_cattrip_0),
+  `elsif __au55n__
+    .hbm_temp_1_0            (hbm_temp_1_0),
+    .hbm_temp_2_0            (hbm_temp_2_0),
+    .interrupt_hbm_cattrip_0 (interrupt_hbm_cattrip_0),
+  `elsif __au55c__
+    .hbm_temp_1_0            (hbm_temp_1_0),
+    .hbm_temp_2_0            (hbm_temp_2_0),
+    .interrupt_hbm_cattrip_0 (interrupt_hbm_cattrip_0), 
+  `elsif __au50__ 
+    .hbm_temp_1_0            (hbm_temp_1_0),
+    .hbm_temp_2_0            (hbm_temp_2_0),
+    .interrupt_hbm_cattrip_0 (interrupt_hbm_cattrip_0),
+  `elsif __au200__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),  
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell),
+  `elsif __au250__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),  
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell), 
+  `endif 
+      
+    .satellite_gpio_0        (satellite_gpio_0),
+    .satellite_uart_0_rxd    (satellite_uart_0_rxd),
+    .satellite_uart_0_txd    (satellite_uart_0_txd)
   );
 
 endmodule: system_config

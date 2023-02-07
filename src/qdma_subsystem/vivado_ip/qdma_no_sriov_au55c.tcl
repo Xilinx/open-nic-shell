@@ -45,6 +45,16 @@ set_property -dict {
     CONFIG.SYS_RST_N_BOARD_INTERFACE {pcie_perstn}
     CONFIG.PCIE_BOARD_INTERFACE {pci_express_x16}
     CONFIG.xlnx_ref_board {AU55C}
+    CONFIG.pf0_base_class_menu_qdma {Network_controller}
+    CONFIG.pf0_class_code_base_qdma {02}
+    CONFIG.pf0_class_code_sub_qdma {80}
+    CONFIG.pf0_sub_class_interface_menu_qdma {Other_network_controller}
+    CONFIG.pf0_class_code_qdma {028000}
+    CONFIG.pf1_base_class_menu_qdma {Network_controller}
+    CONFIG.pf1_class_code_base_qdma {02}
+    CONFIG.pf1_class_code_sub_qdma {80}
+    CONFIG.pf1_sub_class_interface_menu_qdma {Other_network_controller}
+    CONFIG.pf1_class_code_qdma {028000}
 } [get_ips $qdma]
 set_property CONFIG.tl_pf_enable_reg $num_phys_func [get_ips $qdma]
 set_property CONFIG.num_queues $num_queue [get_ips $qdma]

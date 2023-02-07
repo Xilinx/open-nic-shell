@@ -10,6 +10,7 @@ latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported 
 
 - Xilinx Alveo U50, and
 - Xilinx Alveo U55N, and
+- Xilinx Alveo U55C, and
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
 - Xilinx Alveo U280
@@ -136,6 +137,9 @@ the design parameters.
                  supported boards include:
                  - au250, and
                  - au280, and
+                 - au200, and
+                 - au55c, and
+                 - au55n, and
                  - au50.
 
     -tag         DESIGN_TAG

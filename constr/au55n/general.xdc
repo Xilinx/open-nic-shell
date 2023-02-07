@@ -25,6 +25,7 @@ set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN disable [current_design]
 set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
 set_property BITSTREAM.CONFIG.UNUSEDPIN Pullup [current_design]
 set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
+set_operating_conditions -design_power_budget 100
 
 # Manually connecting the Debug Hub clock pin to a valid clock source (100MHz reference clock in this case).
 # Read AR72607 for details.

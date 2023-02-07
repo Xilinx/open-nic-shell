@@ -153,6 +153,7 @@
 
 
     <!-- QSFP28 Connector 0 -->
+    <!-- These pins connect to MGT site 130 X0Y24~27  -->
     <pin index="800" name ="QSFP28_0_RX1_N" loc="AD52"/>
     <pin index="801" name ="QSFP28_0_RX2_N" loc="AC54"/>
     <pin index="802" name ="QSFP28_0_RX3_N" loc="AC50"/>
@@ -174,6 +175,7 @@
     <pin index="815" name ="QSFP28_0_TX4_P" loc="AA48"/>
 
     <!-- QSFP28 Connector 1 -->
+    <!-- These pins connect to MGT site 131 X0Y28~31  -->
     <pin index="850" name ="QSFP28_1_RX1_N" loc="AA54"/>
     <pin index="851" name ="QSFP28_1_RX2_N" loc="Y52"/>
     <pin index="852" name ="QSFP28_1_RX3_N" loc="W54"/>
