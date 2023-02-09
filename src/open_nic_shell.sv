@@ -195,11 +195,7 @@ module open_nic_shell #(
   wire  [31:0] axil_pcie_rdata;
   wire   [1:0] axil_pcie_rresp;
   wire         axil_pcie_rready;
-  
-  // Adding IO buffers for CMS UART
-//  OBUF satellite_txd_obuf_inst (.I(satellite_uart_0_txd), .O(fpga_txd_msp));
-//  IBUF satellite_rxd_ibuf_inst (.I(fpga_rxd_msp), .O(satellite_uart_0_rxd));
-//  IBUF satellite_gpio_inst (.I(gpio_msp), .O(satellite_gpio));
+ 
 
   IBUF pcie_rstn_ibuf_inst (.I(pcie_rstn), .O(pcie_rstn_int));
 
@@ -218,35 +214,9 @@ module open_nic_shell #(
   `elsif __au55c__
     OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
   `elsif __au250__
-//      wire         [1:0] qsfp_resetl_buf;    
-//      wire         [1:0] qsfp_modprsl_buf;   
-//      wire         [1:0] qsfp_intl_buf;   
-//      wire         [1:0] qsfp_lpmode_buf;    
-//      wire         [1:0] qsfp_modsell_buf; 
-//    
-//    generate for (genvar i = 0; i < 2; i++) begin: qsfp_control
-//      OBUF qsfp_resetl_obuf_inst (.I(qsfp_resetl_buf[i] ), .O(qsfp_resetl[i]));
-//      IBUF qsfp_modprsl_ibuf_inst (.I(qsfp_modprsl[i]), .O(qsfp_modprsl_buf[i]));
-//      IBUF qsfp_intl_ibuf_inst (.I(qsfp_intl[i]), .O(qsfp_intl_buf[i]));
-//      OBUF qsfp_lpmode_obuf_inst (.I(qsfp_lpmode_buf[i]), .O(qsfp_lpmode[i]));
-//      OBUF qsfp_modsell_obuf_inst (.I(qsfp_modsell_buf[i]), .O(qsfp_modsell[i]));
-//    end: qsfp_control
-//    endgenerate   
+  
   `elsif __au200__
-//      wire         [1:0] qsfp_resetl_buf;    
-//      wire         [1:0] qsfp_modprsl_buf;   
-//      wire         [1:0] qsfp_intl_buf;   
-//      wire         [1:0] qsfp_lpmode_buf;    
-//      wire         [1:0] qsfp_modsell_buf; 
-//        
-//    generate for (genvar i = 0; i < 2; i++) begin: qsfp_control
-//      OBUF qsfp_resetl_obuf_inst (.I(qsfp_resetl_buf[i] ), .O(qsfp_resetl[i]));
-//      IBUF qsfp_modprsl_ibuf_inst (.I(qsfp_modprsl[i]), .O(qsfp_modprsl_buf[i]));
-//      IBUF qsfp_intl_ibuf_inst (.I(qsfp_intl[i]), .O(qsfp_intl_buf[i]));
-//      OBUF qsfp_lpmode_obuf_inst (.I(qsfp_lpmode_buf[i]), .O(qsfp_lpmode[i]));
-//      OBUF qsfp_modsell_obuf_inst (.I(qsfp_modsell_buf[i]), .O(qsfp_modsell[i]));
-//    end: qsfp_control
-//    endgenerate    
+   
   `endif
   
   `ifdef __zynq_family__
