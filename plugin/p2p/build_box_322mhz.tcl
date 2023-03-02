@@ -15,4 +15,5 @@
 # limitations under the License.
 #
 # *************************************************************************
+source box_250mhz/box_250mhz_axis_switch.tcl
 read_verilog -quiet -sv p2p_322mhz.sv

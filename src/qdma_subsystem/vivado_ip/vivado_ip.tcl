@@ -1,6 +1,5 @@
 # *************************************************************************
 #
-# Copyright 2023 Advanced Micro Devices
 # Copyright 2020 Xilinx, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +22,7 @@ set ips {
     qdma_subsystem_axi_crossbar
     qdma_subsystem_c2h_ecc
 }
-if {$board == "sn1022"} {
-    lappend ips "qdma_no_sriov_arm"
-    lappend ips "c2h_axis_interconnect_1"
-    lappend ips "h2c_axis_interconnect_1"
-    lappend ips "cpl_axis_interconnect_1"
-    lappend ips "vio_0_1"
-#    lappend ips "cms_qspi_sn1022"
+
+if {$num_qdma == 2} {
+    lappend ips "qdma_no_sriov_1"
 }

@@ -35,18 +35,24 @@ proc _do_impl {jobs {strategies ""}} {
     }
 }
 
-proc _do_post_impl {build_dir top impl_run {zynq_family 0}} {
+proc _do_post_impl {build_dir top impl_run {zynq_family 0} board} {
     if {$zynq_family} {
         current_run $impl_run
         set sdk_dir ${build_dir}/${top}.sdk
         file mkdir $sdk_dir
-        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa
+        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa       
     } else {
+        if {$board == "sn1022"} {
+            set mem_size 256
+            set start_address 0x00000000
+        } else {
+            set mem_size 128
+            set start_address 0x01002000
+        }
         set interface SPIx4
-        set start_address 0x01002000
         set bit_file ${build_dir}/${top}.runs/${impl_run}/${top}.bit
         set mcs_file ${build_dir}/${top}.runs/${impl_run}/${top}.mcs
-        write_cfgmem -format mcs -size 128 -interface $interface -loadbit "up $start_address $bit_file" -file "$mcs_file"
+        write_cfgmem -format mcs -size $mem_size -interface $interface -loadbit "up $start_address $bit_file" -file "$mcs_file"
     }
 }
 
@@ -78,6 +84,7 @@ set src_dir ${root_dir}/src
 #   max_pkt_len      Maximum packet length
 #   use_phys_func    Include H2C and C2H AXI-stream interfaces (0 or 1)
 #   num_phys_func    Number of PCI-e physical functions (1 to 4)
+#   num_qdma      Number of QDMA interfaces (1 to 2)
 #   num_queue        Number of QDMA queues (1 to 2048)
 #   num_cmac_port    Number of CMAC ports (1 or 2)
 #
@@ -109,6 +116,7 @@ array set design_params {
     -max_pkt_len      1518
     -use_phys_func    1
     -num_phys_func    1
+    -num_qdma         1
     -num_queue        512
     -num_cmac_port    1
 }
@@ -155,13 +163,19 @@ if {$max_pkt_len < 256 || $max_pkt_len > 9600} {
     puts "Invalid value for -max_pkt_len: allowed range is \[256, 9600\]"
     exit
 }
-if {$num_queue < 1 || $num_queue > 2048} {
-    puts "Invalid value for -num_queue: allowed range is \[1, 2048\]"
-    exit
-}
-if {$num_phys_func < 0 || $num_phys_func > 4} {
-    puts "Invalid value for -num_phys_func: allowed range is \[0, 4\]"
-    exit
+if {$use_phys_func == 1} {
+    if {$num_queue < 1 || $num_queue > 2048} {
+        puts "Invalid value for -num_queue: allowed range is \[1, 2048\]"
+        exit
+    }
+    if {$num_phys_func < 1 || $num_phys_func > 4} {
+        puts "Invalid value for -num_phys_func: allowed range is \[1, 4\]"
+        exit
+    }
+    if {$num_qdma < 1 || $num_qdma > 2} {
+        puts "Invalid value for -num_qdma: allowed range is \[1, 2\]"
+        exit
+    }
 }
 if {$num_cmac_port != 1 && $num_cmac_port != 2} {
     puts "Invalid value for -num_cmac_port: allowed values are 1 and 2"
@@ -401,12 +415,6 @@ puts $fp "set_property BITSTREAM.CONFIG.USERID \"$bitstream_userid\" \[current_d
 puts $fp "set_property BITSTREAM.CONFIG.USR_ACCESS $bitstream_usr_access \[current_design\]"
 close $fp
 
-# Card Management for SN1022
-if {$board == "sn1022"} {
-    source $src_dir/qdma_subsystem/vivado_ip/cms_qspi_sn1022.tcl
-}
-
-
 # Read constraint files
 read_xdc -unmanaged ${constr_dir}/${board}/pins.xdc
 read_xdc -unmanaged ${constr_dir}/${board}/timing.xdc
@@ -441,5 +449,5 @@ if {$impl} {
 }
 
 if {$post_impl} {
-    _do_post_impl $top_build_dir $top impl_1 $zynq_family
+    _do_post_impl $top_build_dir $top impl_1 $zynq_family ${board}
 }

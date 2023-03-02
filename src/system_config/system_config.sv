@@ -18,6 +18,7 @@
 `timescale 1ns/1ps
 module system_config #(
   parameter [31:0] BUILD_TIMESTAMP = 32'h01010000,
+  parameter int    NUM_QDMA     = 1,
   parameter int    NUM_CMAC_PORT   = 1
 ) (
   input                         s_axil_awvalid,
@@ -37,22 +38,22 @@ module system_config #(
   output                  [1:0] s_axil_rresp,
   input                         s_axil_rready,
 
-  output                        m_axil_qdma_awvalid,
-  output                 [31:0] m_axil_qdma_awaddr,
-  input                         m_axil_qdma_awready,
-  output                        m_axil_qdma_wvalid,
-  output                 [31:0] m_axil_qdma_wdata,
-  input                         m_axil_qdma_wready,
-  input                         m_axil_qdma_bvalid,
-  input                   [1:0] m_axil_qdma_bresp,
-  output                        m_axil_qdma_bready,
-  output                        m_axil_qdma_arvalid,
-  output                 [31:0] m_axil_qdma_araddr,
-  input                         m_axil_qdma_arready,
-  input                         m_axil_qdma_rvalid,
-  input                  [31:0] m_axil_qdma_rdata,
-  input                   [1:0] m_axil_qdma_rresp,
-  output                        m_axil_qdma_rready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_awvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_awaddr,
+  input          [NUM_QDMA-1:0] m_axil_qdma_awready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_wvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_wdata,
+  input          [NUM_QDMA-1:0] m_axil_qdma_wready,
+  input          [NUM_QDMA-1:0] m_axil_qdma_bvalid,
+  input        [2*NUM_QDMA-1:0] m_axil_qdma_bresp,
+  output         [NUM_QDMA-1:0] m_axil_qdma_bready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_arvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_araddr,
+  input          [NUM_QDMA-1:0] m_axil_qdma_arready,
+  input          [NUM_QDMA-1:0] m_axil_qdma_rvalid,
+  input       [32*NUM_QDMA-1:0] m_axil_qdma_rdata,
+  input        [2*NUM_QDMA-1:0] m_axil_qdma_rresp,
+  output         [NUM_QDMA-1:0] m_axil_qdma_rready,
 
   output    [NUM_CMAC_PORT-1:0] m_axil_adap_awvalid,
   output [32*NUM_CMAC_PORT-1:0] m_axil_adap_awaddr,
@@ -122,40 +123,6 @@ module system_config #(
   input                   [1:0] m_axil_box1_rresp,
   output                        m_axil_box1_rready,
 
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_awvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_awaddr,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_awready,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_wvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_wdata,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_wready,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_bvalid,
-  input   [2*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_bresp,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_bready,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_arvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_araddr,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_arready,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_rvalid,
-  input  [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_rdata,
-  input   [2*NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_rresp,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_ing_rready,
-  
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_awvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_awaddr,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_awready,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_wvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_wdata,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_wready,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_bvalid,
-  input   [2*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_bresp,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_bready,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_arvalid,
-  output [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_araddr,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_arready,
-  input     [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_rvalid,
-  input  [32*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_rdata,
-  input   [2*NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_rresp,
-  output    [NUM_CMAC_PORT-1:0] m_axil_sdnet_egr_rready,
-
   output                 [31:0] shell_rstn,
   input                  [31:0] shell_rst_done,
   output                 [31:0] user_rstn,
@@ -167,6 +134,9 @@ module system_config #(
 
   // Parameter DRC
   initial begin
+    if (NUM_QDMA > 2 || NUM_QDMA < 1) begin
+      $fatal("[%m] Number of QDMAs should be within the range [1, 2]");
+    end
     if (NUM_CMAC_PORT > 2 || NUM_CMAC_PORT < 1) begin
       $fatal("[%m] Number of CMACs should be within the range [1, 2]");
     end
@@ -189,7 +159,25 @@ module system_config #(
   wire  [1:0] axil_scfg_rresp;
   wire        axil_scfg_rready;
 
+  wire        axil_smon_awvalid;
+  wire [31:0] axil_smon_awaddr;
+  wire        axil_smon_awready;
+  wire        axil_smon_wvalid;
+  wire [31:0] axil_smon_wdata;
+  wire        axil_smon_wready;
+  wire        axil_smon_bvalid;
+  wire  [1:0] axil_smon_bresp;
+  wire        axil_smon_bready;
+  wire        axil_smon_arvalid;
+  wire [31:0] axil_smon_araddr;
+  wire        axil_smon_arready;
+  wire        axil_smon_rvalid;
+  wire [31:0] axil_smon_rdata;
+  wire  [1:0] axil_smon_rresp;
+  wire        axil_smon_rready;
+   
   system_config_address_map #(
+    .NUM_QDMA   (NUM_QDMA),
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
   ) scfg_address_map_inst (
     .s_axil_awvalid      (s_axil_awvalid),
@@ -276,7 +264,24 @@ module system_config #(
     .m_axil_cmac_rdata   (m_axil_cmac_rdata),
     .m_axil_cmac_rresp   (m_axil_cmac_rresp),
     .m_axil_cmac_rready  (m_axil_cmac_rready),
-
+    
+    .m_axil_smon_awvalid (axil_smon_awvalid),
+    .m_axil_smon_awaddr  (axil_smon_awaddr),
+    .m_axil_smon_awready (axil_smon_awready),
+    .m_axil_smon_wvalid  (axil_smon_wvalid),
+    .m_axil_smon_wdata   (axil_smon_wdata),
+    .m_axil_smon_wready  (axil_smon_wready),
+    .m_axil_smon_bvalid  (axil_smon_bvalid),
+    .m_axil_smon_bresp   (axil_smon_bresp),
+    .m_axil_smon_bready  (axil_smon_bready),
+    .m_axil_smon_arvalid (axil_smon_arvalid),
+    .m_axil_smon_araddr  (axil_smon_araddr),
+    .m_axil_smon_arready (axil_smon_arready),
+    .m_axil_smon_rvalid  (axil_smon_rvalid),
+    .m_axil_smon_rdata   (axil_smon_rdata),
+    .m_axil_smon_rresp   (axil_smon_rresp),
+    .m_axil_smon_rready  (axil_smon_rready),
+			   
     .m_axil_box0_awvalid (m_axil_box0_awvalid),
     .m_axil_box0_awaddr  (m_axil_box0_awaddr),
     .m_axil_box0_awready (m_axil_box0_awready),
@@ -311,40 +316,6 @@ module system_config #(
     .m_axil_box1_rresp   (m_axil_box1_rresp),
     .m_axil_box1_rready  (m_axil_box1_rready),
 
-    .m_axil_sdnet_ing_awvalid (m_axil_sdnet_ing_awvalid),
-    .m_axil_sdnet_ing_awaddr  (m_axil_sdnet_ing_awaddr),
-    .m_axil_sdnet_ing_awready (m_axil_sdnet_ing_awready),
-    .m_axil_sdnet_ing_wvalid  (m_axil_sdnet_ing_wvalid),
-    .m_axil_sdnet_ing_wdata   (m_axil_sdnet_ing_wdata),
-    .m_axil_sdnet_ing_wready  (m_axil_sdnet_ing_wready),
-    .m_axil_sdnet_ing_bvalid  (m_axil_sdnet_ing_bvalid),
-    .m_axil_sdnet_ing_bresp   (m_axil_sdnet_ing_bresp),
-    .m_axil_sdnet_ing_bready  (m_axil_sdnet_ing_bready),
-    .m_axil_sdnet_ing_arvalid (m_axil_sdnet_ing_arvalid),
-    .m_axil_sdnet_ing_araddr  (m_axil_sdnet_ing_araddr),
-    .m_axil_sdnet_ing_arready (m_axil_sdnet_ing_arready),
-    .m_axil_sdnet_ing_rvalid  (m_axil_sdnet_ing_rvalid),
-    .m_axil_sdnet_ing_rdata   (m_axil_sdnet_ing_rdata),
-    .m_axil_sdnet_ing_rresp   (m_axil_sdnet_ing_rresp),
-    .m_axil_sdnet_ing_rready  (m_axil_sdnet_ing_rready),
-
-    .m_axil_sdnet_egr_awvalid (m_axil_sdnet_egr_awvalid),
-    .m_axil_sdnet_egr_awaddr  (m_axil_sdnet_egr_awaddr),
-    .m_axil_sdnet_egr_awready (m_axil_sdnet_egr_awready),
-    .m_axil_sdnet_egr_wvalid  (m_axil_sdnet_egr_wvalid),
-    .m_axil_sdnet_egr_wdata   (m_axil_sdnet_egr_wdata),
-    .m_axil_sdnet_egr_wready  (m_axil_sdnet_egr_wready),
-    .m_axil_sdnet_egr_bvalid  (m_axil_sdnet_egr_bvalid),
-    .m_axil_sdnet_egr_bresp   (m_axil_sdnet_egr_bresp),
-    .m_axil_sdnet_egr_bready  (m_axil_sdnet_egr_bready),
-    .m_axil_sdnet_egr_arvalid (m_axil_sdnet_egr_arvalid),
-    .m_axil_sdnet_egr_araddr  (m_axil_sdnet_egr_araddr),
-    .m_axil_sdnet_egr_arready (m_axil_sdnet_egr_arready),
-    .m_axil_sdnet_egr_rvalid  (m_axil_sdnet_egr_rvalid),
-    .m_axil_sdnet_egr_rdata   (m_axil_sdnet_egr_rdata),
-    .m_axil_sdnet_egr_rresp   (m_axil_sdnet_egr_rresp),
-    .m_axil_sdnet_egr_rready  (m_axil_sdnet_egr_rready),
-
     .aclk                (aclk),
     .aresetn             (aresetn)
   );
@@ -376,6 +347,30 @@ module system_config #(
 
     .aclk           (aclk),
     .aresetn        (aresetn)
+  );
+
+   system_management_wiz
+   system_management_wiz_inst (
+     .s_axi_aclk      (aclk),                    
+     .s_axi_aresetn   (aresetn),                    
+ 
+     .s_axi_awaddr    (axil_smon_awaddr),                    
+     .s_axi_awvalid   (axil_smon_awvalid),                    
+     .s_axi_awready   (axil_smon_awready),                    
+     .s_axi_wdata     (axil_smon_wdata),                    
+     .s_axi_wstrb     (4'hF),                    
+     .s_axi_wvalid    (axil_smon_wvalid),                    
+     .s_axi_wready    (axil_smon_wready),                    
+     .s_axi_bresp     (axil_smon_bresp),                    
+     .s_axi_bvalid    (axil_smon_bvalid),                    
+     .s_axi_bready    (axil_smon_bready),                    
+     .s_axi_araddr    (axil_smon_araddr),                    
+     .s_axi_arvalid   (axil_smon_arvalid),                    
+     .s_axi_arready   (axil_smon_arready),                    
+     .s_axi_rdata     (axil_smon_rdata),                    
+     .s_axi_rresp     (axil_smon_rresp),                    
+     .s_axi_rvalid    (axil_smon_rvalid),                    
+     .s_axi_rready    (axil_smon_rready)
   );
 
 endmodule: system_config
