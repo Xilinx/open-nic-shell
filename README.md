@@ -12,7 +12,8 @@ latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported 
 - Xilinx Alveo U55N, and
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
-- Xilinx Alveo U280
+- Xilinx Alveo U280, and
+- Xilinx Alveo SN1022
 
 | Notes: |
 |:---|

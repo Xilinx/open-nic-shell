@@ -70,50 +70,90 @@ module box_250mhz_address_map #(
   input   [2*NUM_INTF*2-1:0] m_axil_p2p_rresp,
   output    [NUM_INTF*2-1:0] m_axil_p2p_rready,
 
+  output        m_axil_dummy_awvalid,
+  output [31:0] m_axil_dummy_awaddr,
+  input         m_axil_dummy_awready,
+  output        m_axil_dummy_wvalid,
+  output [31:0] m_axil_dummy_wdata,
+  input         m_axil_dummy_wready,
+  input         m_axil_dummy_bvalid,
+  input   [1:0] m_axil_dummy_bresp,
+  output        m_axil_dummy_bready,
+  output        m_axil_dummy_arvalid,
+  output [31:0] m_axil_dummy_araddr,
+  input         m_axil_dummy_arready,
+  input         m_axil_dummy_rvalid,
+  input  [31:0] m_axil_dummy_rdata,
+  input   [1:0] m_axil_dummy_rresp,
+  output        m_axil_dummy_rready,
+
   input         aclk,
   input         aresetn
 );
 
-  localparam C_BASE_ADDR = 32'h0;
-  localparam C_SIZE = 32'h80;
+  localparam C_NUM_SLAVES  = NUM_INTF*2 + 1;
 
-  wire    [NUM_INTF*2-1:0] axil_awvalid;
-  wire [32*NUM_INTF*2-1:0] axil_awaddr;
-  wire    [NUM_INTF*2-1:0] axil_awready;
-  wire    [NUM_INTF*2-1:0] axil_wvalid;
-  wire [32*NUM_INTF*2-1:0] axil_wdata;
-  wire    [NUM_INTF*2-1:0] axil_wready;
-  wire    [NUM_INTF*2-1:0] axil_bvalid;
-  wire  [2*NUM_INTF*2-1:0] axil_bresp;
-  wire    [NUM_INTF*2-1:0] axil_bready;
-  wire    [NUM_INTF*2-1:0] axil_arvalid;
-  wire [32*NUM_INTF*2-1:0] axil_araddr;
-  wire    [NUM_INTF*2-1:0] axil_arready;
-  wire    [NUM_INTF*2-1:0] axil_rvalid;
-  wire [32*NUM_INTF*2-1:0] axil_rdata;
-  wire  [2*NUM_INTF*2-1:0] axil_rresp;
-  wire    [NUM_INTF*2-1:0] axil_rready;
+  localparam C_P2P_INDEX   = 0;
+  localparam C_DUMMY_INDEX = NUM_INTF*2;
+
+  localparam C_P2P_BASE_ADDR = 32'h0;
+  localparam C_SIZE = 32'h80;
+  localparam C_DUMMY_BASE_ADDR = 32'h1000;
+
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_awvalid;
+  wire [(32*C_NUM_SLAVES)-1:0] axil_awaddr;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_awready;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_wvalid;
+  wire [(32*C_NUM_SLAVES)-1:0] axil_wdata;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_wready;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_bvalid;
+  wire  [(2*C_NUM_SLAVES)-1:0] axil_bresp;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_bready;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_arvalid;
+  wire [(32*C_NUM_SLAVES)-1:0] axil_araddr;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_arready;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_rvalid;
+  wire [(32*C_NUM_SLAVES)-1:0] axil_rdata;
+  wire  [(2*C_NUM_SLAVES)-1:0] axil_rresp;
+  wire  [(1*C_NUM_SLAVES)-1:0] axil_rready;
 
   // Adjust AXI-Lite address so that each slave can assume a base address of 0x0
   for (genvar i = 0; i < NUM_INTF*2; i=i+1) begin
-    assign m_axil_p2p_awaddr[32*i +: 32] = axil_awaddr[32*i +: 32] - C_SIZE*i - C_BASE_ADDR;
-    assign m_axil_p2p_araddr[32*i +: 32] = axil_araddr[32*i +: 32] - C_SIZE*i - C_BASE_ADDR;
+    assign m_axil_p2p_awaddr[32*i +: 32] = axil_awaddr[32*i +: 32] - C_SIZE*i - C_P2P_BASE_ADDR;
+    assign m_axil_p2p_araddr[32*i +: 32] = axil_araddr[32*i +: 32] - C_SIZE*i - C_P2P_BASE_ADDR;
   end
 
-  assign m_axil_p2p_awvalid = axil_awvalid;
-  assign axil_awready       = m_axil_p2p_awready;
-  assign m_axil_p2p_wvalid  = axil_wvalid;
-  assign m_axil_p2p_wdata   = axil_wdata;
-  assign axil_wready        = m_axil_p2p_wready;
-  assign axil_bvalid        = m_axil_p2p_bvalid;
-  assign axil_bresp         = m_axil_p2p_bresp;
-  assign m_axil_p2p_bready  = axil_bready;
-  assign m_axil_p2p_arvalid = axil_arvalid;
-  assign axil_arready       = m_axil_p2p_arready;
-  assign axil_rvalid        = m_axil_p2p_rvalid;
-  assign axil_rdata         = m_axil_p2p_rdata;
-  assign axil_rresp         = m_axil_p2p_rresp;
-  assign m_axil_p2p_rready  = axil_rready;
+  assign m_axil_p2p_awvalid                            = axil_awvalid[C_P2P_INDEX +: NUM_INTF*2];
+  assign axil_awready[C_P2P_INDEX +: NUM_INTF*2]       = m_axil_p2p_awready;
+  assign m_axil_p2p_wvalid                             = axil_wvalid[C_P2P_INDEX +: NUM_INTF*2];
+  assign m_axil_p2p_wdata                              = axil_wdata[32*C_P2P_INDEX +: 32*NUM_INTF*2];
+  assign axil_wready[C_P2P_INDEX +: NUM_INTF*2]        = m_axil_p2p_wready;
+  assign axil_bvalid[C_P2P_INDEX +: NUM_INTF*2]        = m_axil_p2p_bvalid;
+  assign axil_bresp[2*C_P2P_INDEX +: 2*NUM_INTF*2]     = m_axil_p2p_bresp;
+  assign m_axil_p2p_bready                             = axil_bready[C_P2P_INDEX +: NUM_INTF*2];
+  assign m_axil_p2p_arvalid                            = axil_arvalid[C_P2P_INDEX +: NUM_INTF*2];
+  assign axil_arready[C_P2P_INDEX +: NUM_INTF*2]       = m_axil_p2p_arready;
+  assign axil_rvalid[C_P2P_INDEX +: NUM_INTF*2]        = m_axil_p2p_rvalid;
+  assign axil_rdata[32*C_P2P_INDEX +: 32*NUM_INTF*2]   = m_axil_p2p_rdata;
+  assign axil_rresp[2*C_P2P_INDEX +: 2*NUM_INTF*2]     = m_axil_p2p_rresp;
+  assign m_axil_p2p_rready                             = axil_rready[C_P2P_INDEX +: NUM_INTF*2];
+
+  assign m_axil_dummy_awvalid               = axil_awvalid[C_DUMMY_INDEX];
+  assign m_axil_dummy_awaddr                = axil_awaddr[C_DUMMY_INDEX*32 +: 32] - C_DUMMY_BASE_ADDR;
+  assign axil_awready[C_DUMMY_INDEX]        = m_axil_dummy_awready;
+  assign m_axil_dummy_wvalid                = axil_wvalid[C_DUMMY_INDEX];
+  assign m_axil_dummy_wdata                 = axil_wdata[C_DUMMY_INDEX*32 +: 32];
+  assign axil_wready[C_DUMMY_INDEX]         = m_axil_dummy_wready;
+  assign axil_bvalid[C_DUMMY_INDEX]         = m_axil_dummy_bvalid;
+  assign axil_bresp[C_DUMMY_INDEX*2 +: 2]   = m_axil_dummy_bresp;
+  assign m_axil_dummy_bready                = axil_bready[C_DUMMY_INDEX];
+  assign m_axil_dummy_arvalid               = axil_arvalid[C_DUMMY_INDEX];
+  assign m_axil_dummy_araddr                = axil_araddr[C_DUMMY_INDEX*32 +: 32] - C_DUMMY_BASE_ADDR;
+  assign axil_arready[C_DUMMY_INDEX]        = m_axil_dummy_arready;
+  assign axil_rvalid[C_DUMMY_INDEX]         = m_axil_dummy_rvalid;
+  assign axil_rdata[C_DUMMY_INDEX*32 +: 32] = m_axil_dummy_rdata;
+  assign axil_rresp[C_DUMMY_INDEX* 2 +: 2]  = m_axil_dummy_rresp;
+  assign m_axil_dummy_rready                = axil_rready[C_DUMMY_INDEX];
 
   box_250mhz_axi_crossbar xbar_inst (
     .s_axi_awaddr  (s_axil_awaddr),
