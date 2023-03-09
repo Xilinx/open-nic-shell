@@ -22,19 +22,19 @@
 // --------------------------------------------------
 //    0x00000  |  0x00FFF  |  System configuration
 // --------------------------------------------------
-//    0x01000  |  0x07FFF  |  QDMA subsystem #0
+//    0x01000  |  0x05FFF  |  QDMA subsystem #0
 // --------------------------------------------------
-//    0x08000  |  0x0EFFF  |  QDMA subsystem #1
+//    0x08000  |  0x0AFFF  |  CMAC subsystem #0
 // --------------------------------------------------
-//    0x0F000  |  0x11FFF  |  CMAC subsystem #0
+//    0x0B000  |  0x0BFFF  |  Packet adapter #0
 // --------------------------------------------------
-//    0x12000  |  0x12FFF  |  Packet adapter #0
+//    0x0C000  |  0x0EFFF  |  CMAC subsystem #1
 // --------------------------------------------------
-//    0x13000  |  0x14FFF  |  CMAC subsystem #1
+//    0x0F000  |  0x0FFFF  |  Packet adapter #1
 // --------------------------------------------------
-//    0x16000  |  0x17FFF  |  Packet adapter #1
+//    0x10000  |  0x11FFF  |  Sysmon block
 // --------------------------------------------------
-//    0x18000  |  0x1FFFF  |  Sysmon block
+//    0x12000  |  0x16FFF  |  QDMA subsystem #1
 // --------------------------------------------------
 //   0x100000  |  0x1FFFFF |  Box0 @ 250MHz
 // --------------------------------------------------
@@ -191,23 +191,23 @@ module system_config_address_map #(
 
   localparam C_SCFG_INDEX  = 0;
   localparam C_QDMA0_INDEX = 1;
-  localparam C_QDMA1_INDEX = 2;
-  localparam C_CMAC0_INDEX = 3;
-  localparam C_ADAP0_INDEX = 4;
-  localparam C_CMAC1_INDEX = 5;
-  localparam C_ADAP1_INDEX = 6;
-  localparam C_SMON_INDEX  = 7;
+  localparam C_CMAC0_INDEX = 2;
+  localparam C_ADAP0_INDEX = 3;
+  localparam C_CMAC1_INDEX = 4;
+  localparam C_ADAP1_INDEX = 5;
+  localparam C_SMON_INDEX  = 6;
+  localparam C_QDMA1_INDEX = 7;
   localparam C_BOX1_INDEX  = 8;
   localparam C_BOX0_INDEX  = 9;
 
   localparam C_SCFG_BASE_ADDR  = 32'h0;
   localparam C_QDMA0_BASE_ADDR = 32'h01000;
-  localparam C_QDMA1_BASE_ADDR = 32'h08000;
-  localparam C_CMAC0_BASE_ADDR = 32'h0F000;
-  localparam C_ADAP0_BASE_ADDR = 32'h12000;
-  localparam C_CMAC1_BASE_ADDR = 32'h13000;
-  localparam C_ADAP1_BASE_ADDR = 32'h16000;
-  localparam C_SMON_BASE_ADDR  = 32'h18000;  // 15 bits
+  localparam C_QDMA1_BASE_ADDR = 32'h12000;
+  localparam C_CMAC0_BASE_ADDR = 32'h08000;
+  localparam C_ADAP0_BASE_ADDR = 32'h0B000;
+  localparam C_CMAC1_BASE_ADDR = 32'h0C000;
+  localparam C_ADAP1_BASE_ADDR = 32'h0F000;
+  localparam C_SMON_BASE_ADDR  = 32'h10000;  // 14 bits
   localparam C_BOX1_BASE_ADDR  = 32'h200000; // 20 bits
   localparam C_BOX0_BASE_ADDR  = 32'h100000; // 20 bits
 
