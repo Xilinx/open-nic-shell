@@ -21,22 +21,22 @@ module system_config #(
   parameter int    NUM_QDMA     = 1,
   parameter int    NUM_CMAC_PORT   = 1
 ) (
-  input                         s_axil_awvalid,
-  input                  [31:0] s_axil_awaddr,
-  output                        s_axil_awready,
-  input                         s_axil_wvalid,
-  input                  [31:0] s_axil_wdata,
-  output                        s_axil_wready,
-  output                        s_axil_bvalid,
-  output                  [1:0] s_axil_bresp,
-  input                         s_axil_bready,
-  input                         s_axil_arvalid,
-  input                  [31:0] s_axil_araddr,
-  output                        s_axil_arready,
-  output                        s_axil_rvalid,
-  output                 [31:0] s_axil_rdata,
-  output                  [1:0] s_axil_rresp,
-  input                         s_axil_rready,
+  input          [NUM_QDMA-1:0] s_axil_awvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_awaddr,
+  output         [NUM_QDMA-1:0] s_axil_awready,
+  input          [NUM_QDMA-1:0] s_axil_wvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_wdata,
+  output         [NUM_QDMA-1:0] s_axil_wready,
+  output         [NUM_QDMA-1:0] s_axil_bvalid,
+  output       [2*NUM_QDMA-1:0] s_axil_bresp,
+  input          [NUM_QDMA-1:0] s_axil_bready,
+  input          [NUM_QDMA-1:0] s_axil_arvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_araddr,
+  output         [NUM_QDMA-1:0] s_axil_arready,
+  output         [NUM_QDMA-1:0] s_axil_rvalid,
+  output      [32*NUM_QDMA-1:0] s_axil_rdata,
+  output       [2*NUM_QDMA-1:0] s_axil_rresp,
+  input          [NUM_QDMA-1:0] s_axil_rready,
 
   output         [NUM_QDMA-1:0] m_axil_qdma_awvalid,
   output      [32*NUM_QDMA-1:0] m_axil_qdma_awaddr,
@@ -128,7 +128,7 @@ module system_config #(
   output                 [31:0] user_rstn,
   input                  [31:0] user_rst_done,
 
-  input                         aclk,
+  input          [NUM_QDMA-1:0] aclk,
   input                         aresetn
 );
 
@@ -175,7 +175,7 @@ module system_config #(
   wire [31:0] axil_smon_rdata;
   wire  [1:0] axil_smon_rresp;
   wire        axil_smon_rready;
-   
+
   system_config_address_map #(
     .NUM_QDMA   (NUM_QDMA),
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
@@ -345,13 +345,13 @@ module system_config #(
     .user_rstn      (user_rstn),
     .user_rst_done  (user_rst_done),
 
-    .aclk           (aclk),
+    .aclk           (aclk[0]),
     .aresetn        (aresetn)
   );
 
    system_management_wiz
    system_management_wiz_inst (
-     .s_axi_aclk      (aclk),                    
+     .s_axi_aclk      (aclk[0]),                    
      .s_axi_aresetn   (aresetn),                    
  
      .s_axi_awaddr    (axil_smon_awaddr),                    

@@ -40,7 +40,7 @@ proc _do_post_impl {build_dir top impl_run {zynq_family 0} board} {
         current_run $impl_run
         set sdk_dir ${build_dir}/${top}.sdk
         file mkdir $sdk_dir
-        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa       
+        write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa
     } else {
         if {$board == "sn1022"} {
             set mem_size 256

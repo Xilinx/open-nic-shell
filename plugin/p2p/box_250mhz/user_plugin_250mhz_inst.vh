@@ -32,7 +32,7 @@ localparam C_NUM_USER_BLOCK = 1;
 assign mod_rst_done[15:C_NUM_USER_BLOCK] = {(16-C_NUM_USER_BLOCK){1'b1}};
 
 p2p_250mhz #(
-  .NUM_QDMA (NUM_QDMA),
+  .NUM_QDMA    (NUM_QDMA),
   .NUM_INTF    (NUM_PHYS_FUNC)
 ) p2p_250mhz_inst (
   .s_axil_awvalid                   (axil_p2p_awvalid),

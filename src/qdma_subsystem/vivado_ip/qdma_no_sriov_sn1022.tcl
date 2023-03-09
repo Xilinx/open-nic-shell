@@ -30,8 +30,10 @@ set_property -dict {
     CONFIG.dma_reset_source_sel {Phy_Ready}
     CONFIG.pf0_bar2_scale_qdma {Megabytes}
     CONFIG.pf0_bar2_size_qdma {16}
+    CONFIG.pf0_device_id {903F}
     CONFIG.pf1_bar2_scale_qdma {Megabytes}
     CONFIG.pf1_bar2_size_qdma {16}
+    CONFIG.pf1_device_id {913f}
     CONFIG.pf2_bar2_scale_qdma {Megabytes}
     CONFIG.pf2_bar2_size_qdma {16}
     CONFIG.pf3_bar2_scale_qdma {Megabytes}

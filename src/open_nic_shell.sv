@@ -465,22 +465,22 @@ module open_nic_shell #(
     .NUM_CMAC_PORT   (NUM_CMAC_PORT)
   ) system_config_inst (
 `ifdef __synthesis__
-    .s_axil_awvalid      (axil_pcie_awvalid[0]),
-    .s_axil_awaddr       (axil_pcie_awaddr[`getvec(32, 0)]),
-    .s_axil_awready      (axil_pcie_awready[0]),
-    .s_axil_wvalid       (axil_pcie_wvalid[0]),
-    .s_axil_wdata        (axil_pcie_wdata[`getvec(32, 0)]),
-    .s_axil_wready       (axil_pcie_wready[0]),
-    .s_axil_bvalid       (axil_pcie_bvalid[0]),
-    .s_axil_bresp        (axil_pcie_bresp[`getvec(2, 0)]),
-    .s_axil_bready       (axil_pcie_bready[0]),
-    .s_axil_arvalid      (axil_pcie_arvalid[0]),
-    .s_axil_araddr       (axil_pcie_araddr[`getvec(32, 0)]),
-    .s_axil_arready      (axil_pcie_arready[0]),
-    .s_axil_rvalid       (axil_pcie_rvalid[0]),
-    .s_axil_rdata        (axil_pcie_rdata[`getvec(32, 0)]),
-    .s_axil_rresp        (axil_pcie_rresp[`getvec(2, 0)]),
-    .s_axil_rready       (axil_pcie_rready[0]),
+    .s_axil_awvalid      (axil_pcie_awvalid),
+    .s_axil_awaddr       (axil_pcie_awaddr),
+    .s_axil_awready      (axil_pcie_awready),
+    .s_axil_wvalid       (axil_pcie_wvalid),
+    .s_axil_wdata        (axil_pcie_wdata),
+    .s_axil_wready       (axil_pcie_wready),
+    .s_axil_bvalid       (axil_pcie_bvalid),
+    .s_axil_bresp        (axil_pcie_bresp),
+    .s_axil_bready       (axil_pcie_bready),
+    .s_axil_arvalid      (axil_pcie_arvalid),
+    .s_axil_araddr       (axil_pcie_araddr),
+    .s_axil_arready      (axil_pcie_arready),
+    .s_axil_rvalid       (axil_pcie_rvalid),
+    .s_axil_rdata        (axil_pcie_rdata),
+    .s_axil_rresp        (axil_pcie_rresp),
+    .s_axil_rready       (axil_pcie_rready),
 `else // !`ifdef __synthesis__
     .s_axil_awvalid      (s_axil_sim_awvalid),
     .s_axil_awaddr       (s_axil_sim_awaddr),
@@ -590,7 +590,7 @@ module open_nic_shell #(
     .user_rstn           (user_rstn),
     .user_rst_done       (user_rst_done),
 
-    .aclk                (axil_aclk[0]),
+    .aclk                (axil_aclk),
     .aresetn             (sys_cfg_powerup_rstn)
   );
 
@@ -712,14 +712,14 @@ module open_nic_shell #(
       .mod_rstn                             (qdma_rstn[i]),
       .mod_rst_done                         (qdma_rst_done[i]),
 
+      .axil_cfg_aclk                        (axil_aclk[0]),
       .axil_aclk                            (axil_aclk[i]),
 
     `ifdef __au55n__
-      .axis_aclk                            (axis_aclk[i]),
-      .ref_clk_100mhz                       (ref_clk_100mhz)
-    `else
-      .axis_aclk                            (axis_aclk[i])
+      .ref_clk_100mhz                       (ref_clk_100mhz),
     `endif
+      .axis_master_aclk                     (axis_aclk[0]),
+      .axis_aclk                            (axis_aclk[i])
     );
   end: qdma_if
   endgenerate
@@ -866,7 +866,7 @@ module open_nic_shell #(
     .MAX_PKT_LEN   (MAX_PKT_LEN),
     .USE_PHYS_FUNC (USE_PHYS_FUNC),
     .NUM_PHYS_FUNC (NUM_PHYS_FUNC),
-    .NUM_QDMA   (NUM_QDMA),
+    .NUM_QDMA      (NUM_QDMA),
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
   ) box_250mhz_inst (
     .s_axil_awvalid                   (axil_box0_awvalid),
@@ -931,11 +931,9 @@ module open_nic_shell #(
     .axil_aclk                        (axil_aclk[0]),
 
   `ifdef __au55n__
-    .axis_aclk                        (axis_aclk[0]),
     .ref_clk_100mhz                   (ref_clk_100mhz)
-  `else
-    .axis_aclk                        (axis_aclk[0])
   `endif
+    .axis_aclk                        (axis_aclk[0])
   );
 
   box_322mhz #(

@@ -19,3 +19,7 @@ set ips {
     system_config_axi_crossbar
     system_management_wiz
 }
+
+if {$num_qdma > 1} {
+    lappend ips "system_config_axi_clock_converter"
+}

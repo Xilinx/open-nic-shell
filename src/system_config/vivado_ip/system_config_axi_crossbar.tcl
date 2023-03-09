@@ -48,3 +48,5 @@ set_property -dict {
     CONFIG.M08_A00_ADDR_WIDTH {20}
     CONFIG.M09_A00_ADDR_WIDTH {20}
 } [get_ips $axi_crossbar]
+
+set_property CONFIG.NUM_SI [expr {$num_qdma}] [get_ips $axi_crossbar]

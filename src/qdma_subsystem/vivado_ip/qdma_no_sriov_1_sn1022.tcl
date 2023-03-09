@@ -30,8 +30,10 @@ set_property -dict {
     CONFIG.dma_reset_source_sel {Phy_Ready}
     CONFIG.pf0_bar2_scale_qdma {Megabytes}
     CONFIG.pf0_bar2_size_qdma {16}
+    CONFIG.pf0_device_id {903f}
     CONFIG.pf1_bar2_scale_qdma {Megabytes}
     CONFIG.pf1_bar2_size_qdma {16}
+    CONFIG.pf1_device_id {913f}
     CONFIG.pf2_bar2_scale_qdma {Megabytes}
     CONFIG.pf2_bar2_size_qdma {16}
     CONFIG.pf3_bar2_scale_qdma {Megabytes}
@@ -52,8 +54,6 @@ set_property -dict {
     CONFIG.ins_loss_profile {Chip-to-Chip}
     CONFIG.pcie_blk_locn {PCIE4C_X0Y2}
     CONFIG.select_quad {GTY_Quad_231}
-    CONFIG.pf0_device_id {903f}
-    CONFIG.pf1_device_id {913f}
  } [get_ips $qdma_1]
 set_property CONFIG.tl_pf_enable_reg $num_phys_func [get_ips $qdma_1]
 set_property CONFIG.num_queues $num_queue [get_ips $qdma_1]

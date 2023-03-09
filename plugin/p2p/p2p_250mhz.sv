@@ -137,72 +137,7 @@ module p2p_250mhz #(
       assign m_axis_qdma_c2h_tuser_src[`getvec(16, 2*ii+i)]  = axis_qdma_c2h_tuser[`getvec(16, 3*ii+1)];
       assign m_axis_qdma_c2h_tuser_dst[`getvec(16, 2*ii+i)]  = axis_qdma_c2h_tuser[`getvec(16, 3*ii+2)];
       assign axis_qdma_c2h_tready[ii]                        = m_axis_qdma_c2h_tready[2*ii+i];
-
-      ila_axis ila_axis_qdma_h2c_inst (
-        .clk(axis_aclk),
-
-        .probe0(axis_qdma_h2c_tvalid[ii]),
-        .probe1(axis_qdma_h2c_tdata[`getvec(512, ii)]),
-        .probe2(axis_qdma_h2c_tkeep[`getvec(64, ii)]),
-        .probe3(axis_qdma_h2c_tlast[ii]),
-        .probe4(axis_qdma_h2c_tuser[`getvec(48, ii)]),
-        .probe5(axis_qdma_h2c_tready[ii])
-      );
-
-      ila_axis ila_axis_qdma_c2h_inst (
-        .clk(axis_aclk),
-
-        .probe0(axis_qdma_c2h_tvalid[ii]),
-        .probe1(axis_qdma_c2h_tdata[`getvec(512, ii)]),
-        .probe2(axis_qdma_c2h_tkeep[`getvec(64, ii)]),
-        .probe3(axis_qdma_c2h_tlast[2*ii+i]),
-        .probe4(axis_qdma_c2h_tuser[`getvec(48, ii)]),
-        .probe5(axis_qdma_c2h_tready[ii])
-      );
-
-      ila_axil ila_axil_inst (
-        .clk(axil_aclk),
-
-        .probe0(s_axil_awvalid[2*ii+i]),
-        .probe1(s_axil_awaddr[`getvec(32, 2*ii+i)]),
-        .probe2(s_axil_awready[2*ii+i]),
-        .probe3(s_axil_wvalid[2*ii+i]),
-        .probe4(s_axil_wdata[`getvec(32, 2*ii+i)]),
-        .probe5(s_axil_wready[2*ii+i]),
-        .probe6(s_axil_bvalid[2*ii+i]),
-        .probe7(s_axil_bresp[`getvec(2, 2*ii+i)]),
-        .probe8(s_axil_bready[2*ii+i]),
-        .probe9(s_axil_arvalid[2*ii+i]),
-        .probe10(s_axil_araddr[`getvec(32, 2*ii+i)]),
-        .probe11(s_axil_arready[2*ii+i]),
-        .probe12(s_axil_rvalid[2*ii+i]),
-        .probe13(s_axil_rdata[`getvec(32, 2*ii+i)]),
-        .probe14(s_axil_rresp[`getvec(2, 2*ii+i)]),
-        .probe15(s_axil_rready[2*ii+i])
-      );
     end
-
-    ila_axis ila_axis_adap_tx_inst (
-      .clk(axis_aclk),
-
-      .probe0(m_axis_adap_tx_250mhz_tvalid[i]),
-      .probe1(m_axis_adap_tx_250mhz_tdata[`getvec(512, i)]),
-      .probe2(m_axis_adap_tx_250mhz_tkeep[`getvec(64, i)]),
-      .probe3(m_axis_adap_tx_250mhz_tlast[i]),
-      .probe4(axis_adap_tx_250mhz_tuser),
-      .probe5(m_axis_adap_tx_250mhz_tready[i])
-    );
-
-    ila_axis ila_axis_adap_rx_inst (
-      .clk(axis_aclk),
-
-      .probe0(s_axis_adap_rx_250mhz_tvalid[i]),
-      .probe1(s_axis_adap_rx_250mhz_tdata[`getvec(512, i)]),
-      .probe2(s_axis_adap_rx_250mhz_tkeep[`getvec(64, i)]),
-      .probe3(s_axis_adap_rx_250mhz_tlast[i]),
-      .probe4(axis_adap_rx_250mhz_tuser),
-      .probe5(s_axis_adap_rx_250mhz_tready[i])
-    );
 
     assign axis_adap_rx_250mhz_tuser[0+:16]                 = s_axis_adap_rx_250mhz_tuser_size[`getvec(16, i)];
     assign axis_adap_rx_250mhz_tuser[16+:16]                = s_axis_adap_rx_250mhz_tuser_src[`getvec(16, i)];

@@ -1,6 +1,6 @@
 # *************************************************************************
 #
-# Copyright 2020 Xilinx, Inc.
+# Copyright 2023 AMD, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
 # limitations under the License.
 #
 # *************************************************************************
-set ips {
-    qdma_no_sriov
-    qdma_subsystem_clk_div
-    qdma_subsystem_axi_cdc
-    qdma_subsystem_axi_crossbar
-    qdma_subsystem_c2h_ecc
-}
-
-if {$num_qdma > 1} {
-    lappend ips "qdma_no_sriov_1"
-    lappend ips "qdma_subsystem_clk_converter"
-}
+set axi_clock_converter system_config_axi_clock_converter
+create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name $axi_clock_converter -dir ${ip_build_dir}
+set_property -dict {
+  CONFIG.ARUSER_WIDTH {0}
+  CONFIG.AWUSER_WIDTH {0}
+  CONFIG.BUSER_WIDTH {0}
+  CONFIG.DATA_WIDTH {32}
+  CONFIG.ID_WIDTH {0}
+  CONFIG.PROTOCOL {AXI4LITE}
+  CONFIG.RUSER_WIDTH {0}
+  CONFIG.WUSER_WIDTH {0}
+ } [get_ips $axi_clock_converter]

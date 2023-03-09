@@ -139,24 +139,26 @@ module qdma_subsystem #(
   input                          mod_rstn,
   output                         mod_rst_done,
 
+  input                          axil_cfg_aclk,
+
 `ifdef __synthesis__
   output                         axil_aclk,
 
 `ifdef __au55n__
-  output                         axis_aclk,
-  output                         ref_clk_100mhz
-`else
-  output                         axis_aclk
+  output                         ref_clk_100mhz,
 `endif
+  input                          axis_master_aclk,
+  output                         axis_aclk
+
 `else // !`ifdef __synthesis__
   output reg                     axil_aclk,
 
 `ifdef __au55n__
-  output reg                     axis_aclk,
-  output reg                     ref_clk_100mhz
-`else
-  output reg                     axis_aclk
+  output reg                     ref_clk_100mhz,
 `endif
+  input ret                      axis_master_aclk,
+  output reg                     axis_aclk
+
 `endif
 );
 
@@ -511,7 +513,7 @@ module qdma_subsystem #(
       .s_axil_rready  (s_axil_rready),
 
       .aresetn        (axil_aresetn),
-      .aclk           (axil_aclk)
+      .aclk           (axil_cfg_aclk)
     );
 
     // Terminate H2C and C2H interfaces to QDMA IP
@@ -666,7 +668,7 @@ module qdma_subsystem #(
       .m_axil_func_rresp   (axil_func_rresp),
       .m_axil_func_rready  (axil_func_rready),
 
-      .aclk                (axil_aclk),
+      .aclk                (axil_cfg_aclk),
       .aresetn             (axil_aresetn)
     );
 
@@ -688,7 +690,7 @@ module qdma_subsystem #(
       .s_axil_rresp   (axil_rresp),
       .s_axil_rready  (axil_rready),
 
-      .axil_aclk      (axil_aclk),
+      .axil_aclk      (axil_cfg_aclk),
       .axis_aclk      (axis_aclk),
       .axil_aresetn   (axil_aresetn)
     );
@@ -772,6 +774,7 @@ module qdma_subsystem #(
     for (genvar i = 0; i < NUM_PHYS_FUNC; i++) begin
       qdma_subsystem_function #(
         .FUNC_ID     (i),
+        .QDMA_ID     (QDMA_ID),
         .MAX_PKT_LEN (MAX_PKT_LEN),
         .MIN_PKT_LEN (MIN_PKT_LEN)
       ) func_inst (
@@ -824,8 +827,9 @@ module qdma_subsystem #(
         .m_axis_c2h_tuser_qid  (axis_c2h_tuser_qid[`getvec(11, i)]),
         .m_axis_c2h_tready     (axis_c2h_tready[i]),
 
-        .axil_aclk             (axil_aclk),
+        .axil_aclk             (axil_cfg_aclk),
         .axis_aclk             (axis_aclk),
+        .axis_master_aclk      (axis_master_aclk),
         .axil_aresetn          (axil_aresetn)
       );
     end
