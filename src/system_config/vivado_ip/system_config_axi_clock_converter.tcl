@@ -1,6 +1,6 @@
 # *************************************************************************
 #
-# Copyright 2023 Advanced Micro Devices
+# Copyright 2023 AMD, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,25 +15,15 @@
 # limitations under the License.
 #
 # *************************************************************************
-
-##################################################################
-# CREATE IP vio_0_1
-##################################################################
-
-set vio_0_1 vio_0_1
-create_ip -name vio -vendor xilinx.com -library ip -module_name vio_0_1 -dir ${ip_build_dir}
-
-# User Parameters
-set_property -dict [list \
-  CONFIG.C_EN_PROBE_IN_ACTIVITY {0} \
-  CONFIG.C_NUM_PROBE_IN {0} \
-  CONFIG.C_PROBE_OUT0_INIT_VAL {0x1} \
-] [get_ips vio_0_1]
-
-# Runtime Parameters
-#set_property -dict { 
-#  GENERATE_SYNTH_CHECKPOINT {1}
-#} $vio_0_1
-
-##################################################################
-
+set axi_clock_converter system_config_axi_clock_converter
+create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name $axi_clock_converter -dir ${ip_build_dir}
+set_property -dict {
+  CONFIG.ARUSER_WIDTH {0}
+  CONFIG.AWUSER_WIDTH {0}
+  CONFIG.BUSER_WIDTH {0}
+  CONFIG.DATA_WIDTH {32}
+  CONFIG.ID_WIDTH {0}
+  CONFIG.PROTOCOL {AXI4LITE}
+  CONFIG.RUSER_WIDTH {0}
+  CONFIG.WUSER_WIDTH {0}
+ } [get_ips $axi_clock_converter]

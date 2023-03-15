@@ -19,6 +19,7 @@
 `timescale 1ns/1ps
 module qdma_subsystem_function #(
   parameter int FUNC_ID     = 0,
+  parameter int QDMA_ID     = 0,
   parameter int MIN_PKT_LEN = 64,
   parameter int MAX_PKT_LEN = 1518
 ) (
@@ -73,13 +74,15 @@ module qdma_subsystem_function #(
 
   input          axil_aclk,
   input          axis_aclk,
+  input          axis_master_aclk,
   input          axil_aresetn
 );
 
   // The value of `C_PKT_FIFO_DEPTH` should be at least the latency of queue ID
   // computation.  The FIFO is not operated in packet mode.
   localparam C_PKT_FIFO_DEPTH = 32;
-  localparam C_QID_FIFO_DEPTH = 16;
+  // using the same depth to handle the case of 64B frames   
+  localparam C_QID_FIFO_DEPTH = C_PKT_FIFO_DEPTH; 
 
   wire   [15:0] q_base;
   wire   [15:0] num_q;
@@ -171,10 +174,10 @@ module qdma_subsystem_function #(
     if (~axil_aresetn) begin
       h2c_matched <= 1'b0;
     end
-    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast) begin
+    else if (~h2c_matched && s_axis_h2c_tvalid && ~s_axis_h2c_tlast && s_axis_h2c_tready) begin
       h2c_matched <= h2c_q_in_range;
     end
-    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast) begin
+    else if (h2c_matched && s_axis_h2c_tvalid && s_axis_h2c_tlast && s_axis_h2c_tready) begin
       h2c_matched <= 1'b0;
     end
   end
@@ -190,34 +193,57 @@ module qdma_subsystem_function #(
   assign axis_h2c_tuser_size = s_axis_h2c_tuser_size;
   assign s_axis_h2c_tready   = axis_h2c_tready && h2c_match;
 
-  // So far we do not have additional processing on TX packets.  Replace the
-  // following portion if later TSO/GSO is to be implemented.
-  axi_stream_register_slice #(
-    .TDATA_W (512),
-    .TUSER_W (16),
-    .MODE    ("full")
-  ) h2c_slice_inst (
-    .s_axis_tvalid (axis_h2c_tvalid),
-    .s_axis_tdata  (axis_h2c_tdata),
-    .s_axis_tkeep  (axis_h2c_tkeep),
-    .s_axis_tlast  (axis_h2c_tlast),
-    .s_axis_tuser  (axis_h2c_tuser_size),
-    .s_axis_tid    (0),
-    .s_axis_tdest  (0),
-    .s_axis_tready (axis_h2c_tready),
+  generate if (QDMA_ID == 0) begin
+    // So far we do not have additional processing on TX packets.  Replace the
+    // following portion if later TSO/GSO is to be implemented.
+    axi_stream_register_slice #(
+      .TDATA_W (512),
+      .TUSER_W (16),
+      .MODE    ("full")
+    ) h2c_slice_inst (
+      .s_axis_tvalid (axis_h2c_tvalid),
+      .s_axis_tdata  (axis_h2c_tdata),
+      .s_axis_tkeep  (axis_h2c_tkeep),
+      .s_axis_tlast  (axis_h2c_tlast),
+      .s_axis_tuser  (axis_h2c_tuser_size),
+      .s_axis_tid    (0),
+      .s_axis_tdest  (0),
+      .s_axis_tready (axis_h2c_tready),
 
-    .m_axis_tvalid (m_axis_h2c_tvalid),
-    .m_axis_tdata  (m_axis_h2c_tdata),
-    .m_axis_tkeep  (m_axis_h2c_tkeep),
-    .m_axis_tlast  (m_axis_h2c_tlast),
-    .m_axis_tuser  (m_axis_h2c_tuser_size),
-    .m_axis_tid    (),
-    .m_axis_tdest  (),
-    .m_axis_tready (m_axis_h2c_tready),
+      .m_axis_tvalid (m_axis_h2c_tvalid),
+      .m_axis_tdata  (m_axis_h2c_tdata),
+      .m_axis_tkeep  (m_axis_h2c_tkeep),
+      .m_axis_tlast  (m_axis_h2c_tlast),
+      .m_axis_tuser  (m_axis_h2c_tuser_size),
+      .m_axis_tid    (),
+      .m_axis_tdest  (),
+      .m_axis_tready (m_axis_h2c_tready),
 
-    .aclk          (axis_aclk),
-    .aresetn       (axil_aresetn)
-  );
+      .aclk          (axis_aclk),
+      .aresetn       (axil_aresetn)
+    );
+  end
+  else begin
+    qdma_subsystem_clk_converter h2c_axis_inst(
+      .s_axis_aresetn (axil_aresetn),
+      .m_axis_aresetn (axil_aresetn),
+      .s_axis_aclk    (axis_aclk),
+      .s_axis_tvalid  (axis_h2c_tvalid),
+      .s_axis_tready  (axis_h2c_tready),
+      .s_axis_tdata   (axis_h2c_tdata),
+      .s_axis_tkeep   (axis_h2c_tkeep),
+      .s_axis_tlast   (axis_h2c_tlast),
+      .s_axis_tuser   (axis_h2c_tuser_size),
+      .m_axis_aclk    (axis_master_aclk),
+      .m_axis_tvalid  (m_axis_h2c_tvalid),
+      .m_axis_tready  (m_axis_h2c_tready),
+      .m_axis_tdata   (m_axis_h2c_tdata),
+      .m_axis_tkeep   (m_axis_h2c_tkeep),
+      .m_axis_tlast   (m_axis_h2c_tlast),
+      .m_axis_tuser   (m_axis_h2c_tuser_size)
+    );
+  end
+  endgenerate
 
   generate for (genvar i = 0; i < 64; i++) begin
     assign axis_h2c_tkeep[i] = (axis_h2c_tvalid && axis_h2c_tready && axis_h2c_tlast) ?
@@ -232,33 +258,56 @@ module qdma_subsystem_function #(
   // RX path
   // ==========
 
-  // RX packets should have valid `tuser_size` interpreted as packet size.
-  axi_stream_register_slice #(
-    .TDATA_W (512),
-    .TUSER_W (16),
-    .MODE    ("full")
-  ) c2h_slice_inst (
-    .s_axis_tvalid    (s_axis_c2h_tvalid),
-    .s_axis_tdata     (s_axis_c2h_tdata),
-    .s_axis_tkeep     ({64{1'b1}}),
-    .s_axis_tlast     (s_axis_c2h_tlast),
-    .s_axis_tuser     (s_axis_c2h_tuser_size),
-    .s_axis_tid       (0),
-    .s_axis_tdest     (0),
-    .s_axis_tready    (s_axis_c2h_tready),
-    
-    .m_axis_tvalid    (axis_c2h_tvalid),
-    .m_axis_tdata     (axis_c2h_tdata),
-    .m_axis_tkeep     (),
-    .m_axis_tlast     (axis_c2h_tlast),
-    .m_axis_tuser     (axis_c2h_tuser_size),
-    .m_axis_tid       (),
-    .m_axis_tdest     (),
-    .m_axis_tready    (axis_c2h_tready),
+  generate if (QDMA_ID == 0) begin
+    // RX packets should have valid `tuser_size` interpreted as packet size.
+    axi_stream_register_slice #(
+      .TDATA_W (512),
+      .TUSER_W (16),
+      .MODE    ("full")
+    ) c2h_slice_inst (
+      .s_axis_tvalid    (s_axis_c2h_tvalid),
+      .s_axis_tdata     (s_axis_c2h_tdata),
+      .s_axis_tkeep     ({64{1'b1}}),
+      .s_axis_tlast     (s_axis_c2h_tlast),
+      .s_axis_tuser     (s_axis_c2h_tuser_size),
+      .s_axis_tid       (0),
+      .s_axis_tdest     (0),
+      .s_axis_tready    (s_axis_c2h_tready),
+      
+      .m_axis_tvalid    (axis_c2h_tvalid),
+      .m_axis_tdata     (axis_c2h_tdata),
+      .m_axis_tkeep     (),
+      .m_axis_tlast     (axis_c2h_tlast),
+      .m_axis_tuser     (axis_c2h_tuser_size),
+      .m_axis_tid       (),
+      .m_axis_tdest     (),
+      .m_axis_tready    (axis_c2h_tready),
 
-    .aclk             (axis_aclk),
-    .aresetn          (axil_aresetn)
-  );
+      .aclk             (axis_aclk),
+      .aresetn          (axil_aresetn)
+    );
+  end
+  else begin
+    qdma_subsystem_clk_converter c2h_axis_inst(
+      .s_axis_aresetn (axil_aresetn),
+      .m_axis_aresetn (axil_aresetn),
+      .s_axis_aclk    (axis_master_aclk),
+      .s_axis_tvalid  (s_axis_c2h_tvalid),
+      .s_axis_tready  (s_axis_c2h_tready),
+      .s_axis_tdata   (s_axis_c2h_tdata),
+      .s_axis_tkeep   ({64{1'b1}}),
+      .s_axis_tlast   (s_axis_c2h_tlast),
+      .s_axis_tuser   (s_axis_c2h_tuser_size),
+      .m_axis_aclk    (axis_aclk),
+      .m_axis_tvalid  (axis_c2h_tvalid),
+      .m_axis_tready  (axis_c2h_tready),
+      .m_axis_tdata   (axis_c2h_tdata),
+      .m_axis_tkeep   (),
+      .m_axis_tlast   (axis_c2h_tlast),
+      .m_axis_tuser   (axis_c2h_tuser_size)
+    );
+  end
+  endgenerate
 
   // Passively "listen" to the stream and compute hash over the packet headers
   qdma_subsystem_hash hash_inst (

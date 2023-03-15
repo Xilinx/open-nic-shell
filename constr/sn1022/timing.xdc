@@ -15,15 +15,16 @@
 # limitations under the License.
 #
 # *************************************************************************
-create_clock -period 10.000 -name pcie_refclk [get_ports pcie_refclk_p]
-create_clock -period 10.000 -name pcie_refclk_arm [get_ports arm_pcie_refclk_p]
+create_clock -period 10.000 -name pcie_refclk [get_ports pcie_refclk_p[0]]
+create_clock -period 10.000 -name pcie_refclk_arm [get_ports pcie_refclk_p[1]]
 
 set_false_path -through [get_ports pcie_rstn]
 
-set axis_aclk [get_clocks -of_object [get_nets axis_aclk]]
-foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
-    set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
-    set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103 
+foreach axis_aclk [get_clocks -of_object [get_nets axis_aclk*]] {
+    foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
+        set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
+        set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103 
+    }
 }
 
 #set_case_analysis 0 [get_pins {qdma_subsystem_inst/qdma_wrapper_arm/qdma_no_sriov_arm_inst/inst/pcie4c_ip_i/inst/qdma_no_sriov_arm_pcie4c_ip_gt_top_i/diablo_gt.diablo_gt_phy_wrapper/phy_clk_i/bufg_gt_pclk/DIV[2]}]                         

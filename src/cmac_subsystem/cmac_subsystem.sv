@@ -58,11 +58,13 @@ module cmac_subsystem #(
   output   [3:0] gt_txn,
   input          gt_refclk_p,
   input          gt_refclk_n,
-  
-  input dual0_gt_ref_clk_p,
-  input dual0_gt_ref_clk_n,
-  input dual1_gt_ref_clk_p,
-  input dual1_gt_ref_clk_n,
+
+`ifdef __sn1022__
+  input          dual0_gt_ref_clk_p,
+  input          dual0_gt_ref_clk_n,
+  input          dual1_gt_ref_clk_p,
+  input          dual1_gt_ref_clk_n,
+`endif
 
   output         cmac_clk,
 `else
@@ -81,7 +83,7 @@ module cmac_subsystem #(
 
   output reg     cmac_clk,
 `endif
-output  [19:0] stat_rx_block_lock,
+
   input          mod_rstn,
   output         mod_rst_done,
   input          axil_aclk
@@ -136,14 +138,6 @@ output  [19:0] stat_rx_block_lock,
   wire  [63:0] axis_cmac_rx_tkeep;
   wire         axis_cmac_rx_tlast;
   wire         axis_cmac_rx_tuser_err;
-  
-  wire     [1-1:0] axis_cmac_tx_tvalid_shim_o;
-  wire     [511:0] axis_cmac_tx_tdata_shim_o;
-  wire      [63:0] axis_cmac_tx_tkeep_shim_o;
-  wire     [1-1:0] axis_cmac_tx_tlast_shim_o;
-  wire     [1-1:0] axis_cmac_tx_tuser_err_shim_o;
-  wire     [1-1:0] axis_cmac_tx_tready_shim_i;
-  
 
   // Reset is clocked by the 125MHz AXI-Lite clock
   generic_reset #(
@@ -264,47 +258,6 @@ output  [19:0] stat_rx_block_lock,
     .aclk          (cmac_clk),
     .aresetn       (cmac_rstn)
   );
-  
-  
-  axi_axi (
-
-	.clk                (cmac_clk),
-	.reset_n            (cmac_rstn),
-	.block_lock         (&stat_rx_block_lock),
-	.s_axis_tvalid      (axis_cmac_tx_tvalid),                     
-	.s_axis_tdata       (axis_cmac_tx_tdata),        
-	.s_axis_tdest       (2'b00),                                      
-	.s_axis_tid         (2'b00),                                                    
-	.s_axis_tkeep       (axis_cmac_tx_tkeep),                                 
-	.s_axis_tlast       (axis_cmac_tx_tlast),                                      
-	.s_axis_tuser       (axis_cmac_tx_tuser_err),
-	.s_axis_tready      (axis_cmac_tx_tready),
-	.m_axis_tvalid      (axis_cmac_tx_tvalid_shim_o),
-	.m_axis_tdata       (axis_cmac_tx_tdata_shim_o),
-	.m_axis_tdest       (),
-	.m_axis_tid         (),
-	.m_axis_tkeep       (axis_cmac_tx_tkeep_shim_o),
-	.m_axis_tlast       (axis_cmac_tx_tlast_shim_o),
-	.m_axis_tuser       (axis_cmac_tx_tuser_err_shim_o),
-	.m_axis_tready      (axis_cmac_tx_tready_shim_i)
-
-);
- /* 
- ila_0 your_instance_name (
-	.clk		(cmac_clk						),                                		
- 	.probe0		(axis_cmac_tx_tdata				),   
-	.probe1		(axis_cmac_tx_tkeep				),  
-	.probe2		(axis_cmac_tx_tvalid			),  
-	.probe3		(axis_cmac_tx_tlast				),  
-	.probe4		(&stat_rx_block_lock			),  
-	.probe5		(axis_cmac_tx_tuser_err			),  
-	.probe6		(axis_cmac_tx_tdata_shim_o		), 
-	.probe7		(axis_cmac_tx_tkeep_shim_o		),
-	.probe8		({1'b0,axis_cmac_tx_tuser_err_shim_o}), 
-	.probe9		(axis_cmac_tx_tvalid_shim_o		), 
-	.probe10	(axis_cmac_tx_tlast_shim_o		),   
-	.probe11	({1'b0,axis_cmac_tx_tready_shim_i}) 
-); */
 
   axi_stream_register_slice #(
     .TDATA_W (512),
@@ -341,11 +294,13 @@ output  [19:0] stat_rx_block_lock,
     .gt_rxn              (gt_rxn),
     .gt_txp              (gt_txp),
     .gt_txn              (gt_txn),
-    
+
+`ifdef __sn1022__
     .dual0_gt_ref_clk_p (dual0_gt_ref_clk_p),
     .dual0_gt_ref_clk_n (dual0_gt_ref_clk_n),
     .dual1_gt_ref_clk_p (dual1_gt_ref_clk_p),
     .dual1_gt_ref_clk_n (dual1_gt_ref_clk_n),
+`endif
 
     .s_axil_awaddr       (axil_cmac_awaddr),
     .s_axil_awvalid      (axil_cmac_awvalid),
@@ -364,12 +319,12 @@ output  [19:0] stat_rx_block_lock,
     .s_axil_rvalid       (axil_cmac_rvalid),
     .s_axil_rready       (axil_cmac_rready),
 
-    .s_axis_tx_tvalid    (axis_cmac_tx_tvalid_shim_o),
-    .s_axis_tx_tdata     (axis_cmac_tx_tdata_shim_o),
-    .s_axis_tx_tkeep     (axis_cmac_tx_tkeep_shim_o),
-    .s_axis_tx_tlast     (axis_cmac_tx_tlast_shim_o),
-    .s_axis_tx_tuser_err (axis_cmac_tx_tuser_err_shim_o),
-    .s_axis_tx_tready    (axis_cmac_tx_tready_shim_i),
+    .s_axis_tx_tvalid    (axis_cmac_tx_tvalid),
+    .s_axis_tx_tdata     (axis_cmac_tx_tdata),
+    .s_axis_tx_tkeep     (axis_cmac_tx_tkeep),
+    .s_axis_tx_tlast     (axis_cmac_tx_tlast),
+    .s_axis_tx_tuser_err (axis_cmac_tx_tuser_err),
+    .s_axis_tx_tready    (axis_cmac_tx_tready),
 
     .m_axis_rx_tvalid    (axis_cmac_rx_tvalid),
     .m_axis_rx_tdata     (axis_cmac_rx_tdata),
@@ -381,8 +336,6 @@ output  [19:0] stat_rx_block_lock,
     .gt_refclk_n         (gt_refclk_n),
     .cmac_clk            (cmac_clk),
     .cmac_sys_reset      (~axil_aresetn),
-    
-    .stat_rx_block_lock (stat_rx_block_lock),
 
     .axil_aclk           (axil_aclk)
   );
