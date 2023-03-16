@@ -196,7 +196,7 @@ the design parameters.
                      number of QDMA physical functions per QDMA subsystem.
 
     -num_qdma        1 (default), 2
-    	             number of QDMA subsystems, subjects to the board model.
+                     number of QDMA subsystems, subjects to the board model.
 
     -num_queue       [1, 2048] (default to 512)
                      number of QDMA queues.
@@ -232,8 +232,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55n__`
-  or `__sn1022__`
+- Board name, either `__au250__`, `__au280__`, `__au50__`, `__au55n__` or `__sn1022__`.
 
 ### Build without Github Access from Vivado
 
@@ -303,10 +302,9 @@ interfaces are provided to box_250MHz. The default p2p plugin of box_250MHz has
 one ingress switch and one egress switch per QDMA physical function. For example, 
 P2P plugin of SN1022 has totaly four AXI4-stream switches. To select the data 
 path between MAC and two QDMA subsystems, AXI4-stream switch control registers
-are used.
-
-The user can select one QDMA subsystem to be used exclusively for transmitting or 
-receiving traffic. Please refer to [AXI4-Stream Switch Control Register](https://docs.xilinx.com/r/en-US/pg085-axi4stream-infrastructure/Control-Register) 
+are used. The user can select one QDMA subsystem to be used exclusively for 
+transmitting or receiving traffic. Please refer to [AXI4-Stream Switch Control 
+Register](https://docs.xilinx.com/r/en-US/pg085-axi4stream-infrastructure/Control-Register) 
 of PG085 for more details.
 
 For example:
