@@ -6,7 +6,7 @@ This is one of the three components of the
 - [OpenNIC DPDK](https://github.com/Xilinx/open-nic-dpdk.git).
 
 OpenNIC shell delivers an FPGA-based NIC shell with 100Gbps Ethernet ports.  The
-latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported boards include:
+latest version is built with Vivado 2020.x, 2021.x or 2022.1.  Currently, the supported boards include:
 
 - Xilinx Alveo U50, and
 - Xilinx Alveo U55N, and
@@ -18,7 +18,8 @@ latest version is built with Vivado 2020.x or 2021.x.  Currently, the supported 
 | Notes: |
 |:---|
 |* In the Alveo U50 version only, Vivado may issue critical warnings regarding the power margin for the MGTYAVtt with respect to a margin on the 4A rail limit. While the U50's open-nic-shell MGT current (~3.97A) is still slightly below the rail's limit, this will go outside of the 10% margin described in the U50 board files.  The U50 version has worked in a lab setting but with minimal testing.  While this issue is considered to have low risk, please be aware of this condition and proceed if that risk is acceptable.
-Also, starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no longer maintained. *
+|* Vivado 2022.2 uses QDMA v5.0. Driver may need to be upgraded to support QDMA 5.0.
+|* Also, starting from OpenNIC 1.0, the support for Bittware SoC-250 is obsolete and no longer maintained.
 
 
 The NIC shell consists of skeleton components which implement host and Ethernet
@@ -40,22 +41,25 @@ architecture is shown in the figure below.
     -----  ------- | ------- | ------- | ------- | -------
                    |         |         |         |
                    -----------         -----------
-                 AXI-stream 250MHz   AXI-stream 322MHz
+                 AXI4-stream 250MHz  AXI4-stream 322MHz
 
 The shell skeleton has the following components.
 
 - QDMA subsystem.  It includes the Xilinx QDMA IP and RTL logic that bridges the
   QDMA IP interface and the 250MHz user logic box.  The interfaces between QDMA
   subsystem and the 250MHz box use a variant of the AXI4-stream protocol.  Let
-  us refer the variant as the 250MHz AXI-stream.
+  us refer the variant as the 250MHz AXI4-stream. 
+  > - SN1022 has two QDMA subsystems. One for the host CPU, another 
+  	for onboard Arm CPU. Two sets of AXI4-stream interfaces between QDMA
+	subsystems and the 250MHz box.
 - CMAC subsystem.  It includes the Xilinx CMAC IP and some wrapper logic.
   OpenNIC shell supports either 1 or 2 CMAC ports.  In the case of 2 CMAC ports,
   there are two instances of CMAC subsystems with dedicated data and control
   interfaces.  The CMAC subsystem runs at 322MHz and connects to the 322MHz user
   logic box using a variant of the AXI4-stream protocol.  Similarly, let us
-  refer the variant as the 322MHz AXI-stream.
-- Packet adapter.  It is used to convert between the 250MHz AXI-stream and
-  322MHz AXI-stream.  On both TX and RX paths, the packet adapter serves as a
+  refer the variant as the 322MHz AXI4-stream.
+- Packet adapter.  It is used to convert between the 250MHz AXI4-stream and
+  322MHz AXI4-stream.  On both TX and RX paths, the packet adapter serves as a
   packet-mode FIFO, which buffers the whole packet before sending out.  On the
   RX path, it also restores the back-pressure capability which is missing from
   the CMAC subsystem interface.
@@ -65,7 +69,7 @@ The shell skeleton has the following components.
 
 There are 2 user logic boxes, one running at 250MHz and the other at 322MHz.
 Each has a AXI-lite interface for register, 2 pairs of slave and master
-AXI-stream interfaces for TX and RX respectively.  User RTL plugins are
+AXI4-stream interfaces for TX and RX respectively.  User RTL plugins are
 responsible for implementing the handling of these interfaces.
 
 ## Repo Structure
@@ -75,10 +79,11 @@ The `open-nic-shell` repository is organized as follows.
     |-- open-nic-shell --
         |-- constr --
             |-- au50 --
+	    |-- au55n --
             |-- au200 --
             |-- au250 --
             |-- au280 --
-	    |-- au55n --
+	    |-- sn1022 --
             |-- ... --
         |-- plugin --
             |-- p2p --
@@ -180,21 +185,25 @@ the design parameters.
                      maximum packet length.
 
     -use_phys_func   0, 1 (default)
-                     indicates if the QDMA H2C and C2H AXI-stream interfaces are
+                     indicates if the QDMA H2C and C2H AXI4-stream interfaces are
                      included in the 250MHz user logic box.  A common scenario
                      for not using them is networking accelerators without DMA.
                      Regardless the value of this option, the QDMA IP is always
                      present in the shell since it also provide the AXI-lite
                      interfaces for register access.
-
+    
     -num_phys_func   [1, 4] (default to 1)
-                     number of QDMA physical functions.
+                     number of QDMA physical functions per QDMA subsystem.
+
+    -num_qdma        1 (default), 2
+    	             number of QDMA subsystems, subjects to the board model.
 
     -num_queue       [1, 2048] (default to 512)
                      number of QDMA queues.
 
     -num_cmac_port   1 (default), 2
                      number of CMAC ports, subjects to the board model.
+
 
 ### Build Process
 
@@ -223,7 +232,8 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55n__`.
+- Board name, either `__au250__`, `__au280__` or `__au50__` or `__au55n__`
+  or `__sn1022__`
 
 ### Build without Github Access from Vivado
 
@@ -288,12 +298,65 @@ For each box, the build script performs the following steps.
 To use the default plugin (i.e., `plugin/p2p`) in one of the boxes, remove the
 corresponding `box_XXXmhz` directory and `build_box_XXXmhz.tcl`.
 
+When the design is configured with two QDMA subsystems, two sets of AXI4-stream 
+interfaces are provided to box_250MHz. The default p2p plugin of box_250MHz has 
+one ingress switch and one egress switch per QDMA physical function. For example, 
+P2P plugin of SN1022 has totaly four AXI4-stream switches. To select the data 
+path between MAC and two QDMA subsystems, AXI4-stream switch control registers
+are used.
+
+The user can select one QDMA subsystem to be used exclusively for transmitting or 
+receiving traffic. Please refer to [AXI4-Stream Switch Control Register](https://docs.xilinx.com/r/en-US/pg085-axi4stream-infrastructure/Control-Register) 
+of PG085 for more details.
+
+For example:
+
+Data path: MAC <-> QDMA subsystem 0 (On SN1022, it is connected to host CPU)
+Select QDMA subsystem 0:
+```bash
+# BDF is the bus ID of first physical function of QDMA's
+bdf=<PCIe BDF> #e.g. d9
+# Ingress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100040 w*1 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100000 w*1 0x2
+# Egress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x1000c0 w*1 0x0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100080 w*1 0x2
+# Ingress port 1
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100140 w*1 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100100 w*1 0x2
+# Egress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x1001c0 w*1 0x0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100180 w*1 0x2
+```
+
+Data path: MAC <-> QDMA subsystem 1 (On SN1022, it is connected to onboard Arm CPU)
+To select QDMA subsystem 1:
+```bash
+# BDF is the bus ID of first physical function of QDMA's
+bdf=<PCIe BDF> #e.g. d9
+# Ingress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100040 w*1 0x80000000
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100044 w*1 0x0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100000 w*1 0x2
+# Egress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x1000c0 w*1 0x1
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100080 w*1 0x2
+# Ingress port 1
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100140 w*1 0x80000000
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100144 w*1 0x0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100100 w*1 0x2
+# Egress port 0
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x1001c0 w*1 0x1
+pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100180 w*1 0x2
+```
+
 ## Shell Interface
 
 Shell and user logic boxes communicates through 3 types of interfaces.
 
 - AXI-lite interface running at 125MHz for register access.
-- AXI-stream interface running at either 250MHz or 322MHz for data path.
+- AXI4-stream interface running at either 250MHz or 322MHz for data path.
 - Synchronous reset interface running at 125MHz.
 
 The 125MHz and 250MHz clock domains are phase aligned.  Signals can be sampled
@@ -304,10 +367,10 @@ The AXI-lite interface follows the standard AXI4-lite protocol without `wstrb`,
 `awprot` and `arprot`.  At the system level, the address ranges for the 2 boxes
 are
 
-- 0x10000 - 0x3FFFF for the 322MHz box, and
-- 0x40000 - 0xFFFFF for the 250MHz box.
+- 0x100000 - 0x1FFFFF for the 322MHz box, and
+- 0x200000 - 0x2FFFFF for the 250MHz box.
 
-The 250MHz and 322MHz AXI-stream interfaces have slightly different semantics.
+The 250MHz and 322MHz AXI4-stream interfaces have slightly different semantics.
 The 250MHz interface has the following signals.
 
 - `tvalid`, 1 bit: same as standard AXI4-stream protocol.
