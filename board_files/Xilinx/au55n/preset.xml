@@ -154,7 +154,7 @@
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="1" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 			<user_parameter name="CONFIG.LINE_RATE" value="10" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 			<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		</user_parameters>
 		</ip>
@@ -163,7 +163,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="1" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 		</user_parameters>
 		</ip>	
 	
@@ -177,7 +177,7 @@
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="2" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 			<user_parameter name="CONFIG.LINE_RATE" value="10" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 			<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		</user_parameters>
 		</ip>
@@ -186,7 +186,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="2" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 		</user_parameters>
 		</ip>			
 
@@ -195,7 +195,7 @@
 			<!-- <user_parameter name="CONFIG.GT_REF_CLK_FREQ" value="161.1328125" /> -->
 			<user_parameter name="CONFIG.LINE_RATE" value="40" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 			<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		</user_parameters>
 		</ip>
@@ -210,7 +210,7 @@
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="3" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 			<user_parameter name="CONFIG.LINE_RATE" value="10" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 			<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		</user_parameters>
 		</ip>
@@ -219,7 +219,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="3" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
 		</user_parameters>
 		</ip>			
 	
@@ -233,7 +233,7 @@
  				<user_parameter name="CONFIG.NUM_OF_CORES" value="4" />
  				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
  				<user_parameter name="CONFIG.LINE_RATE" value="10" />
- 				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+ 				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
  				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
  		  </user_parameters>
  		</ip>
@@ -242,7 +242,7 @@
  		  <user_parameters>
  			<user_parameter name="CONFIG.NUM_OF_CORES" value="4" />
  			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
- 			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+ 			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
  		  </user_parameters>
  		</ip>
 
@@ -252,7 +252,7 @@
  			<!-- <user_parameter name="CONFIG.GT_REF_CLK_FREQ" value="161.1328125" /> -->
  				<user_parameter name="CONFIG.LINE_RATE" value="40" />
  				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
- 				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
+ 				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
  				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
  		  </user_parameters>
  		</ip>
@@ -263,9 +263,9 @@
  			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
  			<user_parameter name="CONFIG.CMAC_CAUI4_MODE" value="1" />
  			<user_parameter name="CONFIG.NUM_LANES" value="4x25" />
- 			<user_parameter name="CONFIG.CMAC_CORE_SELECT" value="CMACE4_X0Y4" />
+ 			<user_parameter name="CONFIG.CMAC_CORE_SELECT" value="CMACE4_X0Y3" />
  			<!--<user_parameter name="CONFIG.GT_GROUP_SELECT" value= "Quad_X0Y7" />-->
- 			<user_parameter name="CONFIG.GT_GROUP_SELECT" value= "X0Y28~X0Y31" />
+ 			<user_parameter name="CONFIG.GT_GROUP_SELECT" value= "X0Y24~X0Y27" />
  			<user_parameter name="CONFIG.RS_FEC_TRANSCODE_BYPASS" value= "0" />
  		  </user_parameters>
  		</ip>
@@ -281,7 +281,7 @@
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="1" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 			<user_parameter name="CONFIG.LINE_RATE" value="10" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 			<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />	
 		</user_parameters>
 		</ip>
@@ -290,7 +290,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="1" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 		</user_parameters>
 		</ip>			
 	
@@ -303,7 +303,7 @@
 				<user_parameter name="CONFIG.NUM_OF_CORES" value="2" />
 				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 				<user_parameter name="CONFIG.LINE_RATE" value="10" />
-				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />	
 		</user_parameters>
 		</ip>
@@ -312,7 +312,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="2" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 		</user_parameters>
 		</ip>		
 
@@ -321,7 +321,7 @@
 			<!-- <user_parameter name="CONFIG.GT_REF_CLK_FREQ" value="161.1328125" /> -->
 				<user_parameter name="CONFIG.LINE_RATE" value="40" />
 				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		</user_parameters>
 		</ip>
@@ -335,7 +335,7 @@
 				<user_parameter name="CONFIG.NUM_OF_CORES" value="3" />
 				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 				<user_parameter name="CONFIG.LINE_RATE" value="10" />
-				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />	
 		</user_parameters>
 		</ip>
@@ -344,7 +344,7 @@
 		<user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="3" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 		</user_parameters>
 		</ip>		
 
@@ -357,7 +357,7 @@
 				<user_parameter name="CONFIG.NUM_OF_CORES" value="4" />
 				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 				<user_parameter name="CONFIG.LINE_RATE" value="10" />
-				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />	
 		  </user_parameters>
 		</ip>
@@ -366,7 +366,7 @@
 		  <user_parameters>
 			<user_parameter name="CONFIG.NUM_OF_CORES" value="4" />
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 		  </user_parameters>
 		</ip>		
 		
@@ -376,7 +376,7 @@
 			<!-- <user_parameter name="CONFIG.GT_REF_CLK_FREQ" value="161.1328125" /> -->
 				<user_parameter name="CONFIG.LINE_RATE" value="40" />
 				<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
-				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y3" />
+				<user_parameter name="CONFIG.GT_GROUP_SELECT" value="Quad_X0Y4" />
 				<user_parameter name="CONFIG.BASE_R_KR" value="BASE-R" />
 		  </user_parameters>
 		</ip>
@@ -387,8 +387,8 @@
 			<user_parameter name="CONFIG.GT_TYPE" value="GTY" />
 			<user_parameter name="CONFIG.CMAC_CAUI4_MODE" value="1" />		
 			<user_parameter name="CONFIG.NUM_LANES" value="4x25" />		
-			<user_parameter name="CONFIG.CMAC_CORE_SELECT" value="CMACE4_X0Y3" />
-			<user_parameter name="CONFIG.GT_GROUP_SELECT" value= "X0Y24~X0Y27" />
+			<user_parameter name="CONFIG.CMAC_CORE_SELECT" value="CMACE4_X0Y4" />
+			<user_parameter name="CONFIG.GT_GROUP_SELECT" value= "X0Y28~X0Y31" />
 			<user_parameter name="CONFIG.RS_FEC_TRANSCODE_BYPASS" value= "0" />		
 		  </user_parameters>
 		</ip>		
