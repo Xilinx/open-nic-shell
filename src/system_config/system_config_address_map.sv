@@ -323,6 +323,29 @@ module system_config_address_map #(
     assign axil_rresp[`getvec(2, C_QDMA0_INDEX)]  = m_axil_qdma_rresp;
     assign m_axil_qdma_rready                     = axil_rready[C_QDMA0_INDEX];
 
+    // Sink for the unused dummy register interface
+    axi_lite_slave dummy_reg_inst (
+      .s_axil_awvalid (axil_awvalid[C_QDMA1_INDEX]),
+      .s_axil_awaddr  (axil_qdma1_awaddr),
+      .s_axil_awready (axil_awready[C_QDMA1_INDEX]),
+      .s_axil_wvalid  (axil_wvalid[C_QDMA1_INDEX]),
+      .s_axil_wdata   (axil_wdata[`getvec(32, C_QDMA1_INDEX)]),
+      .s_axil_wready  (axil_wready[C_QDMA1_INDEX]),
+      .s_axil_bvalid  (axil_bvalid[C_QDMA1_INDEX]),
+      .s_axil_bresp   (axil_bresp[`getvec(2, C_QDMA1_INDEX)]),
+      .s_axil_bready  (axil_bready[C_QDMA1_INDEX]),
+      .s_axil_arvalid (axil_arvalid[C_QDMA1_INDEX]),
+      .s_axil_araddr  (axil_qdma1_araddr),
+      .s_axil_arready (axil_arready[C_QDMA1_INDEX]),
+      .s_axil_rvalid  (axil_rvalid[C_QDMA1_INDEX] ),
+      .s_axil_rdata   (axil_rdata[`getvec(32, C_QDMA1_INDEX)]),
+      .s_axil_rresp   (axil_rresp[`getvec(2, C_QDMA1_INDEX)]),
+      .s_axil_rready  (axil_rready[C_QDMA1_INDEX]),
+
+      .aresetn        (aresetn),
+      .aclk           (aclk[0])
+    );
+
     assign axil_pcie_awvalid                      = s_axil_awvalid;
     assign axil_pcie_awaddr                       = s_axil_awaddr;
     assign s_axil_awready                         = axil_pcie_awready;
@@ -332,7 +355,7 @@ module system_config_address_map #(
     assign s_axil_bvalid                          = axil_pcie_bvalid;
     assign s_axil_bresp                           = axil_pcie_bresp;
     assign axil_pcie_bready                       = s_axil_bready;
-    assign xil_pcie_arvalid                       = s_axil_arvalid;
+    assign axil_pcie_arvalid                      = s_axil_arvalid;
     assign axil_pcie_araddr                       = s_axil_araddr;
     assign s_axil_arready                         = axil_pcie_arready;
     assign s_axil_rvalid                          = axil_pcie_rvalid;

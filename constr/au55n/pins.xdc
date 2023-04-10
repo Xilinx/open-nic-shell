@@ -38,11 +38,10 @@ if {$num_ports >= 2} {
     set_property PACKAGE_PIN AB42 [get_ports qsfp_refclk_p[1]]
 }
 
-set axis_aclk [get_clocks -of_object [get_nets axis_aclk]]
-foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
-    set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
-    set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103
+foreach axis_aclk [get_clocks -of_object [get_nets axis_aclk*]] {
+    foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
+        set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
+        set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103 
+    }
 }
-
-
 

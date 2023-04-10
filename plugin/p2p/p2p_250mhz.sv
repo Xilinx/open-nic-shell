@@ -131,6 +131,7 @@ module p2p_250mhz #(
   generate for (genvar i = 0; i < NUM_INTF; i++) begin
     wire          [16*3-1:0] axis_adap_tx_250mhz_tuser;
     wire          [16*3-1:0] axis_adap_rx_250mhz_tuser;
+    wire          [16*3*NUM_QDMA-1:0] axis_qdma_c2h_tuser;
 
     assign axis_adap_rx_250mhz_tuser[0+:16]                 = s_axis_adap_rx_250mhz_tuser_size[`getvec(16, i)];
     assign axis_adap_rx_250mhz_tuser[16+:16]                = s_axis_adap_rx_250mhz_tuser_src[`getvec(16, i)];
@@ -152,7 +153,6 @@ module p2p_250mhz #(
       wire  [512*NUM_QDMA-1:0] axis_qdma_c2h_tdata;
       wire   [64*NUM_QDMA-1:0] axis_qdma_c2h_tkeep;
       wire      [NUM_QDMA-1:0] axis_qdma_c2h_tlast;
-      wire [16*3*NUM_QDMA-1:0] axis_qdma_c2h_tuser;
       wire      [NUM_QDMA-1:0] axis_qdma_c2h_tready;
 
       for (genvar ii = 0; ii < NUM_QDMA; ii++) begin
@@ -247,15 +247,14 @@ module p2p_250mhz #(
     end
     else begin
       wire [47:0] axis_qdma_h2c_tuser;
-      wire [47:0] axis_qdma_c2h_tuser;
 
       assign axis_qdma_h2c_tuser[0+:16]                       = s_axis_qdma_h2c_tuser_size[`getvec(16, i)];
       assign axis_qdma_h2c_tuser[16+:16]                      = s_axis_qdma_h2c_tuser_src[`getvec(16, i)];
       assign axis_qdma_h2c_tuser[32+:16]                      = s_axis_qdma_h2c_tuser_dst[`getvec(16, i)];
 
-      assign axis_adap_rx_250mhz_tuser[0+:16]                 = s_axis_adap_rx_250mhz_tuser_size[`getvec(16, i)];
-      assign axis_adap_rx_250mhz_tuser[16+:16]                = s_axis_adap_rx_250mhz_tuser_src[`getvec(16, i)];
-      assign axis_adap_rx_250mhz_tuser[32+:16]                = s_axis_adap_rx_250mhz_tuser_dst[`getvec(16, i)];
+      assign m_axis_qdma_c2h_tuser_size[`getvec(16, i)]       = axis_qdma_c2h_tuser[0+:16];
+      assign m_axis_qdma_c2h_tuser_src[`getvec(16, i)]        = axis_qdma_c2h_tuser[16+:16];
+      assign m_axis_qdma_c2h_tuser_dst[`getvec(16, i)]        = 16'h1 << i;
 
       axi_stream_pipeline tx_ppl_inst (
         .s_axis_tvalid (s_axis_qdma_h2c_tvalid[i]),
