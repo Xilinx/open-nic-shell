@@ -434,11 +434,11 @@ Currently, cocotb (https://www.cocotb.org/) and modelsim (https://eda.sw.siemens
 Example command:
 ```
 vivado -mode tcl -source ./build.tcl -tclargs \
-  -board_repo /datadrive/board-files -board au280 \
+  -board au280 \
   -num_cmac_port 2 -num_phys_func 2 \
   -sim 1 \
   -sim_lib_path $HOME/opt/xilinx_sim_libs/Vivado2021.2/compile_simlib \
-  -sim_path $HOME/opt/modelsim/modelsim-se_2020.1/modeltech/linux_x86_64 \
+  -sim_exec_path $HOME/opt/modelsim/modelsim-se_2020.1/modeltech/linux_x86_64 \
   -sim_top p2p_250mhz
 ```
 - `sim 1` builds simulation sources.
@@ -454,9 +454,9 @@ This command will create simulation sources in `build/<board>_<tag>/open_nic_she
 cd build/<board>_<tag>/open_nic_shell/open_nic_shell.sim/sim_1/behav/modelsim
 
 # Symlink helper scripts
-ln -s ../../../../../../../script/tb/* ./
-# Example:
 ln -s <path-to>/open-nic-shell/script/tb/* ./
+# Example:
+ln -s ../../../../../../../script/tb/* ./
 
 # Symlink the test bench files
 ln -s <path-to>/open-nic-shell/plugin/p2p/box_250mhz/tb/<module-to-test>/* ./

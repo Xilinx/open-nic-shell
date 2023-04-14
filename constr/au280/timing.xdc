@@ -35,7 +35,7 @@ add_cells_to_pblock [get_pblocks pblock_packet_adapter_rx] [get_cells -quiet {cm
 resize_pblock [get_pblocks pblock_packet_adapter_rx] -add {CLOCKREGION_X5Y8:CLOCKREGION_X6Y8}
 
 create_pblock pblock_qdma_subsystem
-add_cells_to_pblock [get_pblocks pblock_qdma_subsystem] [get_cells -quiet [list qdma_subsystem_inst]]
+add_cells_to_pblock [get_pblocks pblock_qdma_subsystem] [get_cells -quiet {qdma_if*.qdma_subsystem_inst}]
 resize_pblock [get_pblocks pblock_qdma_subsystem] -add {SLR0}
 
 create_pblock pblock_cmac_subsystem
