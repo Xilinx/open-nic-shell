@@ -156,7 +156,7 @@ module qdma_subsystem #(
 `ifdef __au55n__
   output reg                     ref_clk_100mhz,
 `endif
-  input ret                      axis_master_aclk,
+  input reg                      axis_master_aclk,
   output reg                     axis_aclk
 
 `endif

@@ -79,11 +79,11 @@ The `open-nic-shell` repository is organized as follows.
     |-- open-nic-shell --
         |-- constr --
             |-- au50 --
-	    |-- au55n --
+	        |-- au55n --
             |-- au200 --
             |-- au250 --
             |-- au280 --
-	    |-- sn1022 --
+	        |-- sn1022 --
             |-- ... --
         |-- plugin --
             |-- p2p --
