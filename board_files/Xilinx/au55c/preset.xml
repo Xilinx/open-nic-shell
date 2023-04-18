@@ -350,7 +350,6 @@
 
 	</ip_preset>
 
-
    <ip_preset preset_proc_name="qsfp1_4x_preset">
 		<ip vendor="xilinx.com" library="ip" name="xxv_ethernet">
 		  <user_parameters>

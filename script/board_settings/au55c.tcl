@@ -1,6 +1,7 @@
+ 
 # *************************************************************************
 #
-# Copyright 2020 Xilinx, Inc.
+# Copyright 2021 Xilinx, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +16,7 @@
 # limitations under the License.
 #
 # *************************************************************************
-set_property CONFIG_VOLTAGE 1.8 [current_design]
-set_property BITSTREAM.CONFIG.CONFIGFALLBACK Enable [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
-set_property CONFIG_MODE SPIx4 [current_design]
-set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
-set_property BITSTREAM.CONFIG.CONFIGRATE 85.0 [current_design]
-set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN disable [current_design]
-set_property BITSTREAM.CONFIG.SPI_FALL_EDGE YES [current_design]
-set_property BITSTREAM.CONFIG.UNUSEDPIN Pullup [current_design]
-set_property BITSTREAM.CONFIG.SPI_32BIT_ADDR Yes [current_design]
-set_operating_conditions -design_power_budget 160
+
+set part xcu55c-fsvh2892-2L-e
+set board_part xilinx.com:au55c:part0:1.0
+set zynq_family 0

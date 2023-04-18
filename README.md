@@ -10,6 +10,7 @@ latest version is built with Vivado 2020.x, 2021.x or 2022.1.  Currently, the su
 
 - Xilinx Alveo U50, and
 - Xilinx Alveo U55N, and
+- Xilinx Alveo U55C, and
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
 - Xilinx Alveo U280, and
@@ -48,7 +49,7 @@ The shell skeleton has the following components.
 - QDMA subsystem.  It includes the Xilinx QDMA IP and RTL logic that bridges the
   QDMA IP interface and the 250MHz user logic box.  The interfaces between QDMA
   subsystem and the 250MHz box use a variant of the AXI4-stream protocol.  Let
-  us refer the variant as the 250MHz AXI4-stream. 
+  us refer the variant as the 250MHz AXI4-stream.
   > - SN1022 has two QDMA subsystems. One for the host CPU, another 
   	for onboard Arm CPU. Two sets of AXI4-stream interfaces between QDMA
 	subsystems and the 250MHz box.
@@ -79,6 +80,7 @@ The `open-nic-shell` repository is organized as follows.
     |-- open-nic-shell --
         |-- constr --
             |-- au50 --
+	        |-- au55c --
 	        |-- au55n --
             |-- au200 --
             |-- au250 --
@@ -142,7 +144,11 @@ the design parameters.
                  supported boards include:
                  - au250, and
                  - au280, and
-                 - au50.
+                 - au200, and
+                 - au55c, and
+                 - au55n, and
+                 - au50,  and
+				 - sn1022.
 
     -tag         DESIGN_TAG
                  string to identify the build.  The tag, along with the board
@@ -191,7 +197,7 @@ the design parameters.
                      Regardless the value of this option, the QDMA IP is always
                      present in the shell since it also provide the AXI-lite
                      interfaces for register access.
-    
+
     -num_phys_func   [1, 4] (default to 1)
                      number of QDMA physical functions per QDMA subsystem.
 
@@ -203,7 +209,6 @@ the design parameters.
 
     -num_cmac_port   1 (default), 2
                      number of CMAC ports, subjects to the board model.
-
 
 ### Build Process
 
@@ -232,7 +237,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__`, `__au50__`, `__au55n__` or `__sn1022__`.
+- Board name, either `__au250__`, `__au280__`, `__au50__`, `__au55c__`, `__au55n__` or `__sn1022__`.
 
 ### Build without Github Access from Vivado
 

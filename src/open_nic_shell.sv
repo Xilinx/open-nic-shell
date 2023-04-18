@@ -29,14 +29,39 @@ module open_nic_shell #(
 ) (
 `ifdef __synthesis__
 
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C, and AU55N custom flow
 `ifdef __au280__
   output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
 `elsif __au50__
   output                         hbm_cattrip,
+  input                    [1:0] satellite_gpio,
 `elsif __au55n__
   output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
+`elsif __au55c__
+  output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
+`elsif __au200__
+  output                   [1:0] qsfp_resetl, 
+  input                    [1:0] qsfp_modprsl,
+  input                    [1:0] qsfp_intl,   
+  output                   [1:0] qsfp_lpmode,
+  output                   [1:0] qsfp_modsell,
+  input                    [3:0] satellite_gpio,
+`elsif __au250__
+  output                   [1:0] qsfp_resetl, 
+  input                    [1:0] qsfp_modprsl,
+  input                    [1:0] qsfp_intl,   
+  output                   [1:0] qsfp_lpmode,
+  output                   [1:0] qsfp_modsell,
+  input                    [3:0] satellite_gpio,
+`elsif __sn1022__
+  input                    [1:0] satellite_gpio,
 `endif
+
+  input                          satellite_uart_0_rxd,
+  output                         satellite_uart_0_txd,
 
 `ifdef __sn1022__
 // SN1022 has 24 PCIe lanes: x16(host CPU) + x8(ARM CPU)
@@ -207,16 +232,23 @@ module open_nic_shell #(
   end
   endgenerate
   
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C and AU55N custom flow
 //
 // This pin must be tied to 0; otherwise the board might be unrecoverable
 // after programming
+// Connect QSFP control lines through to the CMS for AU200 and AU250
 `ifdef __au280__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au50__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au55n__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au55c__
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au250__
+  
+`elsif __au200__
+  
 `endif
 
 `ifdef __zynq_family__
@@ -400,6 +432,12 @@ module open_nic_shell #(
 
 `ifdef __au55n__
   wire                         ref_clk_100mhz;
+`elsif __au55c__
+  wire                         ref_clk_100mhz;
+`elsif __au50__
+  wire                         ref_clk_100mhz;
+`elsif __au280__
+  wire                         ref_clk_100mhz;
 `endif
 
   wire     [NUM_CMAC_PORT-1:0] cmac_clk;
@@ -409,7 +447,7 @@ module open_nic_shell #(
   // First 4-bit for QDMA subsystem
   assign qdma_rstn                    = shell_rstn[NUM_QDMA-1:0];
   assign shell_rst_done[NUM_QDMA-1:0] = qdma_rst_done;
-  assign shell_rst_done[3:2]          = 2'b11;
+  assign shell_rst_done[3:NUM_QDMA]   = {4-NUM_QDMA{1'b1}};
 
   // For each CMAC port, use the subsequent 4-bit: bit 0 for CMAC subsystem and
   // bit 1 for the corresponding adapter
@@ -590,6 +628,42 @@ module open_nic_shell #(
     .user_rstn           (user_rstn),
     .user_rst_done       (user_rst_done),
 
+    .satellite_uart_0_rxd (satellite_uart_0_rxd),
+    .satellite_uart_0_txd (satellite_uart_0_txd),
+    .satellite_gpio_0     (satellite_gpio),
+
+  `ifdef __au280__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au55n__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au55c__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au50__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au200__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell),
+  `elsif __au250__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell),
+  `elsif __sn1022__
+  
+  `endif
+
     .aclk                (axil_aclk),
     .aresetn             (sys_cfg_powerup_rstn)
   );
@@ -716,6 +790,12 @@ module open_nic_shell #(
       .axil_aclk                            (axil_aclk[i]),
 
     `ifdef __au55n__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au55c__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au50__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au280__
       .ref_clk_100mhz                       (ref_clk_100mhz),
     `endif
       .axis_master_aclk                     (axis_aclk[0]),
@@ -931,6 +1011,12 @@ module open_nic_shell #(
     .axil_aclk                        (axil_aclk[0]),
 
   `ifdef __au55n__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au55c__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au50__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au280__
     .ref_clk_100mhz                   (ref_clk_100mhz),
   `endif
     .axis_aclk                        (axis_aclk[0])

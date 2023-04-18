@@ -80,11 +80,15 @@ module p2p_250mhz #(
   input                     axil_aclk,
 
 `ifdef __au55n__
-  input                     axis_aclk,
-  input                     ref_clk_100mhz
-`else
-  input                     axis_aclk
+  input                     ref_clk_100mhz,
+`elsif __au55c__
+  input                     ref_clk_100mhz,
+`elsif __au50__
+  input                     ref_clk_100mhz,
+`elsif __au280__
+  input                     ref_clk_100mhz,
 `endif
+  input                     axis_aclk
 );
 
   wire axil_aresetn;
@@ -124,7 +128,7 @@ module p2p_250mhz #(
 
       .aclk           (axil_aclk),
       .aresetn        (axil_aresetn)
-    );  
+    );
   end
   endgenerate
 

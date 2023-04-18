@@ -146,6 +146,12 @@ module qdma_subsystem #(
 
 `ifdef __au55n__
   output                         ref_clk_100mhz,
+`elsif __au55c__
+  output                         ref_clk_100mhz,
+`elsif __au50__
+  output                         ref_clk_100mhz,
+`elsif __au280__
+  output                         ref_clk_100mhz,
 `endif
   input                          axis_master_aclk,
   output                         axis_aclk
@@ -154,6 +160,12 @@ module qdma_subsystem #(
   output reg                     axil_aclk,
 
 `ifdef __au55n__
+  output reg                     ref_clk_100mhz,
+`elsif __au55c__
+  output reg                     ref_clk_100mhz,
+`elsif __au50__
+  output reg                     ref_clk_100mhz,
+`elsif __au280__
   output reg                     ref_clk_100mhz,
 `endif
   input reg                      axis_master_aclk,
@@ -424,11 +436,17 @@ module qdma_subsystem #(
 
     .axil_aclk                       (axil_aclk),
     .axis_aclk                       (axis_aclk),
-  
-  `ifdef __au55n__
+
+`ifdef __au55n__
     .ref_clk_100mhz                  (ref_clk_100mhz),
-  `endif
-  
+`elsif __au55c__
+    .ref_clk_100mhz                  (ref_clk_100mhz),
+`elsif __au50__
+    .ref_clk_100mhz                  (ref_clk_100mhz),
+`elsif __au280__
+    .ref_clk_100mhz                  (ref_clk_100mhz),
+`endif
+
     .aresetn                         (powerup_rstn)
   );
 `else // !`ifdef __synthesis__
@@ -436,15 +454,27 @@ module qdma_subsystem #(
     axil_aclk = 1'b1;
     axis_aclk = 1'b1;
   
-  `ifdef __au55n__
+`ifdef __au55n__
     ref_clk_100mhz = 1'b1;
-  `endif
+`elsif __au55c__
+    ref_clk_100mhz = 1'b1;
+`elsif __au50__
+    ref_clk_100mhz = 1'b1;
+`elsif __au280__
+    ref_clk_100mhz = 1'b1;
+`endif
   end
 
   always #4000ps axil_aclk = ~axil_aclk;
   always #2000ps axis_aclk = ~axis_aclk;
 
 `ifdef __au55n__
+  always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
+`elsif __au55c__
+  always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
+`elsif __au50__
+  always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
+`elsif __au280__
   always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
 `endif
 
