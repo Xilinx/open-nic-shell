@@ -44,7 +44,7 @@ set_property -dict {
     CONFIG.en_axi_mm_qdma {false}
     CONFIG.SYS_RST_N_BOARD_INTERFACE {pcie_perstn}
     CONFIG.PCIE_BOARD_INTERFACE {pci_express_x16}
-    CONFIG.xlnx_ref_board {AU50}
+    CONFIG.xlnx_ref_board {AU55C}
     CONFIG.pf0_base_class_menu_qdma {Network_controller}
     CONFIG.pf0_class_code_base_qdma {02}
     CONFIG.pf0_class_code_sub_qdma {80}

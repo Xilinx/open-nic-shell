@@ -21,7 +21,7 @@ module box_250mhz #(
   parameter int MAX_PKT_LEN   = 1518,
   parameter int USE_PHYS_FUNC = 1,
   parameter int NUM_PHYS_FUNC = 1,
-  parameter int NUM_QDMA = 1,
+  parameter int NUM_QDMA      = 1,
   parameter int NUM_CMAC_PORT = 1
 ) (
   input                          s_axil_awvalid,
@@ -86,11 +86,15 @@ module box_250mhz #(
   input                          axil_aclk,
 
 `ifdef __au55n__
-  input                          axis_aclk,
-  input                          ref_clk_100mhz
-`else
-  input                          axis_aclk
+  input                          ref_clk_100mhz,
+`elsif __au55c__
+  input                          ref_clk_100mhz,
+`elsif __au50__
+  input                          ref_clk_100mhz,
+`elsif __au280__
+  input                          ref_clk_100mhz,
 `endif
+  input                          axis_aclk
 );
 
   wire internal_box_rstn;

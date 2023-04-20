@@ -18,6 +18,9 @@
 set ips {
     system_config_axi_crossbar
     system_management_wiz
+    clk_wiz_50Mhz
+    axi_quad_spi_0
+    cms_subsystem_0
 }
 
 if {$num_qdma > 1} {

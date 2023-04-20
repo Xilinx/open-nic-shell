@@ -144,10 +144,15 @@ module qdma_subsystem_qdma_wrapper #(
   output         axis_aclk,
   output         axil_aclk,
 
-// For AU55N, we generate 100MHz reference clock which is needed when HBM IP is instantiated 
+// For AU55N, AU55C, AU50, and AU280, we generate 100MHz reference clock which is needed when HBM IP is instantiated 
 // in user-defined logic.
-// TODO: This should be done for all boards that have HBM.
 `ifdef __au55n__
+  output         ref_clk_100mhz,
+`elsif __au55c__
+  output         ref_clk_100mhz,
+`elsif __au50__
+  output         ref_clk_100mhz,
+`elsif __au280__
   output         ref_clk_100mhz,
 `endif
 

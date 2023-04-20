@@ -200,28 +200,19 @@ set_property PACKAGE_PIN U2 [get_ports {pcie_rxp[23]}]
 set_property PACKAGE_PIN R7 [get_ports {pcie_txp[23]}]
 
 ##### CMS PORTS #######
+set_property -dict {PACKAGE_PIN AM17 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[0]]
+set_property -dict {PACKAGE_PIN AL18 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[1]]
 
-# set_property PACKAGE_PIN AM17 [get_ports {satellite_gpio[0]}]
-# set_property PACKAGE_PIN AL18 [get_ports {satellite_gpio[1]}]
-
-# set_property -dict {IOSTANDARD LVCMOS18}  [get_ports {satellite_gpio[0]}]
-# set_property -dict {IOSTANDARD LVCMOS18}  [get_ports {satellite_gpio[1]}]
-
-# set_property PACKAGE_PIN AJ21 [get_ports satellite_uart_txd]
-# set_property PACKAGE_PIN AK21 [get_ports satellite_uart_rxd]
-
-# set_property -dict {IOSTANDARD LVCMOS18}         [get_ports satellite_uart_rxd]
-# set_property -dict {IOSTANDARD LVCMOS18 DRIVE 4} [get_ports satellite_uart_txd]
+set_property -dict {PACKAGE_PIN AK21 IOSTANDARD LVCMOS18} [get_ports satellite_uart_0_rxd]
+set_property -dict {PACKAGE_PIN AJ21 IOSTANDARD LVCMOS18 DRIVE 4} [get_ports satellite_uart_0_txd]
 
 ## QSPI FLASH Interfaec
+# set_property PACKAGE_PIN AH14 [get_ports spi_flash_io1_io]
+# set_property PACKAGE_PIN AL14 [get_ports spi_flash_io2_io]
+# set_property PACKAGE_PIN AL15 [get_ports spi_flash_io3_io]
+# set_property PACKAGE_PIN AM15 [get_ports spi_flash_sck_io]
+# set_property PACKAGE_PIN AK14 [get_ports spi_flash_ss_io]
+# set_property PACKAGE_PIN AN15 [get_ports spi_flash_io0_io]
 
-
-#set_property PACKAGE_PIN AH14 [get_ports spi_flash_io1_io]
-#set_property PACKAGE_PIN AL14 [get_ports spi_flash_io2_io]
-#set_property PACKAGE_PIN AL15 [get_ports spi_flash_io3_io]
-#set_property PACKAGE_PIN AM15 [get_ports spi_flash_sck_io]
-#set_property PACKAGE_PIN AK14 [get_ports spi_flash_ss_io]
-#set_property PACKAGE_PIN AN15 [get_ports spi_flash_io0_io]
-
-#set_property -dict {IOSTANDARD LVCMOS18}  [get_ports spi_flash_*]
+# set_property -dict {IOSTANDARD LVCMOS18}  [get_ports spi_flash_*]
 

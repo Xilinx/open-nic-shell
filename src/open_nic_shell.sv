@@ -29,14 +29,39 @@ module open_nic_shell #(
 ) (
 `ifdef __synthesis__
 
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C, and AU55N custom flow
 `ifdef __au280__
   output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
 `elsif __au50__
   output                         hbm_cattrip,
+  input                    [1:0] satellite_gpio,
 `elsif __au55n__
   output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
+`elsif __au55c__
+  output                         hbm_cattrip,
+  input                    [3:0] satellite_gpio,
+`elsif __au200__
+  output                   [1:0] qsfp_resetl, 
+  input                    [1:0] qsfp_modprsl,
+  input                    [1:0] qsfp_intl,   
+  output                   [1:0] qsfp_lpmode,
+  output                   [1:0] qsfp_modsell,
+  input                    [3:0] satellite_gpio,
+`elsif __au250__
+  output                   [1:0] qsfp_resetl, 
+  input                    [1:0] qsfp_modprsl,
+  input                    [1:0] qsfp_intl,   
+  output                   [1:0] qsfp_lpmode,
+  output                   [1:0] qsfp_modsell,
+  input                    [3:0] satellite_gpio,
+`elsif __sn1022__
+  input                    [1:0] satellite_gpio,
 `endif
+
+  input                          satellite_uart_0_rxd,
+  output                         satellite_uart_0_txd,
 
 `ifdef __sn1022__
 // SN1022 has 24 PCIe lanes: x16(host CPU) + x8(ARM CPU)
@@ -70,77 +95,77 @@ module open_nic_shell #(
   input      [NUM_CMAC_PORT-1:0] qsfp_refclk_n
 
 `else // !`ifdef __synthesis__
-  input  s_axil_sim_awvalid,
-  input  s_axil_sim_awaddr,
-  output s_axil_sim_awready,
-  input  s_axil_sim_wvalid,
-  input  s_axil_sim_wdata,
-  output s_axil_sim_wready,
-  output s_axil_sim_bvalid,
-  output s_axil_sim_bresp,
-  input  s_axil_sim_bready,
-  input  s_axil_sim_arvalid,
-  input  s_axil_sim_araddr,
-  output s_axil_sim_arready,
-  output s_axil_sim_rvalid,
-  output s_axil_sim_rdata,
-  output s_axil_sim_rresp,
-  input  s_axil_sim_rready,
+  input     [NUM_QDMA-1:0] s_axil_sim_awvalid,
+  input  [32*NUM_QDMA-1:0] s_axil_sim_awaddr,
+  output    [NUM_QDMA-1:0] s_axil_sim_awready,
+  input     [NUM_QDMA-1:0] s_axil_sim_wvalid,
+  input  [32*NUM_QDMA-1:0] s_axil_sim_wdata,
+  output    [NUM_QDMA-1:0] s_axil_sim_wready,
+  output    [NUM_QDMA-1:0] s_axil_sim_bvalid,
+  output  [2*NUM_QDMA-1:0] s_axil_sim_bresp,
+  input     [NUM_QDMA-1:0] s_axil_sim_bready,
+  input     [NUM_QDMA-1:0] s_axil_sim_arvalid,
+  input  [32*NUM_QDMA-1:0] s_axil_sim_araddr,
+  output    [NUM_QDMA-1:0] s_axil_sim_arready,
+  output    [NUM_QDMA-1:0] s_axil_sim_rvalid,
+  output [32*NUM_QDMA-1:0] s_axil_sim_rdata,
+  output  [2*NUM_QDMA-1:0] s_axil_sim_rresp,
+  input     [NUM_QDMA-1:0] s_axil_sim_rready,
 
-  input  s_axis_qdma_h2c_sim_tvalid,
-  input  s_axis_qdma_h2c_sim_tdata,
-  input  s_axis_qdma_h2c_sim_tcrc,
-  input  s_axis_qdma_h2c_sim_tlast,
-  input  s_axis_qdma_h2c_sim_tuser_qid,
-  input  s_axis_qdma_h2c_sim_tuser_port_id,
-  input  s_axis_qdma_h2c_sim_tuser_err,
-  input  s_axis_qdma_h2c_sim_tuser_mdata,
-  input  s_axis_qdma_h2c_sim_tuser_mty,
-  input  s_axis_qdma_h2c_sim_tuser_zero_byte,
-  output s_axis_qdma_h2c_sim_tready,
+  input      [NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tvalid,
+  input  [512*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tdata,
+  input   [32*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tcrc,
+  input      [NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tlast,
+  input   [11*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_qid,
+  input    [3*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_port_id,
+  input      [NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_err,
+  input   [32*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_mdata,
+  input    [6*NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_mty,
+  input      [NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tuser_zero_byte,
+  output     [NUM_QDMA-1:0] s_axis_qdma_h2c_sim_tready,
 
-  output m_axis_qdma_c2h_sim_tvalid,
-  output m_axis_qdma_c2h_sim_tdata,
-  output m_axis_qdma_c2h_sim_tcrc,
-  output m_axis_qdma_c2h_sim_tlast,
-  output m_axis_qdma_c2h_sim_ctrl_marker,
-  output m_axis_qdma_c2h_sim_ctrl_port_id,
-  output m_axis_qdma_c2h_sim_ctrl_ecc,
-  output m_axis_qdma_c2h_sim_ctrl_len,
-  output m_axis_qdma_c2h_sim_ctrl_qid,
-  output m_axis_qdma_c2h_sim_ctrl_has_cmpt,
-  output m_axis_qdma_c2h_sim_mty,
-  input  m_axis_qdma_c2h_sim_tready,
+  output     [NUM_QDMA-1:0] m_axis_qdma_c2h_sim_tvalid,
+  output [512*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_tdata,
+  output  [32*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_tcrc,
+  output     [NUM_QDMA-1:0] m_axis_qdma_c2h_sim_tlast,
+  output     [NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_marker,
+  output   [3*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_port_id,
+  output   [7*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_ecc,
+  output  [16*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_len,
+  output  [11*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_qid,
+  output     [NUM_QDMA-1:0] m_axis_qdma_c2h_sim_ctrl_has_cmpt,
+  output   [6*NUM_QDMA-1:0] m_axis_qdma_c2h_sim_mty,
+  input      [NUM_QDMA-1:0] m_axis_qdma_c2h_sim_tready,
 
-  output m_axis_qdma_cpl_sim_tvalid,
-  output m_axis_qdma_cpl_sim_tdata,
-  output m_axis_qdma_cpl_sim_size,
-  output m_axis_qdma_cpl_sim_dpar,
-  output m_axis_qdma_cpl_sim_ctrl_qid,
-  output m_axis_qdma_cpl_sim_ctrl_cmpt_type,
-  output m_axis_qdma_cpl_sim_ctrl_wait_pld_pkt_id,
-  output m_axis_qdma_cpl_sim_ctrl_port_id,
-  output m_axis_qdma_cpl_sim_ctrl_marker,
-  output m_axis_qdma_cpl_sim_ctrl_user_trig,
-  output m_axis_qdma_cpl_sim_ctrl_col_idx,
-  output m_axis_qdma_cpl_sim_ctrl_err_idx,
-  output m_axis_qdma_cpl_sim_ctrl_no_wrb_marker,
-  input  m_axis_qdma_cpl_sim_tready,
+  output     [NUM_QDMA-1:0] m_axis_qdma_cpl_sim_tvalid,
+  output [512*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_tdata,
+  output   [2*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_size,
+  output  [16*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_dpar,
+  output  [11*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_qid,
+  output   [2*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_cmpt_type,
+  output  [16*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_wait_pld_pkt_id,
+  output   [3*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_port_id,
+  output     [NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_marker,
+  output     [NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_user_trig,
+  output   [3*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_col_idx,
+  output   [3*NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_err_idx,
+  output     [NUM_QDMA-1:0] m_axis_qdma_cpl_sim_ctrl_no_wrb_marker,
+  input      [NUM_QDMA-1:0] m_axis_qdma_cpl_sim_tready,
 
-  output m_axis_cmac_tx_sim_tvalid,
-  output m_axis_cmac_tx_sim_tdata,
-  output m_axis_cmac_tx_sim_tkeep,
-  output m_axis_cmac_tx_sim_tlast,
-  output m_axis_cmac_tx_sim_tuser_err,
-  input  m_axis_cmac_tx_sim_tready,
+  output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tvalid,
+  output [512*NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tdata,
+  output  [64*NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tkeep,
+  output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tlast,
+  output     [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tuser_err,
+  input      [NUM_CMAC_PORT-1:0] m_axis_cmac_tx_sim_tready,
 
-  input  s_axis_cmac_rx_sim_tvalid,
-  input  s_axis_cmac_rx_sim_tdata,
-  input  s_axis_cmac_rx_sim_tkeep,
-  input  s_axis_cmac_rx_sim_tlast,
-  input  s_axis_cmac_rx_sim_tuser_err,
+  input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tvalid,
+  input  [512*NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tdata,
+  input   [64*NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tkeep,
+  input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tlast,
+  input      [NUM_CMAC_PORT-1:0] s_axis_cmac_rx_sim_tuser_err,
 
-  input  powerup_rstn
+  input  [NUM_QDMA-1:0] powerup_rstn
 `endif
 );
 
@@ -207,16 +232,23 @@ module open_nic_shell #(
   end
   endgenerate
   
-// Fix the CATTRIP issue for AU280, AU50 and AU55N custom flow
+// Fix the CATTRIP issue for AU280, AU50, AU55C and AU55N custom flow
 //
 // This pin must be tied to 0; otherwise the board might be unrecoverable
 // after programming
+// Connect QSFP control lines through to the CMS for AU200 and AU250
 `ifdef __au280__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au50__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
 `elsif __au55n__
   OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au55c__
+  OBUF hbm_cattrip_obuf_inst (.I(1'b0), .O(hbm_cattrip));
+`elsif __au250__
+  
+`elsif __au200__
+  
 `endif
 
 `ifdef __zynq_family__
@@ -400,6 +432,12 @@ module open_nic_shell #(
 
 `ifdef __au55n__
   wire                         ref_clk_100mhz;
+`elsif __au55c__
+  wire                         ref_clk_100mhz;
+`elsif __au50__
+  wire                         ref_clk_100mhz;
+`elsif __au280__
+  wire                         ref_clk_100mhz;
 `endif
 
   wire     [NUM_CMAC_PORT-1:0] cmac_clk;
@@ -409,7 +447,7 @@ module open_nic_shell #(
   // First 4-bit for QDMA subsystem
   assign qdma_rstn                    = shell_rstn[NUM_QDMA-1:0];
   assign shell_rst_done[NUM_QDMA-1:0] = qdma_rst_done;
-  assign shell_rst_done[3:2]          = 2'b11;
+  assign shell_rst_done[3:NUM_QDMA]   = {4-NUM_QDMA{1'b1}};
 
   // For each CMAC port, use the subsequent 4-bit: bit 0 for CMAC subsystem and
   // bit 1 for the corresponding adapter
@@ -590,6 +628,42 @@ module open_nic_shell #(
     .user_rstn           (user_rstn),
     .user_rst_done       (user_rst_done),
 
+    .satellite_uart_0_rxd (satellite_uart_0_rxd),
+    .satellite_uart_0_txd (satellite_uart_0_txd),
+    .satellite_gpio_0     (satellite_gpio),
+
+  `ifdef __au280__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au55n__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au55c__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au50__
+    .hbm_temp_1_0            (7'd0),
+    .hbm_temp_2_0            (7'd0),
+    .interrupt_hbm_cattrip_0 (1'b0),
+  `elsif __au200__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell),
+  `elsif __au250__
+    .qsfp_resetl             (qsfp_resetl),
+    .qsfp_modprsl            (qsfp_modprsl),
+    .qsfp_intl               (qsfp_intl),
+    .qsfp_lpmode             (qsfp_lpmode),
+    .qsfp_modsell            (qsfp_modsell),
+  `elsif __sn1022__
+  
+  `endif
+
     .aclk                (axil_aclk),
     .aresetn             (sys_cfg_powerup_rstn)
   );
@@ -668,45 +742,45 @@ module open_nic_shell #(
       .phy_ready                            (pcie_phy_ready[i]),
       .powerup_rstn                         (powerup_rstn[i]),
   `else // !`ifdef __synthesis__
-      .s_axis_qdma_h2c_tvalid               (s_axis_qdma_h2c_sim_tvalid),
-      .s_axis_qdma_h2c_tdata                (s_axis_qdma_h2c_sim_tdata),
-      .s_axis_qdma_h2c_tcrc                 (s_axis_qdma_h2c_sim_tcrc),
-      .s_axis_qdma_h2c_tlast                (s_axis_qdma_h2c_sim_tlast),
-      .s_axis_qdma_h2c_tuser_qid            (s_axis_qdma_h2c_sim_tuser_qid),
-      .s_axis_qdma_h2c_tuser_port_id        (s_axis_qdma_h2c_sim_tuser_port_id),
-      .s_axis_qdma_h2c_tuser_err            (s_axis_qdma_h2c_sim_tuser_err),
-      .s_axis_qdma_h2c_tuser_mdata          (s_axis_qdma_h2c_sim_tuser_mdata),
-      .s_axis_qdma_h2c_tuser_mty            (s_axis_qdma_h2c_sim_tuser_mty),
-      .s_axis_qdma_h2c_tuser_zero_byte      (s_axis_qdma_h2c_sim_tuser_zero_byte),
-      .s_axis_qdma_h2c_tready               (s_axis_qdma_h2c_sim_tready),
+      .s_axis_qdma_h2c_tvalid               (s_axis_qdma_h2c_sim_tvalid[i]),
+      .s_axis_qdma_h2c_tdata                (s_axis_qdma_h2c_sim_tdata[`getvec(512, i)]),
+      .s_axis_qdma_h2c_tcrc                 (s_axis_qdma_h2c_sim_tcrc[`getvec(32, i)]),
+      .s_axis_qdma_h2c_tlast                (s_axis_qdma_h2c_sim_tlast[i]),
+      .s_axis_qdma_h2c_tuser_qid            (s_axis_qdma_h2c_sim_tuser_qid[`getvec(11, i)]),
+      .s_axis_qdma_h2c_tuser_port_id        (s_axis_qdma_h2c_sim_tuser_port_id[`getvec(3, i)]),
+      .s_axis_qdma_h2c_tuser_err            (s_axis_qdma_h2c_sim_tuser_err[i]),
+      .s_axis_qdma_h2c_tuser_mdata          (s_axis_qdma_h2c_sim_tuser_mdata[`getvec(32, i)]),
+      .s_axis_qdma_h2c_tuser_mty            (s_axis_qdma_h2c_sim_tuser_mty[`getvec(6, i)]),
+      .s_axis_qdma_h2c_tuser_zero_byte      (s_axis_qdma_h2c_sim_tuser_zero_byte[i]),
+      .s_axis_qdma_h2c_tready               (s_axis_qdma_h2c_sim_tready[i]),
 
-      .m_axis_qdma_c2h_tvalid               (m_axis_qdma_c2h_sim_tvalid),
-      .m_axis_qdma_c2h_tdata                (m_axis_qdma_c2h_sim_tdata),
-      .m_axis_qdma_c2h_tcrc                 (m_axis_qdma_c2h_sim_tcrc),
-      .m_axis_qdma_c2h_tlast                (m_axis_qdma_c2h_sim_tlast),
-      .m_axis_qdma_c2h_ctrl_marker          (m_axis_qdma_c2h_sim_ctrl_marker),
-      .m_axis_qdma_c2h_ctrl_port_id         (m_axis_qdma_c2h_sim_ctrl_port_id),
-      .m_axis_qdma_c2h_ctrl_ecc             (m_axis_qdma_c2h_sim_ctrl_ecc),
-      .m_axis_qdma_c2h_ctrl_len             (m_axis_qdma_c2h_sim_ctrl_len),
-      .m_axis_qdma_c2h_ctrl_qid             (m_axis_qdma_c2h_sim_ctrl_qid),
-      .m_axis_qdma_c2h_ctrl_has_cmpt        (m_axis_qdma_c2h_sim_ctrl_has_cmpt),
-      .m_axis_qdma_c2h_mty                  (m_axis_qdma_c2h_sim_mty),
-      .m_axis_qdma_c2h_tready               (m_axis_qdma_c2h_sim_tready),
+      .m_axis_qdma_c2h_tvalid               (m_axis_qdma_c2h_sim_tvalid[i]),
+      .m_axis_qdma_c2h_tdata                (m_axis_qdma_c2h_sim_tdata[`getvec(512, i)]),
+      .m_axis_qdma_c2h_tcrc                 (m_axis_qdma_c2h_sim_tcrc[`getvec(32, i)]),
+      .m_axis_qdma_c2h_tlast                (m_axis_qdma_c2h_sim_tlast[i]),
+      .m_axis_qdma_c2h_ctrl_marker          (m_axis_qdma_c2h_sim_ctrl_marker[i]),
+      .m_axis_qdma_c2h_ctrl_port_id         (m_axis_qdma_c2h_sim_ctrl_port_id[`getvec(3, i)]),
+      .m_axis_qdma_c2h_ctrl_ecc             (m_axis_qdma_c2h_sim_ctrl_ecc[`getvec(7, i)]),
+      .m_axis_qdma_c2h_ctrl_len             (m_axis_qdma_c2h_sim_ctrl_len[`getvec(16, i)]),
+      .m_axis_qdma_c2h_ctrl_qid             (m_axis_qdma_c2h_sim_ctrl_qid[`getvec(11, i)]),
+      .m_axis_qdma_c2h_ctrl_has_cmpt        (m_axis_qdma_c2h_sim_ctrl_has_cmpt[i]),
+      .m_axis_qdma_c2h_mty                  (m_axis_qdma_c2h_sim_mty[`getvec(6, i)]),
+      .m_axis_qdma_c2h_tready               (m_axis_qdma_c2h_sim_tready[i]),
 
-      .m_axis_qdma_cpl_tvalid               (m_axis_qdma_cpl_sim_tvalid),
-      .m_axis_qdma_cpl_tdata                (m_axis_qdma_cpl_sim_tdata),
-      .m_axis_qdma_cpl_size                 (m_axis_qdma_cpl_sim_size),
-      .m_axis_qdma_cpl_dpar                 (m_axis_qdma_cpl_sim_dpar),
-      .m_axis_qdma_cpl_ctrl_qid             (m_axis_qdma_cpl_sim_ctrl_qid),
-      .m_axis_qdma_cpl_ctrl_cmpt_type       (m_axis_qdma_cpl_sim_ctrl_cmpt_type),
-      .m_axis_qdma_cpl_ctrl_wait_pld_pkt_id (m_axis_qdma_cpl_sim_ctrl_wait_pld_pkt_id),
-      .m_axis_qdma_cpl_ctrl_port_id         (m_axis_qdma_cpl_sim_ctrl_port_id),
-      .m_axis_qdma_cpl_ctrl_marker          (m_axis_qdma_cpl_sim_ctrl_marker),
-      .m_axis_qdma_cpl_ctrl_user_trig       (m_axis_qdma_cpl_sim_ctrl_user_trig),
-      .m_axis_qdma_cpl_ctrl_col_idx         (m_axis_qdma_cpl_sim_ctrl_col_idx),
-      .m_axis_qdma_cpl_ctrl_err_idx         (m_axis_qdma_cpl_sim_ctrl_err_idx),
-      .m_axis_qdma_cpl_ctrl_no_wrb_marker   (m_axis_qdma_cpl_sim_ctrl_no_wrb_marker),
-      .m_axis_qdma_cpl_tready               (m_axis_qdma_cpl_sim_tready),
+      .m_axis_qdma_cpl_tvalid               (m_axis_qdma_cpl_sim_tvalid[i]),
+      .m_axis_qdma_cpl_tdata                (m_axis_qdma_cpl_sim_tdata[`getvec(512, i)]),
+      .m_axis_qdma_cpl_size                 (m_axis_qdma_cpl_sim_size[`getvec(2, i)]),
+      .m_axis_qdma_cpl_dpar                 (m_axis_qdma_cpl_sim_dpar[`getvec(16, i)]),
+      .m_axis_qdma_cpl_ctrl_qid             (m_axis_qdma_cpl_sim_ctrl_qid[`getvec(11, i)]),
+      .m_axis_qdma_cpl_ctrl_cmpt_type       (m_axis_qdma_cpl_sim_ctrl_cmpt_type[`getvec(2, i)]),
+      .m_axis_qdma_cpl_ctrl_wait_pld_pkt_id (m_axis_qdma_cpl_sim_ctrl_wait_pld_pkt_id[`getvec(16, i)]),
+      .m_axis_qdma_cpl_ctrl_port_id         (m_axis_qdma_cpl_sim_ctrl_port_id[`getvec(3, i)]),
+      .m_axis_qdma_cpl_ctrl_marker          (m_axis_qdma_cpl_sim_ctrl_marker[i]),
+      .m_axis_qdma_cpl_ctrl_user_trig       (m_axis_qdma_cpl_sim_ctrl_user_trig[i]),
+      .m_axis_qdma_cpl_ctrl_col_idx         (m_axis_qdma_cpl_sim_ctrl_col_idx[`getvec(3, i)]),
+      .m_axis_qdma_cpl_ctrl_err_idx         (m_axis_qdma_cpl_sim_ctrl_err_idx[`getvec(3, i)]),
+      .m_axis_qdma_cpl_ctrl_no_wrb_marker   (m_axis_qdma_cpl_sim_ctrl_no_wrb_marker[i]),
+      .m_axis_qdma_cpl_tready               (m_axis_qdma_cpl_sim_tready[i]),
   `endif
 
       .mod_rstn                             (qdma_rstn[i]),
@@ -716,6 +790,12 @@ module open_nic_shell #(
       .axil_aclk                            (axil_aclk[i]),
 
     `ifdef __au55n__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au55c__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au50__
+      .ref_clk_100mhz                       (ref_clk_100mhz),
+    `elsif __au280__
       .ref_clk_100mhz                       (ref_clk_100mhz),
     `endif
       .axis_master_aclk                     (axis_aclk[0]),
@@ -931,7 +1011,13 @@ module open_nic_shell #(
     .axil_aclk                        (axil_aclk[0]),
 
   `ifdef __au55n__
-    .ref_clk_100mhz                   (ref_clk_100mhz)
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au55c__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au50__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
+  `elsif __au280__
+    .ref_clk_100mhz                   (ref_clk_100mhz),
   `endif
     .axis_aclk                        (axis_aclk[0])
   );

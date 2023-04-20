@@ -27,15 +27,15 @@ if {$num_ports >= 1} {
     set_property PACKAGE_PIN AD43 [get_ports qsfp_refclk_n[0]]
     set_property PACKAGE_PIN AD42 [get_ports qsfp_refclk_p[0]]
 
-#    set_property PACKAGE_PIN BL13     [get_ports qsfp_activity_led[0]]
-#    set_property IOSTANDARD  LVCMOS18 [get_ports qsfp_activity_led[0]]
+#    set_property PACKAGE_PIN BL13     [get_ports qsfp_activity_led[0]] 
+#    set_property IOSTANDARD  LVCMOS18 [get_ports qsfp_activity_led[0]] 
 #    set_property PACKAGE_PIN BK11     [get_ports qsfp_link_stat_ledg[0]]
 #    set_property IOSTANDARD  LVCMOS18 [get_ports qsfp_link_stat_ledg[0]]
 #    set_property PACKAGE_PIN BJ11     [get_ports qsfp_link_stat_ledy[0]]
 #    set_property IOSTANDARD  LVCMOS18 [get_ports qsfp_link_stat_ledy[0]]
 }
 if {$num_ports >= 2} {
-#    IO pins AB43, AB42 are on IO Bank 131 for use with GTY X0Y28~31 
+#    IO pins AB43, AB42 are on IO Bank 131 for use with GTY X0Y28~31  
     set_property PACKAGE_PIN AB43 [get_ports qsfp_refclk_n[1]]
     set_property PACKAGE_PIN AB42 [get_ports qsfp_refclk_p[1]]
 
@@ -57,7 +57,3 @@ set_property -dict {PACKAGE_PIN BE46 IOSTANDARD LVCMOS18} [get_ports satellite_g
 set_property -dict {PACKAGE_PIN BH46 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[1]]
 set_property -dict {PACKAGE_PIN BF45 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[2]]
 set_property -dict {PACKAGE_PIN BF46 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[3]]
-
-
-
-
