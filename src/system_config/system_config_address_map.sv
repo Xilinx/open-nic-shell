@@ -22,9 +22,7 @@
 // --------------------------------------------------
 //    0x00000  |  0x00FFF  |  System configuration
 // --------------------------------------------------
-//    0x01000  |  0x05FFF  |  QDMA subsystem
-// --------------------------------------------------
-//    0x06000  |  0x06FFF  |  QSPI 
+//    0x01000  |  0x05FFF  |  QDMA subsystem #0
 // --------------------------------------------------
 //    0x08000  |  0x0AFFF  |  CMAC subsystem #0
 // --------------------------------------------------
@@ -36,34 +34,39 @@
 // --------------------------------------------------
 //    0x10000  |  0x11FFF  |  Sysmon block
 // --------------------------------------------------
+//    0x12000  |  0x16FFF  |  QDMA subsystem #1
+// --------------------------------------------------
 //   0x100000  |  0x1FFFFF |  Box0 @ 250MHz
 // --------------------------------------------------
 //   0x200000  |  0x2FFFFF |  Box1 @ 322MHz
 // --------------------------------------------------
 //   0x300000  |  0x33FFFF |  Card Management System
 // --------------------------------------------------
+//   0x340000  |  0x340FFF |  QSPI
+// --------------------------------------------------
 
 `include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
 module system_config_address_map #(
+  parameter int NUM_QDMA = 1,
   parameter int NUM_CMAC_PORT = 1
 ) (
-  input                         s_axil_awvalid,
-  input                  [31:0] s_axil_awaddr,
-  output                        s_axil_awready,
-  input                         s_axil_wvalid,
-  input                  [31:0] s_axil_wdata,
-  output                        s_axil_wready,
-  output                        s_axil_bvalid,
-  output                  [1:0] s_axil_bresp,
-  input                         s_axil_bready,
-  input                         s_axil_arvalid,
-  input                  [31:0] s_axil_araddr,
-  output                        s_axil_arready,
-  output                        s_axil_rvalid,
-  output                 [31:0] s_axil_rdata,
-  output                  [1:0] s_axil_rresp,
-  input                         s_axil_rready,
+  input          [NUM_QDMA-1:0] s_axil_awvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_awaddr,
+  output         [NUM_QDMA-1:0] s_axil_awready,
+  input          [NUM_QDMA-1:0] s_axil_wvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_wdata,
+  output         [NUM_QDMA-1:0] s_axil_wready,
+  output         [NUM_QDMA-1:0] s_axil_bvalid,
+  output       [2*NUM_QDMA-1:0] s_axil_bresp,
+  input          [NUM_QDMA-1:0] s_axil_bready,
+  input          [NUM_QDMA-1:0] s_axil_arvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_araddr,
+  output         [NUM_QDMA-1:0] s_axil_arready,
+  output         [NUM_QDMA-1:0] s_axil_rvalid,
+  output      [32*NUM_QDMA-1:0] s_axil_rdata,
+  output       [2*NUM_QDMA-1:0] s_axil_rresp,
+  input          [NUM_QDMA-1:0] s_axil_rready,
 
   output                        m_axil_scfg_awvalid,
   output                 [31:0] m_axil_scfg_awaddr,
@@ -82,22 +85,22 @@ module system_config_address_map #(
   input                   [1:0] m_axil_scfg_rresp,
   output                        m_axil_scfg_rready,
 
-  output                        m_axil_qdma_awvalid,
-  output                 [31:0] m_axil_qdma_awaddr,
-  input                         m_axil_qdma_awready,
-  output                        m_axil_qdma_wvalid,
-  output                 [31:0] m_axil_qdma_wdata,
-  input                         m_axil_qdma_wready,
-  input                         m_axil_qdma_bvalid,
-  input                   [1:0] m_axil_qdma_bresp,
-  output                        m_axil_qdma_bready,
-  output                        m_axil_qdma_arvalid,
-  output                 [31:0] m_axil_qdma_araddr,
-  input                         m_axil_qdma_arready,
-  input                         m_axil_qdma_rvalid,
-  input                  [31:0] m_axil_qdma_rdata,
-  input                   [1:0] m_axil_qdma_rresp,
-  output                        m_axil_qdma_rready,
+  output      [NUM_QDMA-1:0] m_axil_qdma_awvalid,
+  output   [32*NUM_QDMA-1:0] m_axil_qdma_awaddr,
+  input       [NUM_QDMA-1:0] m_axil_qdma_awready,
+  output      [NUM_QDMA-1:0] m_axil_qdma_wvalid,
+  output   [32*NUM_QDMA-1:0] m_axil_qdma_wdata,
+  input       [NUM_QDMA-1:0] m_axil_qdma_wready,
+  input       [NUM_QDMA-1:0] m_axil_qdma_bvalid,
+  input     [2*NUM_QDMA-1:0] m_axil_qdma_bresp,
+  output      [NUM_QDMA-1:0] m_axil_qdma_bready,
+  output      [NUM_QDMA-1:0] m_axil_qdma_arvalid,
+  output   [32*NUM_QDMA-1:0] m_axil_qdma_araddr,
+  input       [NUM_QDMA-1:0] m_axil_qdma_arready,
+  input       [NUM_QDMA-1:0] m_axil_qdma_rvalid,
+  input    [32*NUM_QDMA-1:0] m_axil_qdma_rdata,
+  input     [2*NUM_QDMA-1:0] m_axil_qdma_rresp,
+  output      [NUM_QDMA-1:0] m_axil_qdma_rready,
 
   output    [NUM_CMAC_PORT-1:0] m_axil_adap_awvalid,
   output [32*NUM_CMAC_PORT-1:0] m_axil_adap_awaddr,
@@ -224,26 +227,28 @@ module system_config_address_map #(
   output                  [2:0] m_axil_qspi_awprot,
   output                  [3:0] m_axil_qspi_wstrb,
 
-  input                         aclk,
+  input          [NUM_QDMA-1:0] aclk,
   input                         aresetn
 );
 
-  localparam C_NUM_SLAVES  = 11;
+  localparam C_NUM_SLAVES  = 12;
 
   localparam C_SCFG_INDEX  = 0;
-  localparam C_QDMA_INDEX  = 1;
+  localparam C_QDMA0_INDEX = 1;
   localparam C_CMAC0_INDEX = 2;
   localparam C_ADAP0_INDEX = 3;
   localparam C_CMAC1_INDEX = 4;
   localparam C_ADAP1_INDEX = 5;
   localparam C_SMON_INDEX  = 6;
-  localparam C_BOX1_INDEX  = 7;
-  localparam C_BOX0_INDEX  = 8;
-  localparam C_CMS_INDEX   = 9;
-  localparam C_QSPI_INDEX  = 10;
+  localparam C_QDMA1_INDEX = 7;
+  localparam C_BOX1_INDEX  = 8;
+  localparam C_BOX0_INDEX  = 9;
+  localparam C_CMS_INDEX   = 10;
+  localparam C_QSPI_INDEX  = 11;
 
   localparam C_SCFG_BASE_ADDR  = 32'h0;
-  localparam C_QDMA_BASE_ADDR  = 32'h01000;
+  localparam C_QDMA0_BASE_ADDR = 32'h01000;
+  localparam C_QDMA1_BASE_ADDR = 32'h12000;
   localparam C_CMAC0_BASE_ADDR = 32'h08000;
   localparam C_ADAP0_BASE_ADDR = 32'h0B000;
   localparam C_CMAC1_BASE_ADDR = 32'h0C000;
@@ -256,8 +261,10 @@ module system_config_address_map #(
 
   wire                [31:0] axil_scfg_awaddr;
   wire                [31:0] axil_scfg_araddr;
-  wire                [31:0] axil_qdma_awaddr;
-  wire                [31:0] axil_qdma_araddr;
+  wire                [31:0] axil_qdma0_awaddr;
+  wire                [31:0] axil_qdma0_araddr;
+  wire                [31:0] axil_qdma1_awaddr;
+  wire                [31:0] axil_qdma1_araddr;
   wire                [31:0] axil_cmac0_awaddr;
   wire                [31:0] axil_cmac0_araddr;
   wire                [31:0] axil_adap0_awaddr;
@@ -277,6 +284,22 @@ module system_config_address_map #(
   wire                [31:0] axil_qspi_awaddr;
   wire                [31:0] axil_qspi_araddr;
 
+  wire        [NUM_QDMA-1:0] axil_pcie_awvalid;
+  wire     [32*NUM_QDMA-1:0] axil_pcie_awaddr;
+  wire        [NUM_QDMA-1:0] axil_pcie_awready;
+  wire        [NUM_QDMA-1:0] axil_pcie_wvalid;
+  wire     [32*NUM_QDMA-1:0] axil_pcie_wdata;
+  wire        [NUM_QDMA-1:0] axil_pcie_wready;
+  wire        [NUM_QDMA-1:0] axil_pcie_bvalid;
+  wire      [2*NUM_QDMA-1:0] axil_pcie_bresp;
+  wire        [NUM_QDMA-1:0] axil_pcie_bready;
+  wire        [NUM_QDMA-1:0] axil_pcie_arvalid;
+  wire     [32*NUM_QDMA-1:0] axil_pcie_araddr;
+  wire        [NUM_QDMA-1:0] axil_pcie_arready;
+  wire        [NUM_QDMA-1:0] axil_pcie_rvalid;
+  wire     [32*NUM_QDMA-1:0] axil_pcie_rdata;
+  wire      [2*NUM_QDMA-1:0] axil_pcie_rresp;
+  wire        [NUM_QDMA-1:0] axil_pcie_rready;
 
   wire  [1*C_NUM_SLAVES-1:0] axil_awvalid;
   wire [32*C_NUM_SLAVES-1:0] axil_awaddr;
@@ -301,8 +324,10 @@ module system_config_address_map #(
   // Adjust AXI-Lite address so that each slave can assume a base address of 0x0
   assign axil_scfg_awaddr                      = axil_awaddr[`getvec(32, C_SCFG_INDEX)] - C_SCFG_BASE_ADDR;
   assign axil_scfg_araddr                      = axil_araddr[`getvec(32, C_SCFG_INDEX)] - C_SCFG_BASE_ADDR;
-  assign axil_qdma_awaddr                      = axil_awaddr[`getvec(32, C_QDMA_INDEX)] - C_QDMA_BASE_ADDR;
-  assign axil_qdma_araddr                      = axil_araddr[`getvec(32, C_QDMA_INDEX)] - C_QDMA_BASE_ADDR;
+  assign axil_qdma0_awaddr                     = axil_awaddr[`getvec(32, C_QDMA0_INDEX)] - C_QDMA0_BASE_ADDR;
+  assign axil_qdma0_araddr                     = axil_araddr[`getvec(32, C_QDMA0_INDEX)] - C_QDMA0_BASE_ADDR;
+  assign axil_qdma1_awaddr                     = axil_awaddr[`getvec(32, C_QDMA1_INDEX)] - C_QDMA1_BASE_ADDR;
+  assign axil_qdma1_araddr                     = axil_araddr[`getvec(32, C_QDMA1_INDEX)] - C_QDMA1_BASE_ADDR;
   assign axil_cmac0_awaddr                     = axil_awaddr[`getvec(32, C_CMAC0_INDEX)] - C_CMAC0_BASE_ADDR;
   assign axil_cmac0_araddr                     = axil_araddr[`getvec(32, C_CMAC0_INDEX)] - C_CMAC0_BASE_ADDR;
   assign axil_adap0_awaddr                     = axil_awaddr[`getvec(32, C_ADAP0_INDEX)] - C_ADAP0_BASE_ADDR;
@@ -311,7 +336,7 @@ module system_config_address_map #(
   assign axil_cmac1_araddr                     = axil_araddr[`getvec(32, C_CMAC1_INDEX)] - C_CMAC1_BASE_ADDR;
   assign axil_adap1_awaddr                     = axil_awaddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
   assign axil_adap1_araddr                     = axil_araddr[`getvec(32, C_ADAP1_INDEX)] - C_ADAP1_BASE_ADDR;
-  assign axil_smon_awddr                       = axil_awaddr[`getvec(32, C_SMON_INDEX)]  - C_SMON_BASE_ADDR;
+  assign axil_smon_awaddr                      = axil_awaddr[`getvec(32, C_SMON_INDEX)]  - C_SMON_BASE_ADDR;
   assign axil_smon_araddr                      = axil_araddr[`getvec(32, C_SMON_INDEX)] - C_SMON_BASE_ADDR;
   assign axil_box1_awaddr                      = axil_awaddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
   assign axil_box1_araddr                      = axil_araddr[`getvec(32, C_BOX1_INDEX)] - C_BOX1_BASE_ADDR;
@@ -339,22 +364,116 @@ module system_config_address_map #(
   assign axil_rresp[`getvec(2, C_SCFG_INDEX)]  = m_axil_scfg_rresp;
   assign m_axil_scfg_rready                    = axil_rready[C_SCFG_INDEX];
 
-  assign m_axil_qdma_awvalid                   = axil_awvalid[C_QDMA_INDEX];
-  assign m_axil_qdma_awaddr                    = axil_qdma_awaddr;
-  assign axil_awready[C_QDMA_INDEX]            = m_axil_qdma_awready;
-  assign m_axil_qdma_wvalid                    = axil_wvalid[C_QDMA_INDEX];
-  assign m_axil_qdma_wdata                     = axil_wdata[`getvec(32, C_QDMA_INDEX)];
-  assign axil_wready[C_QDMA_INDEX]             = m_axil_qdma_wready;
-  assign axil_bvalid[C_QDMA_INDEX]             = m_axil_qdma_bvalid;
-  assign axil_bresp[`getvec(2, C_QDMA_INDEX)]  = m_axil_qdma_bresp;
-  assign m_axil_qdma_bready                    = axil_bready[C_QDMA_INDEX];
-  assign m_axil_qdma_arvalid                   = axil_arvalid[C_QDMA_INDEX];
-  assign m_axil_qdma_araddr                    = axil_qdma_araddr;
-  assign axil_arready[C_QDMA_INDEX]            = m_axil_qdma_arready;
-  assign axil_rvalid[C_QDMA_INDEX]             = m_axil_qdma_rvalid;
-  assign axil_rdata[`getvec(32, C_QDMA_INDEX)] = m_axil_qdma_rdata;
-  assign axil_rresp[`getvec(2, C_QDMA_INDEX)]  = m_axil_qdma_rresp;
-  assign m_axil_qdma_rready                    = axil_rready[C_QDMA_INDEX];
+  if (NUM_QDMA == 1) begin
+    assign m_axil_qdma_awvalid                    = axil_awvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_awaddr                     = axil_qdma0_awaddr;
+    assign axil_awready[C_QDMA0_INDEX]            = m_axil_qdma_awready;
+    assign m_axil_qdma_wvalid                     = axil_wvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_wdata                      = axil_wdata[`getvec(32, C_QDMA0_INDEX)];
+    assign axil_wready[C_QDMA0_INDEX]             = m_axil_qdma_wready;
+    assign axil_bvalid[C_QDMA0_INDEX]             = m_axil_qdma_bvalid;
+    assign axil_bresp[`getvec(2, C_QDMA0_INDEX)]  = m_axil_qdma_bresp;
+    assign m_axil_qdma_bready                     = axil_bready[C_QDMA0_INDEX];
+    assign m_axil_qdma_arvalid                    = axil_arvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_araddr                     = axil_qdma0_araddr;
+    assign axil_arready[C_QDMA0_INDEX]            = m_axil_qdma_arready;
+    assign axil_rvalid[C_QDMA0_INDEX]             = m_axil_qdma_rvalid;
+    assign axil_rdata[`getvec(32, C_QDMA0_INDEX)] = m_axil_qdma_rdata;
+    assign axil_rresp[`getvec(2, C_QDMA0_INDEX)]  = m_axil_qdma_rresp;
+    assign m_axil_qdma_rready                     = axil_rready[C_QDMA0_INDEX];
+
+    // Sink for the unused dummy register interface
+    axi_lite_slave dummy_reg_inst (
+      .s_axil_awvalid (axil_awvalid[C_QDMA1_INDEX]),
+      .s_axil_awaddr  (axil_qdma1_awaddr),
+      .s_axil_awready (axil_awready[C_QDMA1_INDEX]),
+      .s_axil_wvalid  (axil_wvalid[C_QDMA1_INDEX]),
+      .s_axil_wdata   (axil_wdata[`getvec(32, C_QDMA1_INDEX)]),
+      .s_axil_wready  (axil_wready[C_QDMA1_INDEX]),
+      .s_axil_bvalid  (axil_bvalid[C_QDMA1_INDEX]),
+      .s_axil_bresp   (axil_bresp[`getvec(2, C_QDMA1_INDEX)]),
+      .s_axil_bready  (axil_bready[C_QDMA1_INDEX]),
+      .s_axil_arvalid (axil_arvalid[C_QDMA1_INDEX]),
+      .s_axil_araddr  (axil_qdma1_araddr),
+      .s_axil_arready (axil_arready[C_QDMA1_INDEX]),
+      .s_axil_rvalid  (axil_rvalid[C_QDMA1_INDEX] ),
+      .s_axil_rdata   (axil_rdata[`getvec(32, C_QDMA1_INDEX)]),
+      .s_axil_rresp   (axil_rresp[`getvec(2, C_QDMA1_INDEX)]),
+      .s_axil_rready  (axil_rready[C_QDMA1_INDEX]),
+
+      .aresetn        (aresetn),
+      .aclk           (aclk[0])
+    );
+
+    assign axil_pcie_awvalid                      = s_axil_awvalid;
+    assign axil_pcie_awaddr                       = s_axil_awaddr;
+    assign s_axil_awready                         = axil_pcie_awready;
+    assign axil_pcie_wvalid                       = s_axil_wvalid;
+    assign axil_pcie_wdata                        = s_axil_wdata;
+    assign s_axil_wready                          = axil_pcie_wready;
+    assign s_axil_bvalid                          = axil_pcie_bvalid;
+    assign s_axil_bresp                           = axil_pcie_bresp;
+    assign axil_pcie_bready                       = s_axil_bready;
+    assign axil_pcie_arvalid                      = s_axil_arvalid;
+    assign axil_pcie_araddr                       = s_axil_araddr;
+    assign s_axil_arready                         = axil_pcie_arready;
+    assign s_axil_rvalid                          = axil_pcie_rvalid;
+    assign s_axil_rdata                           = axil_pcie_rdata;
+    assign s_axil_rresp                           = axil_pcie_rresp;
+    assign axil_pcie_rready                       = s_axil_rready;
+  end
+  else begin
+    assign m_axil_qdma_awvalid[0]                 = axil_awvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_awaddr[`getvec(32, 0)]     = axil_qdma0_awaddr;
+    assign axil_awready[C_QDMA0_INDEX]            = m_axil_qdma_awready[0];
+    assign m_axil_qdma_wvalid[0]                  = axil_wvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_wdata[`getvec(32, 0)]      = axil_wdata[`getvec(32, C_QDMA0_INDEX)];
+    assign axil_wready[C_QDMA0_INDEX]             = m_axil_qdma_wready[0];
+    assign axil_bvalid[C_QDMA0_INDEX]             = m_axil_qdma_bvalid[0];
+    assign axil_bresp[`getvec(2, C_QDMA0_INDEX)]  = m_axil_qdma_bresp[`getvec(2, 0)];
+    assign m_axil_qdma_bready[0]                  = axil_bready[C_QDMA0_INDEX];
+    assign m_axil_qdma_arvalid[0]                 = axil_arvalid[C_QDMA0_INDEX];
+    assign m_axil_qdma_araddr[`getvec(32, 0)]     = axil_qdma0_araddr;
+    assign axil_arready[C_QDMA0_INDEX]            = m_axil_qdma_arready[0];
+    assign axil_rvalid[C_QDMA0_INDEX]             = m_axil_qdma_rvalid[0];
+    assign axil_rdata[`getvec(32, C_QDMA0_INDEX)] = m_axil_qdma_rdata[`getvec(32, 0)];
+    assign axil_rresp[`getvec(2, C_QDMA0_INDEX)]  = m_axil_qdma_rresp[`getvec(2, 0)];
+    assign m_axil_qdma_rready[0]                  = axil_rready[C_QDMA0_INDEX];
+
+    assign m_axil_qdma_awvalid[1]                 = axil_awvalid[C_QDMA1_INDEX];
+    assign m_axil_qdma_awaddr[`getvec(32, 1)]     = axil_qdma1_awaddr;
+    assign axil_awready[C_QDMA1_INDEX]            = m_axil_qdma_awready[1];
+    assign m_axil_qdma_wvalid[1]                  = axil_wvalid[C_QDMA1_INDEX];
+    assign m_axil_qdma_wdata[`getvec(32, 1)]      = axil_wdata[`getvec(32, C_QDMA1_INDEX)];
+    assign axil_wready[C_QDMA1_INDEX]             = m_axil_qdma_wready[1];
+    assign axil_bvalid[C_QDMA1_INDEX]             = m_axil_qdma_bvalid[1];
+    assign axil_bresp[`getvec(2, C_QDMA1_INDEX)]  = m_axil_qdma_bresp[`getvec(2, 1)];
+    assign m_axil_qdma_bready[1]                  = axil_bready[C_QDMA1_INDEX];
+    assign m_axil_qdma_arvalid[1]                 = axil_arvalid[C_QDMA1_INDEX];
+    assign m_axil_qdma_araddr[`getvec(32, 1)]     = axil_qdma1_araddr;
+    assign axil_arready[C_QDMA1_INDEX]            = m_axil_qdma_arready[1];
+    assign axil_rvalid[C_QDMA1_INDEX]             = m_axil_qdma_rvalid[1];
+    assign axil_rdata[`getvec(32, C_QDMA1_INDEX)] = m_axil_qdma_rdata[`getvec(32, 1)];
+    assign axil_rresp[`getvec(2, C_QDMA1_INDEX)]  = m_axil_qdma_rresp[`getvec(2, 1)];
+    assign m_axil_qdma_rready[1]                  = axil_rready[C_QDMA1_INDEX];
+
+    assign axil_pcie_awvalid[0]                   = s_axil_awvalid[0];
+    assign axil_pcie_awaddr[`getvec(32, 0)]       = s_axil_awaddr[`getvec(32, 0)];
+    assign s_axil_awready[0]                      = axil_pcie_awready[0];
+    assign axil_pcie_wvalid[0]                    = s_axil_wvalid[0];
+    assign axil_pcie_wdata[`getvec(32, 0)]        = s_axil_wdata[`getvec(32, 0)];
+    assign s_axil_wready[0]                       = axil_pcie_wready[0];
+    assign s_axil_bvalid[0]                       = axil_pcie_bvalid[0];
+    assign s_axil_bresp[`getvec(2, 0)]            = axil_pcie_bresp[`getvec(2, 0)];
+    assign axil_pcie_bready[0]                    = s_axil_bready[0];
+    assign axil_pcie_arvalid[0]                   = s_axil_arvalid[0];
+    assign axil_pcie_araddr[`getvec(32, 0)]       = s_axil_araddr[`getvec(32, 0)];
+    assign s_axil_arready[0]                      = axil_pcie_arready[0];
+    assign s_axil_rvalid[0]                       = axil_pcie_rvalid[0];
+    assign s_axil_rdata[`getvec(32, 0)]           = axil_pcie_rdata[`getvec(32, 0)];
+    assign s_axil_rresp[`getvec(2, 0)]            = axil_pcie_rresp[`getvec(2, 0)];
+    assign axil_pcie_rready[0]                    = s_axil_rready[0];
+  end
 
   if (NUM_CMAC_PORT == 1) begin
     assign m_axil_cmac_awvalid                    = axil_awvalid[C_CMAC0_INDEX];
@@ -414,7 +533,7 @@ module system_config_address_map #(
       .s_axil_rready  (axil_rready[C_CMAC1_INDEX]),
 
       .aresetn        (aresetn),
-      .aclk           (aclk)
+      .aclk           (aclk[0])
     );
 
     // Sink for unused ADAP1 register path
@@ -440,7 +559,7 @@ module system_config_address_map #(
       .s_axil_rready  (axil_rready[C_ADAP1_INDEX]),
 
       .aresetn        (aresetn),
-      .aclk           (aclk)
+      .aclk           (aclk[0])
     );
   end
   else begin
@@ -604,26 +723,74 @@ module system_config_address_map #(
   assign m_axil_qspi_awprot                     = axil_awprot[`getvec(3, C_QSPI_INDEX)];
   assign m_axil_qspi_wstrb                      = axil_wstrb[`getvec(4, C_QSPI_INDEX)];
 
+  generate if (NUM_QDMA > 1) begin
+    system_config_axi_clock_converter axi_clk_converter_inst (
+      .s_axi_aclk    (aclk[1]),
+      .s_axi_aresetn (aresetn),
+      .s_axi_awaddr  (s_axil_awaddr[`getvec(32, 1)]),
+      .s_axi_awprot  (0),
+      .s_axi_awvalid (s_axil_awvalid[1]),
+      .s_axi_awready (s_axil_awready[1]),
+      .s_axi_wdata   (s_axil_wdata[`getvec(32, 1)]),
+      .s_axi_wstrb   (4'hF),
+      .s_axi_wvalid  (s_axil_wvalid[1]),
+      .s_axi_wready  (s_axil_wready[1]),
+      .s_axi_bresp   (s_axil_bresp[`getvec(2, 1)]),
+      .s_axi_bvalid  (s_axil_bvalid[1]),
+      .s_axi_bready  (s_axil_bready[1]),
+      .s_axi_araddr  (s_axil_araddr[`getvec(32, 1)]),
+      .s_axi_arprot  (0),
+      .s_axi_arvalid (s_axil_arvalid[1]),
+      .s_axi_arready (s_axil_arready[1]),
+      .s_axi_rdata   (s_axil_rdata[`getvec(32, 1)]),
+      .s_axi_rresp   (s_axil_rresp[`getvec(2, 1)]),
+      .s_axi_rvalid  (s_axil_rvalid[1]),
+      .s_axi_rready  (s_axil_rready[1]),
+      .m_axi_aclk    (aclk[0]),
+      .m_axi_aresetn (aresetn),
+      .m_axi_awaddr  (axil_pcie_awaddr[`getvec(32, 1)]),
+      .m_axi_awprot  (),
+      .m_axi_awvalid (axil_pcie_awvalid[1]),
+      .m_axi_awready (axil_pcie_awready[1]),
+      .m_axi_wdata   (axil_pcie_wdata[`getvec(32, 1)]),
+      .m_axi_wstrb   (),
+      .m_axi_wvalid  (axil_pcie_wvalid[1]),
+      .m_axi_wready  (axil_pcie_wready[1]),
+      .m_axi_bresp   (axil_pcie_bresp[`getvec(2, 1)]),
+      .m_axi_bvalid  (axil_pcie_bvalid[1]),
+      .m_axi_bready  (axil_pcie_bready[1]),
+      .m_axi_araddr  (axil_pcie_araddr[`getvec(32, 1)]),
+      .m_axi_arprot  (),
+      .m_axi_arvalid (axil_pcie_arvalid[1]),
+      .m_axi_arready (axil_pcie_arready[1]),
+      .m_axi_rdata   (axil_pcie_rdata[`getvec(32, 1)]),
+      .m_axi_rresp   (axil_pcie_rresp[`getvec(2, 1)]),
+      .m_axi_rvalid  (axil_pcie_rvalid[1]),
+      .m_axi_rready  (axil_pcie_rready[1])
+    );
+  end
+  endgenerate
+
   system_config_axi_crossbar xbar_inst (
-    .s_axi_awaddr  (s_axil_awaddr),
+    .s_axi_awaddr  (axil_pcie_awaddr),
     .s_axi_awprot  (0),
-    .s_axi_awvalid (s_axil_awvalid),
-    .s_axi_awready (s_axil_awready),
-    .s_axi_wdata   (s_axil_wdata),
+    .s_axi_awvalid (axil_pcie_awvalid),
+    .s_axi_awready (axil_pcie_awready),
+    .s_axi_wdata   (axil_pcie_wdata),
     .s_axi_wstrb   (4'hF),
-    .s_axi_wvalid  (s_axil_wvalid),
-    .s_axi_wready  (s_axil_wready),
-    .s_axi_bresp   (s_axil_bresp),
-    .s_axi_bvalid  (s_axil_bvalid),
-    .s_axi_bready  (s_axil_bready),
-    .s_axi_araddr  (s_axil_araddr),
+    .s_axi_wvalid  (axil_pcie_wvalid),
+    .s_axi_wready  (axil_pcie_wready),
+    .s_axi_bresp   (axil_pcie_bresp),
+    .s_axi_bvalid  (axil_pcie_bvalid),
+    .s_axi_bready  (axil_pcie_bready),
+    .s_axi_araddr  (axil_pcie_araddr),
     .s_axi_arprot  (0),
-    .s_axi_arvalid (s_axil_arvalid),
-    .s_axi_arready (s_axil_arready),
-    .s_axi_rdata   (s_axil_rdata),
-    .s_axi_rresp   (s_axil_rresp),
-    .s_axi_rvalid  (s_axil_rvalid),
-    .s_axi_rready  (s_axil_rready),
+    .s_axi_arvalid (axil_pcie_arvalid),
+    .s_axi_arready (axil_pcie_arready),
+    .s_axi_rdata   (axil_pcie_rdata),
+    .s_axi_rresp   (axil_pcie_rresp),
+    .s_axi_rvalid  (axil_pcie_rvalid),
+    .s_axi_rready  (axil_pcie_rready),
 
     .m_axi_awaddr  (axil_awaddr),
     .m_axi_awprot  (axil_awprot),
@@ -645,7 +812,7 @@ module system_config_address_map #(
     .m_axi_rvalid  (axil_rvalid),
     .m_axi_rready  (axil_rready),
 
-    .aclk          (aclk),
+    .aclk          (aclk[0]),
     .aresetn       (aresetn)
   );
 

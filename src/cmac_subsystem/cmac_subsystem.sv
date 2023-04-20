@@ -59,6 +59,13 @@ module cmac_subsystem #(
   input          gt_refclk_p,
   input          gt_refclk_n,
 
+`ifdef __sn1022__
+  input          dual0_gt_ref_clk_p,
+  input          dual0_gt_ref_clk_n,
+  input          dual1_gt_ref_clk_p,
+  input          dual1_gt_ref_clk_n,
+`endif
+
   output         cmac_clk,
 `else
   output         m_axis_cmac_tx_sim_tvalid,
@@ -287,6 +294,13 @@ module cmac_subsystem #(
     .gt_rxn              (gt_rxn),
     .gt_txp              (gt_txp),
     .gt_txn              (gt_txn),
+
+`ifdef __sn1022__
+    .dual0_gt_ref_clk_p (dual0_gt_ref_clk_p),
+    .dual0_gt_ref_clk_n (dual0_gt_ref_clk_n),
+    .dual1_gt_ref_clk_p (dual1_gt_ref_clk_p),
+    .dual1_gt_ref_clk_n (dual1_gt_ref_clk_n),
+`endif
 
     .s_axil_awaddr       (axil_cmac_awaddr),
     .s_axil_awvalid      (axil_cmac_awvalid),

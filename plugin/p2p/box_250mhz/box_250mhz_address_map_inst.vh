@@ -15,22 +15,22 @@
 // limitations under the License.
 //
 // *************************************************************************
-wire        axil_p2p_awvalid;
-wire [31:0] axil_p2p_awaddr;
-wire        axil_p2p_awready;
-wire        axil_p2p_wvalid;
-wire [31:0] axil_p2p_wdata;
-wire        axil_p2p_wready;
-wire        axil_p2p_bvalid;
-wire  [1:0] axil_p2p_bresp;
-wire        axil_p2p_bready;
-wire        axil_p2p_arvalid;
-wire [31:0] axil_p2p_araddr;
-wire        axil_p2p_arready;
-wire        axil_p2p_rvalid;
-wire [31:0] axil_p2p_rdata;
-wire  [1:0] axil_p2p_rresp;
-wire        axil_p2p_rready;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_awvalid;
+wire [32*NUM_CMAC_PORT*2-1:0] axil_p2p_awaddr;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_awready;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_wvalid;
+wire [32*NUM_CMAC_PORT*2-1:0] axil_p2p_wdata;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_wready;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_bvalid;
+wire  [2*NUM_CMAC_PORT*2-1:0] axil_p2p_bresp;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_bready;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_arvalid;
+wire [32*NUM_CMAC_PORT*2-1:0] axil_p2p_araddr;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_arready;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_rvalid;
+wire [32*NUM_CMAC_PORT*2-1:0] axil_p2p_rdata;
+wire  [2*NUM_CMAC_PORT*2-1:0] axil_p2p_rresp;
+wire    [NUM_CMAC_PORT*2-1:0] axil_p2p_rready;
 
 wire        axil_dummy_awvalid;
 wire [31:0] axil_dummy_awaddr;
@@ -49,7 +49,9 @@ wire [31:0] axil_dummy_rdata;
 wire  [1:0] axil_dummy_rresp;
 wire        axil_dummy_rready;
 
-box_250mhz_address_map address_map_inst (
+box_250mhz_address_map #(
+  .NUM_INTF          (NUM_PHYS_FUNC)
+) address_map_inst (
   .s_axil_awvalid       (s_axil_awvalid),
   .s_axil_awaddr        (s_axil_awaddr),
   .s_axil_awready       (s_axil_awready),

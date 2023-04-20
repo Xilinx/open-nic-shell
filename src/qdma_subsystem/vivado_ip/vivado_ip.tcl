@@ -22,3 +22,8 @@ set ips {
     qdma_subsystem_axi_crossbar
     qdma_subsystem_c2h_ecc
 }
+
+if {$num_qdma > 1} {
+    lappend ips "qdma_no_sriov_1"
+    lappend ips "qdma_subsystem_clk_converter"
+}

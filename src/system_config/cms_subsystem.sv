@@ -102,6 +102,8 @@ module cms_subsystem_wrapper
     output   [1:0] qsfp_lpmode;
     output   [1:0] qsfp_modsell;
     (* X_INTERFACE_INFO = "xilinx.com:signal:interrupt:1.0 INTR.SATELLITE_GPIO_0 INTERRUPT" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME INTR.SATELLITE_GPIO_0, PortWidth 4, SENSITIVITY EDGE_RISING" *) input [3:0]satellite_gpio_0;
+  `elsif __sn1022__
+    (* X_INTERFACE_INFO = "xilinx.com:signal:interrupt:1.0 INTR.SATELLITE_GPIO_0 INTERRUPT" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME INTR.SATELLITE_GPIO_0, PortWidth 4, SENSITIVITY EDGE_RISING" *) input [1:0]satellite_gpio_0;
   `endif  
     
   (* X_INTERFACE_INFO = "xilinx.com:signal:clock:1.0 CLK.ACLK_CTRL_0 CLK" *) (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME CLK.ACLK_CTRL_0, ASSOCIATED_BUSIF s_axi_ctrl_0, ASSOCIATED_RESET aresetn_ctrl_0, CLK_DOMAIN cms_subsystem_0_aclk_ctrl_0, FREQ_HZ 50000000, FREQ_TOLERANCE_HZ 0, INSERT_VIP 0, PHASE 0.0" *) input aclk_ctrl_0;
@@ -274,6 +276,9 @@ module cms_subsystem_wrapper
   assign qsfp_resetl[1] = cms_subsystem_0_qsfp1_reset_l;
   
   assign satellite_gpio_0_1 = satellite_gpio_0;
+`elsif __sn1022__
+  wire [1:0]satellite_gpio_0_1;
+  assign satellite_gpio_0_1 = satellite_gpio_0;
 `endif 
 
   
@@ -324,6 +329,8 @@ module cms_subsystem_wrapper
           .qsfp1_modprs_l(qsfp1_modprs_l_0_1),
           .qsfp1_modsel_l(cms_subsystem_0_qsfp1_modsel_l),
           .qsfp1_reset_l(cms_subsystem_0_qsfp1_reset_l),  
+        `elsif __sn1022__
+          .satellite_gpio(satellite_gpio_0_1),
         `endif
         .interrupt_host(cms_subsystem_0_interrupt_host),
         .s_axi_ctrl_araddr(s_axi_ctrl_0_1_ARADDR),

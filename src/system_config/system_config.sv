@@ -18,41 +18,42 @@
 `timescale 1ns/1ps
 module system_config #(
   parameter [31:0] BUILD_TIMESTAMP = 32'h01010000,
+  parameter int    NUM_QDMA     = 1,
   parameter int    NUM_CMAC_PORT   = 1
 ) (
-  input                         s_axil_awvalid,
-  input                  [31:0] s_axil_awaddr,
-  output                        s_axil_awready,
-  input                         s_axil_wvalid,
-  input                  [31:0] s_axil_wdata,
-  output                        s_axil_wready,
-  output                        s_axil_bvalid,
-  output                  [1:0] s_axil_bresp,
-  input                         s_axil_bready,
-  input                         s_axil_arvalid,
-  input                  [31:0] s_axil_araddr,
-  output                        s_axil_arready,
-  output                        s_axil_rvalid,
-  output                 [31:0] s_axil_rdata,
-  output                  [1:0] s_axil_rresp,
-  input                         s_axil_rready,
+  input          [NUM_QDMA-1:0] s_axil_awvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_awaddr,
+  output         [NUM_QDMA-1:0] s_axil_awready,
+  input          [NUM_QDMA-1:0] s_axil_wvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_wdata,
+  output         [NUM_QDMA-1:0] s_axil_wready,
+  output         [NUM_QDMA-1:0] s_axil_bvalid,
+  output       [2*NUM_QDMA-1:0] s_axil_bresp,
+  input          [NUM_QDMA-1:0] s_axil_bready,
+  input          [NUM_QDMA-1:0] s_axil_arvalid,
+  input       [32*NUM_QDMA-1:0] s_axil_araddr,
+  output         [NUM_QDMA-1:0] s_axil_arready,
+  output         [NUM_QDMA-1:0] s_axil_rvalid,
+  output      [32*NUM_QDMA-1:0] s_axil_rdata,
+  output       [2*NUM_QDMA-1:0] s_axil_rresp,
+  input          [NUM_QDMA-1:0] s_axil_rready,
 
-  output                        m_axil_qdma_awvalid,
-  output                 [31:0] m_axil_qdma_awaddr,
-  input                         m_axil_qdma_awready,
-  output                        m_axil_qdma_wvalid,
-  output                 [31:0] m_axil_qdma_wdata,
-  input                         m_axil_qdma_wready,
-  input                         m_axil_qdma_bvalid,
-  input                   [1:0] m_axil_qdma_bresp,
-  output                        m_axil_qdma_bready,
-  output                        m_axil_qdma_arvalid,
-  output                 [31:0] m_axil_qdma_araddr,
-  input                         m_axil_qdma_arready,
-  input                         m_axil_qdma_rvalid,
-  input                  [31:0] m_axil_qdma_rdata,
-  input                   [1:0] m_axil_qdma_rresp,
-  output                        m_axil_qdma_rready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_awvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_awaddr,
+  input          [NUM_QDMA-1:0] m_axil_qdma_awready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_wvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_wdata,
+  input          [NUM_QDMA-1:0] m_axil_qdma_wready,
+  input          [NUM_QDMA-1:0] m_axil_qdma_bvalid,
+  input        [2*NUM_QDMA-1:0] m_axil_qdma_bresp,
+  output         [NUM_QDMA-1:0] m_axil_qdma_bready,
+  output         [NUM_QDMA-1:0] m_axil_qdma_arvalid,
+  output      [32*NUM_QDMA-1:0] m_axil_qdma_araddr,
+  input          [NUM_QDMA-1:0] m_axil_qdma_arready,
+  input          [NUM_QDMA-1:0] m_axil_qdma_rvalid,
+  input       [32*NUM_QDMA-1:0] m_axil_qdma_rdata,
+  input        [2*NUM_QDMA-1:0] m_axil_qdma_rresp,
+  output         [NUM_QDMA-1:0] m_axil_qdma_rready,
 
   output    [NUM_CMAC_PORT-1:0] m_axil_adap_awvalid,
   output [32*NUM_CMAC_PORT-1:0] m_axil_adap_awaddr,
@@ -163,15 +164,20 @@ module system_config #(
   input                   [1:0] qsfp_modprsl,
   input                   [1:0] qsfp_intl,   
   output                  [1:0] qsfp_lpmode,
-  output                  [1:0] qsfp_modsell,  
+  output                  [1:0] qsfp_modsell,
+`elsif __sn1022__
+  input                   [1:0] satellite_gpio_0,
 `endif
 
-  input                         aclk,
+  input          [NUM_QDMA-1:0] aclk,
   input                         aresetn
 );
 
   // Parameter DRC
   initial begin
+    if (NUM_QDMA > 2 || NUM_QDMA < 1) begin
+      $fatal("[%m] Number of QDMAs should be within the range [1, 2]");
+    end
     if (NUM_CMAC_PORT > 2 || NUM_CMAC_PORT < 1) begin
       $fatal("[%m] Number of CMACs should be within the range [1, 2]");
     end
@@ -292,6 +298,7 @@ module system_config #(
   wire  [3:0] axil_qspi_int_wstrb;
    
   system_config_address_map #(
+    .NUM_QDMA   (NUM_QDMA),
     .NUM_CMAC_PORT (NUM_CMAC_PORT)
   ) scfg_address_map_inst (
     .s_axil_awvalid      (s_axil_awvalid),
@@ -499,13 +506,13 @@ module system_config #(
     .user_rstn      (user_rstn),
     .user_rst_done  (user_rst_done),
 
-    .aclk           (aclk),
+    .aclk           (aclk[0]),
     .aresetn        (aresetn)
   );
 
    system_management_wiz
    system_management_wiz_inst (
-     .s_axi_aclk      (aclk),                    
+     .s_axi_aclk      (aclk[0]),                    
      .s_axi_aresetn   (aresetn),                    
  
      .s_axi_awaddr    (axil_smon_awaddr),                    
@@ -683,7 +690,6 @@ axi_lite_clock_converter axi_clock_conv_cms_inst (
       .m_axi_aclk    (cms_clk),
       .m_axi_aresetn (cms_aresetn)
     );
-
 
 cms_subsystem_wrapper
   cms_subsystem_wrapper_inst (

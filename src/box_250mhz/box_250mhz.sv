@@ -21,6 +21,7 @@ module box_250mhz #(
   parameter int MAX_PKT_LEN   = 1518,
   parameter int USE_PHYS_FUNC = 1,
   parameter int NUM_PHYS_FUNC = 1,
+  parameter int NUM_QDMA      = 1,
   parameter int NUM_CMAC_PORT = 1
 ) (
   input                          s_axil_awvalid,
@@ -40,23 +41,23 @@ module box_250mhz #(
   output                   [1:0] s_axil_rresp,
   input                          s_axil_rready,
 
-  input      [NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tvalid,
-  input  [512*NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tdata,
-  input   [64*NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tkeep,
-  input      [NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tlast,
-  input   [16*NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tuser_size,
-  input   [16*NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tuser_src,
-  input   [16*NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tuser_dst,
-  output     [NUM_PHYS_FUNC-1:0] s_axis_qdma_h2c_tready,
+  input      [NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tvalid,
+  input  [512*NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tdata,
+  input   [64*NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tkeep,
+  input      [NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tlast,
+  input   [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tuser_size,
+  input   [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tuser_src,
+  input   [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tuser_dst,
+  output     [NUM_PHYS_FUNC*NUM_QDMA-1:0] s_axis_qdma_h2c_tready,
 
-  output     [NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tvalid,
-  output [512*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tdata,
-  output  [64*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tkeep,
-  output     [NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tlast,
-  output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_size,
-  output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_src,
-  output  [16*NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tuser_dst,
-  input      [NUM_PHYS_FUNC-1:0] m_axis_qdma_c2h_tready,
+  output     [NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tvalid,
+  output [512*NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tdata,
+  output  [64*NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tkeep,
+  output     [NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tlast,
+  output  [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tuser_size,
+  output  [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tuser_src,
+  output  [16*NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tuser_dst,
+  input      [NUM_PHYS_FUNC*NUM_QDMA-1:0] m_axis_qdma_c2h_tready,
 
   output     [NUM_CMAC_PORT-1:0] m_axis_adap_tx_250mhz_tvalid,
   output [512*NUM_CMAC_PORT-1:0] m_axis_adap_tx_250mhz_tdata,
@@ -84,15 +85,15 @@ module box_250mhz #(
 
   input                          axil_aclk,
 
-  `ifdef __au55n__
-    input                          ref_clk_100mhz,
-  `elsif __au55c__
-    input                          ref_clk_100mhz,
-  `elsif __au50__
-    input                          ref_clk_100mhz,
-  `elsif __au280__
-    input                          ref_clk_100mhz,      
-  `endif
+`ifdef __au55n__
+  input                          ref_clk_100mhz,
+`elsif __au55c__
+  input                          ref_clk_100mhz,
+`elsif __au50__
+  input                          ref_clk_100mhz,
+`elsif __au280__
+  input                          ref_clk_100mhz,
+`endif
   input                          axis_aclk
 );
 
@@ -112,7 +113,7 @@ module box_250mhz #(
 
   generate if (USE_PHYS_FUNC == 0) begin
     // Terminate H2C and C2H interfaces of the box
-    assign s_axis_qdma_h2c_tready     = {NUM_PHYS_FUNC{1'b1}};
+    assign s_axis_qdma_h2c_tready     = {NUM_PHYS_FUNC*NUM_QDMA{1'b1}};
 
     assign m_axis_qdma_c2h_tvalid     = 0;
     assign m_axis_qdma_c2h_tdata      = 0;

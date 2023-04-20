@@ -22,3 +22,7 @@ set ips {
     axi_quad_spi_0
     cms_subsystem_0
 }
+
+if {$num_qdma > 1} {
+    lappend ips "system_config_axi_clock_converter"
+}

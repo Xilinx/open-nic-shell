@@ -56,6 +56,12 @@ module cmac_subsystem_cmac_wrapper #(
 
   input          gt_refclk_p,
   input          gt_refclk_n,
+`ifdef __sn1022__
+  input          dual0_gt_ref_clk_p,
+  input          dual0_gt_ref_clk_n,
+  input          dual1_gt_ref_clk_p,
+  input          dual1_gt_ref_clk_n,
+`endif
   output         cmac_clk,
   input          cmac_sys_reset,
 
@@ -311,6 +317,48 @@ module cmac_subsystem_cmac_wrapper #(
 
   generate if (CMAC_ID == 0) begin
     cmac_usplus_0 cmac_inst (
+`ifdef __sn1022__
+      //new ports
+      .temperature                         (10'd0),
+      .gt_eyescanreset                     (4'd0),
+      .gt_rxcdrhold                        (4'd0),
+      .gt_rxpolarity                       (4'd0),
+      .gt_txpolarity                       (4'd0),
+      .gt_txinhibit                        (4'd0),
+      .gt_rxprbscntreset                   (4'd0),
+      .gt_drpclk                           (axil_aclk),
+      .gt_drpen                            (1'b0),
+      .gt_drpwe                            (1'b0),
+      .gt_drpaddr                          (11'd0),
+      .gt_drpdi                            (16'd0),
+      //end of new ports
+
+      .gt0_rxp_in                          (gt_rxp[0]),
+      .gt0_rxn_in                          (gt_rxn[0]),
+      .gt0_txp_out                         (gt_txp[0]),
+      .gt0_txn_out                         (gt_txn[0]),
+
+      .gt1_rxp_in                          (gt_rxp[1]),
+      .gt1_rxn_in                          (gt_rxn[1]),
+      .gt1_txp_out                         (gt_txp[1]),
+      .gt1_txn_out                         (gt_txn[1]),
+
+      .gt2_rxp_in                          (gt_rxp[2]),
+      .gt2_rxn_in                          (gt_rxn[2]),
+      .gt2_txp_out                         (gt_txp[2]),
+      .gt2_txn_out                         (gt_txn[2]),
+
+      .gt3_rxp_in                          (gt_rxp[3]),
+      .gt3_rxn_in                          (gt_rxn[3]),
+      .gt3_txp_out                         (gt_txp[3]),
+      .gt3_txn_out                         (gt_txn[3]),
+
+      .dual0_gt_ref_clk_p                  (dual0_gt_ref_clk_p),
+      .dual0_gt_ref_clk_n                  (dual0_gt_ref_clk_n),
+
+      .dual1_gt_ref_clk_p                  (dual1_gt_ref_clk_p),
+      .dual1_gt_ref_clk_n                  (dual1_gt_ref_clk_n),
+`else
       .gt_rxp_in                           (gt_rxp),
       .gt_rxn_in                           (gt_rxn),
       .gt_txp_out                          (gt_txp),
@@ -318,6 +366,7 @@ module cmac_subsystem_cmac_wrapper #(
 
       .gt_ref_clk_p                        (gt_refclk_p),
       .gt_ref_clk_n                        (gt_refclk_n),
+`endif
       .gt_ref_clk_out                      (),
       .gt_rxrecclkout                      (),
       .gt_rxusrclk2                        (),

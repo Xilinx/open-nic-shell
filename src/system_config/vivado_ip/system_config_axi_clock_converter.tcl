@@ -1,6 +1,6 @@
 # *************************************************************************
 #
-# Copyright 2020 Xilinx, Inc.
+# Copyright 2023 AMD, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
 # limitations under the License.
 #
 # *************************************************************************
-create_clock -period 10.000 -name pcie_refclk [get_ports pcie_refclk_p]
-
-set_false_path -through [get_ports pcie_rstn]
-
-foreach axis_aclk [get_clocks -of_object [get_nets axis_aclk*]] {
-    foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
-        set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
-        set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103 
-    }
-}
+set axi_clock_converter system_config_axi_clock_converter
+create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name $axi_clock_converter -dir ${ip_build_dir}
+set_property -dict {
+  CONFIG.ARUSER_WIDTH {0}
+  CONFIG.AWUSER_WIDTH {0}
+  CONFIG.BUSER_WIDTH {0}
+  CONFIG.DATA_WIDTH {32}
+  CONFIG.ID_WIDTH {0}
+  CONFIG.PROTOCOL {AXI4LITE}
+  CONFIG.RUSER_WIDTH {0}
+  CONFIG.WUSER_WIDTH {0}
+ } [get_ips $axi_clock_converter]

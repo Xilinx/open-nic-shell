@@ -35,7 +35,7 @@ if {$num_ports >= 1} {
     set_property PACKAGE_PIN N37 [get_ports qsfp_refclk_n[0]]
     set_property PACKAGE_PIN N36 [get_ports qsfp_refclk_p[0]]
 
-// for future implemenation 
+# for future implemenation 
 #    set_property PACKAGE_PIN E18      [get_ports qsfp_activity_led[0]]
 #    set_property IOSTANDARD  LVCMOS18 [get_ports qsfp_activity_led[0]]
 #    set_property PACKAGE_PIN E16      [get_ports qsfp_link_stat_ledg[0]]

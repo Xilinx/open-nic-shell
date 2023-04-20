@@ -1,6 +1,7 @@
+
 # *************************************************************************
 #
-# Copyright 2020 Xilinx, Inc.
+# Copyright 2022 Advanced Micro Devices
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +16,7 @@
 # limitations under the License.
 #
 # *************************************************************************
-create_clock -period 10.000 -name pcie_refclk [get_ports pcie_refclk_p]
 
-set_false_path -through [get_ports pcie_rstn]
-
-foreach axis_aclk [get_clocks -of_object [get_nets axis_aclk*]] {
-    foreach cmac_clk [get_clocks -of_object [get_nets cmac_clk*]] {
-        set_max_delay -datapath_only -from $axis_aclk -to $cmac_clk 4.000
-        set_max_delay -datapath_only -from $cmac_clk -to $axis_aclk 3.103 
-    }
-}
+set part xcu26-vsva1365-2LV-e
+set board_part ""
+set zynq_family 0

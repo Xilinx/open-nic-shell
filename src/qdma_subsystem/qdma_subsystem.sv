@@ -18,6 +18,7 @@
 `include "open_nic_shell_macros.vh"
 `timescale 1ns/1ps
 module qdma_subsystem #(
+  parameter int QDMA_ID       = 0,
   parameter int MIN_PKT_LEN   = 64,
   parameter int MAX_PKT_LEN   = 1518,
   parameter int USE_PHYS_FUNC = 1,
@@ -138,35 +139,38 @@ module qdma_subsystem #(
   input                          mod_rstn,
   output                         mod_rst_done,
 
+  input                          axil_cfg_aclk,
+
 `ifdef __synthesis__
   output                         axil_aclk,
 
-  `ifdef __au55n__
-    output                         ref_clk_100mhz,
-  `elsif __au55c__
-    output                         ref_clk_100mhz,
-  `elsif __au50__
-    output                         ref_clk_100mhz,
-  `elsif __au280__
-    output                         ref_clk_100mhz,        
-  `endif
+`ifdef __au55n__
+  output                         ref_clk_100mhz,
+`elsif __au55c__
+  output                         ref_clk_100mhz,
+`elsif __au50__
+  output                         ref_clk_100mhz,
+`elsif __au280__
+  output                         ref_clk_100mhz,
+`endif
+  input                          axis_master_aclk,
   output                         axis_aclk
-
 
 `else // !`ifdef __synthesis__
   output reg                     axil_aclk,
 
-  `ifdef __au55n__
-    output reg                     ref_clk_100mhz,
-  `elsif __au55c__
-    output reg                     ref_clk_100mhz,
-  `elsif __au50__
-    output reg                     ref_clk_100mhz,
-  `elsif __au280__
-    output reg                     ref_clk_100mhz,        
-  `endif
-  
+`ifdef __au55n__
+  output reg                     ref_clk_100mhz,
+`elsif __au55c__
+  output reg                     ref_clk_100mhz,
+`elsif __au50__
+  output reg                     ref_clk_100mhz,
+`elsif __au280__
+  output reg                     ref_clk_100mhz,
+`endif
+  input reg                      axis_master_aclk,
   output reg                     axis_aclk
+
 `endif
 );
 
@@ -308,7 +312,9 @@ module qdma_subsystem #(
   assign c2h_byp_in_st_csh_func     = 0;
   assign c2h_byp_in_st_csh_pfch_tag = 0;
 
-  qdma_subsystem_qdma_wrapper qdma_wrapper_inst (
+  qdma_subsystem_qdma_wrapper #(
+    .QDMA_ID (QDMA_ID)
+  ) qdma_wrapper_inst (
     .pcie_rxp                        (pcie_rxp),
     .pcie_rxn                        (pcie_rxn),
     .pcie_txp                        (pcie_txp),
@@ -430,17 +436,17 @@ module qdma_subsystem #(
 
     .axil_aclk                       (axil_aclk),
     .axis_aclk                       (axis_aclk),
-  
-  `ifdef __au55n__
+
+`ifdef __au55n__
     .ref_clk_100mhz                  (ref_clk_100mhz),
-  `elsif __au55c__
+`elsif __au55c__
     .ref_clk_100mhz                  (ref_clk_100mhz),
-  `elsif __au50__
+`elsif __au50__
     .ref_clk_100mhz                  (ref_clk_100mhz),
-  `elsif __au280__
-    .ref_clk_100mhz                  (ref_clk_100mhz),        
-  `endif
-  
+`elsif __au280__
+    .ref_clk_100mhz                  (ref_clk_100mhz),
+`endif
+
     .aresetn                         (powerup_rstn)
   );
 `else // !`ifdef __synthesis__
@@ -448,15 +454,15 @@ module qdma_subsystem #(
     axil_aclk = 1'b1;
     axis_aclk = 1'b1;
   
-  `ifdef __au55n__
+`ifdef __au55n__
     ref_clk_100mhz = 1'b1;
-  `elsif __au55c__
+`elsif __au55c__
     ref_clk_100mhz = 1'b1;
-  `elsif __au50__
+`elsif __au50__
     ref_clk_100mhz = 1'b1;
-  `elsif __au280__
-    ref_clk_100mhz = 1'b1;        
-  `endif
+`elsif __au280__
+    ref_clk_100mhz = 1'b1;
+`endif
   end
 
   always #4000ps axil_aclk = ~axil_aclk;
@@ -469,7 +475,7 @@ module qdma_subsystem #(
 `elsif __au50__
   always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
 `elsif __au280__
-  always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;    
+  always #5000ps ref_clk_100mhz = ~ref_clk_100mhz;
 `endif
 
   assign axis_qdma_h2c_tvalid                 = s_axis_qdma_h2c_tvalid;
@@ -537,7 +543,7 @@ module qdma_subsystem #(
       .s_axil_rready  (s_axil_rready),
 
       .aresetn        (axil_aresetn),
-      .aclk           (axil_aclk)
+      .aclk           (axil_cfg_aclk)
     );
 
     // Terminate H2C and C2H interfaces to QDMA IP
@@ -692,7 +698,7 @@ module qdma_subsystem #(
       .m_axil_func_rresp   (axil_func_rresp),
       .m_axil_func_rready  (axil_func_rready),
 
-      .aclk                (axil_aclk),
+      .aclk                (axil_cfg_aclk),
       .aresetn             (axil_aresetn)
     );
 
@@ -714,7 +720,7 @@ module qdma_subsystem #(
       .s_axil_rresp   (axil_rresp),
       .s_axil_rready  (axil_rready),
 
-      .axil_aclk      (axil_aclk),
+      .axil_aclk      (axil_cfg_aclk),
       .axis_aclk      (axis_aclk),
       .axil_aresetn   (axil_aresetn)
     );
@@ -798,6 +804,7 @@ module qdma_subsystem #(
     for (genvar i = 0; i < NUM_PHYS_FUNC; i++) begin
       qdma_subsystem_function #(
         .FUNC_ID     (i),
+        .QDMA_ID     (QDMA_ID),
         .MAX_PKT_LEN (MAX_PKT_LEN),
         .MIN_PKT_LEN (MIN_PKT_LEN)
       ) func_inst (
@@ -850,8 +857,9 @@ module qdma_subsystem #(
         .m_axis_c2h_tuser_qid  (axis_c2h_tuser_qid[`getvec(11, i)]),
         .m_axis_c2h_tready     (axis_c2h_tready[i]),
 
-        .axil_aclk             (axil_aclk),
+        .axil_aclk             (axil_cfg_aclk),
         .axis_aclk             (axis_aclk),
+        .axis_master_aclk      (axis_master_aclk),
         .axil_aresetn          (axil_aresetn)
       );
     end
