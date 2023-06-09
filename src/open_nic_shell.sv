@@ -56,15 +56,15 @@ module open_nic_shell #(
   output                   [1:0] qsfp_lpmode,
   output                   [1:0] qsfp_modsell,
   input                    [3:0] satellite_gpio,
-`elsif __sn1022__
+`elsif __au45n__
   input                    [1:0] satellite_gpio,
 `endif
 
   input                          satellite_uart_0_rxd,
   output                         satellite_uart_0_txd,
 
-`ifdef __sn1022__
-// SN1022 has 24 PCIe lanes: x16(host CPU) + x8(ARM CPU)
+`ifdef __au45n__
+// U45N has 24 PCIe lanes: x16(host CPU) + x8(ARM CPU)
   input                [23:0] pcie_rxp,
   input                [23:0] pcie_rxn,
   output               [23:0] pcie_txp,
@@ -84,7 +84,7 @@ module open_nic_shell #(
   output   [4*NUM_CMAC_PORT-1:0] qsfp_txp,
   output   [4*NUM_CMAC_PORT-1:0] qsfp_txn,
 
-`ifdef __sn1022__
+`ifdef __au45n__
   input                          dual0_gt_ref_clk_p,
   input                          dual0_gt_ref_clk_n,
   input                          dual1_gt_ref_clk_p,
@@ -485,7 +485,7 @@ module open_nic_shell #(
 
   assign sys_cfg_powerup_rstn = | powerup_rstn; 
 
-`ifdef __sn1022__
+`ifdef __au45n__
   assign qdma_pcie_rxp[23:0] = pcie_rxp;
   assign qdma_pcie_rxn[23:0] = pcie_rxn;
   assign qdma_pcie_txp[23:0] = pcie_txp;
@@ -660,7 +660,7 @@ module open_nic_shell #(
     .qsfp_intl               (qsfp_intl),
     .qsfp_lpmode             (qsfp_lpmode),
     .qsfp_modsell            (qsfp_modsell),
-  `elsif __sn1022__
+  `elsif __au45n__
   
   `endif
 
@@ -909,7 +909,7 @@ module open_nic_shell #(
       .gt_refclk_p                  (qsfp_refclk_p[i]),
       .gt_refclk_n                  (qsfp_refclk_n[i]),
 
-`ifdef __sn1022__
+`ifdef __au45n__
       .dual0_gt_ref_clk_p           (dual0_gt_ref_clk_p),
       .dual0_gt_ref_clk_n           (dual0_gt_ref_clk_n),
       .dual1_gt_ref_clk_p           (dual1_gt_ref_clk_p),

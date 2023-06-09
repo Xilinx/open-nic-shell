@@ -14,7 +14,7 @@ latest version is built with Vivado 2020.x, 2021.x or 2022.1.  Currently, the su
 - Xilinx Alveo U200, and
 - Xilinx Alveo U250, and
 - Xilinx Alveo U280, and
-- Xilinx Alveo SN1022
+- Xilinx Alveo U45N
 
 | Notes: |
 |:---|
@@ -50,7 +50,7 @@ The shell skeleton has the following components.
   QDMA IP interface and the 250MHz user logic box.  The interfaces between QDMA
   subsystem and the 250MHz box use a variant of the AXI4-stream protocol.  Let
   us refer the variant as the 250MHz AXI4-stream.
-  > - SN1022 has two QDMA subsystems. One for the host CPU, another 
+  > - U45N has two QDMA subsystems. One for the host CPU, another 
   	for onboard Arm CPU. Two sets of AXI4-stream interfaces between QDMA
 	subsystems and the 250MHz box.
 - CMAC subsystem.  It includes the Xilinx CMAC IP and some wrapper logic.
@@ -85,7 +85,7 @@ The `open-nic-shell` repository is organized as follows.
             |-- au200 --
             |-- au250 --
             |-- au280 --
-	        |-- sn1022 --
+	        |-- U45N --
             |-- ... --
         |-- plugin --
             |-- p2p --
@@ -148,7 +148,7 @@ the design parameters.
                  - au55c, and
                  - au55n, and
                  - au50,  and
-				 - sn1022.
+				 - U45N.
 
     -tag         DESIGN_TAG
                  string to identify the build.  The tag, along with the board
@@ -237,7 +237,7 @@ The following Verilog macros are defined and made available to the RTL source
 code.
 
 - The `__synthesis__` macro.
-- Board name, either `__au250__`, `__au280__`, `__au50__`, `__au55c__`, `__au55n__` or `__sn1022__`.
+- Board name, either `__au250__`, `__au280__`, `__au50__`, `__au55c__`, `__au55n__` or `__au45n__`.
 
 ### Build without Github Access from Vivado
 
@@ -305,7 +305,7 @@ corresponding `box_XXXmhz` directory and `build_box_XXXmhz.tcl`.
 When the design is configured with two QDMA subsystems, two sets of AXI4-stream 
 interfaces are provided to box_250MHz. The default p2p plugin of box_250MHz has 
 one ingress switch and one egress switch per QDMA physical function. For example, 
-P2P plugin of SN1022 has totaly four AXI4-stream switches. To select the data 
+P2P plugin of U45N has totaly four AXI4-stream switches. To select the data 
 path between MAC and two QDMA subsystems, AXI4-stream switch control registers
 are used. The user can select one QDMA subsystem to be used exclusively for 
 transmitting or receiving traffic. Please refer to [AXI4-Stream Switch Control 
@@ -314,7 +314,7 @@ of PG085 for more details.
 
 For example:
 
-Data path: MAC <-> QDMA subsystem 0 (On SN1022, it is connected to host CPU)
+Data path: MAC <-> QDMA subsystem 0 (On U45N, it is connected to host CPU)
 Select QDMA subsystem 0:
 ```bash
 # BDF is the bus ID of first physical function of QDMA's
@@ -333,7 +333,7 @@ pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x1001c0 w*1 0x0
 pcimem /sys/bus/pci/devices/0000\:${bdf}\:00.0/resource2 0x100180 w*1 0x2
 ```
 
-Data path: MAC <-> QDMA subsystem 1 (On SN1022, it is connected to onboard Arm CPU)
+Data path: MAC <-> QDMA subsystem 1 (On U45N, it is connected to onboard Arm CPU)
 To select QDMA subsystem 1:
 ```bash
 # BDF is the bus ID of first physical function of QDMA's

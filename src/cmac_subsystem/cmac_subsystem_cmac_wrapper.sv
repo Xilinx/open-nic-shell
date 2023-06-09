@@ -56,7 +56,7 @@ module cmac_subsystem_cmac_wrapper #(
 
   input          gt_refclk_p,
   input          gt_refclk_n,
-`ifdef __sn1022__
+`ifdef __au45n__
   input          dual0_gt_ref_clk_p,
   input          dual0_gt_ref_clk_n,
   input          dual1_gt_ref_clk_p,
@@ -317,7 +317,7 @@ module cmac_subsystem_cmac_wrapper #(
 
   generate if (CMAC_ID == 0) begin
     cmac_usplus_0 cmac_inst (
-`ifdef __sn1022__
+`ifdef __au45n__
       //new ports
       .temperature                         (10'd0),
       .gt_eyescanreset                     (4'd0),
