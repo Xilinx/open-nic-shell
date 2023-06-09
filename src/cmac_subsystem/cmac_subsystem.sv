@@ -59,7 +59,7 @@ module cmac_subsystem #(
   input          gt_refclk_p,
   input          gt_refclk_n,
 
-`ifdef __sn1022__
+`ifdef __au45n__
   input          dual0_gt_ref_clk_p,
   input          dual0_gt_ref_clk_n,
   input          dual1_gt_ref_clk_p,
@@ -295,7 +295,7 @@ module cmac_subsystem #(
     .gt_txp              (gt_txp),
     .gt_txn              (gt_txn),
 
-`ifdef __sn1022__
+`ifdef __au45n__
     .dual0_gt_ref_clk_p (dual0_gt_ref_clk_p),
     .dual0_gt_ref_clk_n (dual0_gt_ref_clk_n),
     .dual1_gt_ref_clk_p (dual1_gt_ref_clk_p),

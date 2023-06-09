@@ -42,7 +42,7 @@ proc _do_post_impl {build_dir top impl_run {zynq_family 0} board} {
         file mkdir $sdk_dir
         write_hw_platform -fixed -force -include_bit -file ${sdk_dir}/${top}.xsa
     } else {
-        if {$board == "sn1022"} {
+        if {$board == "au45n"} {
             set mem_size 256
             set start_address 0x00000000
         } else {

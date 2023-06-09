@@ -165,7 +165,7 @@ module system_config #(
   input                   [1:0] qsfp_intl,   
   output                  [1:0] qsfp_lpmode,
   output                  [1:0] qsfp_modsell,
-`elsif __sn1022__
+`elsif __au45n__
   input                   [1:0] satellite_gpio_0,
 `endif
 
