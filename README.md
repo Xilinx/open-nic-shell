@@ -80,12 +80,12 @@ The `open-nic-shell` repository is organized as follows.
     |-- open-nic-shell --
         |-- constr --
             |-- au50 --
-	        |-- au55c --
-	        |-- au55n --
+	          |-- au55c --
+	          |-- au55n --
             |-- au200 --
             |-- au250 --
             |-- au280 --
-	        |-- U45N --
+	          |-- au45n --
             |-- ... --
         |-- plugin --
             |-- p2p --
