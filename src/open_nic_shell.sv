@@ -65,10 +65,10 @@ module open_nic_shell #(
 
 `ifdef __au45n__
 // U45N has 24 PCIe lanes: x16(host CPU) + x8(ARM CPU)
-  input                [23:0] pcie_rxp,
-  input                [23:0] pcie_rxn,
-  output               [23:0] pcie_txp,
-  output               [23:0] pcie_txn,
+  input                [15+8*(NUM_QDMA-1):0] pcie_rxp,
+  input                [15+8*(NUM_QDMA-1):0] pcie_rxn,
+  output               [15+8*(NUM_QDMA-1):0] pcie_txp,
+  output               [15+8*(NUM_QDMA-1):0] pcie_txn,
 `else
   input     [16*NUM_QDMA-1:0] pcie_rxp,
   input     [16*NUM_QDMA-1:0] pcie_rxn,
@@ -486,10 +486,10 @@ module open_nic_shell #(
   assign sys_cfg_powerup_rstn = | powerup_rstn; 
 
 `ifdef __au45n__
-  assign qdma_pcie_rxp[23:0] = pcie_rxp;
-  assign qdma_pcie_rxn[23:0] = pcie_rxn;
-  assign qdma_pcie_txp[23:0] = pcie_txp;
-  assign qdma_pcie_txn[23:0] = pcie_txn;
+  assign qdma_pcie_rxp[15+8*(NUM_QDMA-1):0] = pcie_rxp;
+  assign qdma_pcie_rxn[15+8*(NUM_QDMA-1):0] = pcie_rxn;
+  assign qdma_pcie_txp[15+8*(NUM_QDMA-1):0] = pcie_txp;
+  assign qdma_pcie_txn[15+8*(NUM_QDMA-1):0] = pcie_txn;
 `else
   assign qdma_pcie_rxp       = pcie_rxp;
   assign qdma_pcie_rxn       = pcie_rxn;

@@ -24,7 +24,9 @@ set_property PACKAGE_PIN AL10 [get_ports pcie_refclk_p[0]]
 set_property PACKAGE_PIN AK18 [get_ports pcie_rstn[0]]
 set_property IOSTANDARD LVCMOS18 [get_ports pcie_rstn[0]]
 
+set num_qdmas [llength [get_ports pcie_refclk_p]]
 set num_ports [llength [get_ports qsfp_refclk_p]]
+
 if {$num_ports >= 1} {
     set_property PACKAGE_PIN G9 [get_ports dual0_gt_ref_clk_n]
     set_property PACKAGE_PIN G10 [get_ports dual0_gt_ref_clk_p]
@@ -173,31 +175,32 @@ set_property PACKAGE_PIN G7                  [get_ports "qsfp_txp[6]"]          
 set_property PACKAGE_PIN F4                  [get_ports "qsfp_txn[7]"]              ;# Bank 231 - MGTYTXN3_231
 set_property PACKAGE_PIN F5                  [get_ports "qsfp_txp[7]"]              ;# Bank 231 - MGTYTXP3_231
 
-################### ARM PCIe
+if {$num_qdmas > 1} {
+    ################### ARM PCIe
+    set_property PACKAGE_PIN AJ17 [get_ports pcie_rstn[1]]
+    set_property -dict {IOSTANDARD LVCMOS18} [get_ports pcie_rstn[1]]
 
-set_property PACKAGE_PIN AJ17 [get_ports pcie_rstn[1]]
-set_property -dict {IOSTANDARD LVCMOS18} [get_ports pcie_rstn[1]]
+    set_property PACKAGE_PIN AC9  [get_ports pcie_refclk_n[1]]
+    set_property PACKAGE_PIN AC10 [get_ports pcie_refclk_p[1]]
 
-set_property PACKAGE_PIN AC9  [get_ports pcie_refclk_n[1]]
-set_property PACKAGE_PIN AC10 [get_ports pcie_refclk_p[1]]
-
-##### TEMP CHANGE  ################## ACTUAL #############
-set_property PACKAGE_PIN AE2 [get_ports {pcie_rxp[16]}]
-set_property PACKAGE_PIN AD4 [get_ports {pcie_txp[16]}]
-set_property PACKAGE_PIN AC2 [get_ports {pcie_rxp[17]}]
-set_property PACKAGE_PIN AC6 [get_ports {pcie_txp[17]}]
-set_property PACKAGE_PIN AB4 [get_ports {pcie_rxp[18]}]
-set_property PACKAGE_PIN AB8 [get_ports {pcie_txp[18]}]
-set_property PACKAGE_PIN AA2 [get_ports {pcie_rxp[19]}]
-set_property PACKAGE_PIN AA6 [get_ports {pcie_txp[19]}]
-set_property PACKAGE_PIN Y4 [get_ports {pcie_rxp[20]}]
-set_property PACKAGE_PIN Y8 [get_ports {pcie_txp[20]}]
-set_property PACKAGE_PIN W2 [get_ports {pcie_rxp[21]}]
-set_property PACKAGE_PIN W6 [get_ports {pcie_txp[21]}]
-set_property PACKAGE_PIN V4 [get_ports {pcie_rxp[22]}]
-set_property PACKAGE_PIN U7 [get_ports {pcie_txp[22]}]
-set_property PACKAGE_PIN U2 [get_ports {pcie_rxp[23]}]
-set_property PACKAGE_PIN R7 [get_ports {pcie_txp[23]}]
+    ##### TEMP CHANGE  ################## ACTUAL #############
+    set_property PACKAGE_PIN AE2 [get_ports {pcie_rxp[16]}]
+    set_property PACKAGE_PIN AD4 [get_ports {pcie_txp[16]}]
+    set_property PACKAGE_PIN AC2 [get_ports {pcie_rxp[17]}]
+    set_property PACKAGE_PIN AC6 [get_ports {pcie_txp[17]}]
+    set_property PACKAGE_PIN AB4 [get_ports {pcie_rxp[18]}]
+    set_property PACKAGE_PIN AB8 [get_ports {pcie_txp[18]}]
+    set_property PACKAGE_PIN AA2 [get_ports {pcie_rxp[19]}]
+    set_property PACKAGE_PIN AA6 [get_ports {pcie_txp[19]}]
+    set_property PACKAGE_PIN Y4 [get_ports {pcie_rxp[20]}]
+    set_property PACKAGE_PIN Y8 [get_ports {pcie_txp[20]}]
+    set_property PACKAGE_PIN W2 [get_ports {pcie_rxp[21]}]
+    set_property PACKAGE_PIN W6 [get_ports {pcie_txp[21]}]
+    set_property PACKAGE_PIN V4 [get_ports {pcie_rxp[22]}]
+    set_property PACKAGE_PIN U7 [get_ports {pcie_txp[22]}]
+    set_property PACKAGE_PIN U2 [get_ports {pcie_rxp[23]}]
+    set_property PACKAGE_PIN R7 [get_ports {pcie_txp[23]}]
+}
 
 ##### CMS PORTS #######
 set_property -dict {PACKAGE_PIN AM17 IOSTANDARD LVCMOS18} [get_ports satellite_gpio[0]]

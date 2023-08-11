@@ -15,8 +15,12 @@
 # limitations under the License.
 #
 # *************************************************************************
+set num_qdmas [llength [get_ports pcie_refclk_p]]
+
 create_clock -period 10.000 -name pcie_refclk [get_ports pcie_refclk_p[0]]
-create_clock -period 10.000 -name pcie_refclk_arm [get_ports pcie_refclk_p[1]]
+if {$num_qdmas > 1} {
+    create_clock -period 10.000 -name pcie_refclk_arm [get_ports pcie_refclk_p[1]]
+}
 
 set_false_path -through [get_ports pcie_rstn]
 
