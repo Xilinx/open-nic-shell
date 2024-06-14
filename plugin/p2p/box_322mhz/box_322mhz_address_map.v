@@ -17,7 +17,7 @@
 // *************************************************************************
 // Address map for the box running at 322MHz (through PCI-e BAR2 1MB)
 //
-// System-level address range: 0x10000 - 0x3FFFF
+// System-level address range: 0x200000 - 0x2FFFFF
 //
 // --------------------------------------------------
 //   BaseAddr |  HighAddr |  Module
