@@ -48,6 +48,16 @@ set_property -dict {
     CONFIG.PCIE_BOARD_INTERFACE {Custom}
     CONFIG.xlnx_ref_board {None}
     CONFIG.copy_pf0 {true}
+    CONFIG.pf0_base_class_menu_qdma {Network_controller}
+    CONFIG.pf0_class_code_base_qdma {02}
+    CONFIG.pf0_class_code_sub_qdma {80}
+    CONFIG.pf0_sub_class_interface_menu_qdma {Other_network_controller}
+    CONFIG.pf0_class_code_qdma {028000}
+    CONFIG.pf1_base_class_menu_qdma {Network_controller}
+    CONFIG.pf1_class_code_base_qdma {02}
+    CONFIG.pf1_class_code_sub_qdma {80}
+    CONFIG.pf1_sub_class_interface_menu_qdma {Other_network_controller}
+    CONFIG.pf1_class_code_qdma {028000}
     CONFIG.coreclk_freq {500}
     CONFIG.disable_gt_loc {true}
     CONFIG.vsec_cap_addr {0xe00}
