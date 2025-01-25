@@ -370,8 +370,8 @@ The AXI-lite interface follows the standard AXI4-lite protocol without `wstrb`,
 `awprot` and `arprot`.  At the system level, the address ranges for the 2 boxes
 are
 
-- 0x100000 - 0x1FFFFF for the 322MHz box, and
-- 0x200000 - 0x2FFFFF for the 250MHz box.
+- 0x100000 - 0x1FFFFF for the 250MHz box, and
+- 0x200000 - 0x2FFFFF for the 322MHz box.
 
 The 250MHz and 322MHz AXI4-stream interfaces have slightly different semantics.
 The 250MHz interface has the following signals.
