@@ -146,7 +146,7 @@ module axi_stream_packet_buffer #(
     if (~s_aresetn) begin
       dropped <= 1'b0;
     end
-    else if (s_axis_tvalid && s_axis_tlast && s_axis_tready && drop_in_prog) begin
+   else if (s_axis_tvalid && s_axis_tlast && s_axis_tready && drop_busy) begin 
       dropped <= 1'b1;
     end
     else begin
