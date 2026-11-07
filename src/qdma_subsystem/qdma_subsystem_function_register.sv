@@ -137,7 +137,7 @@ module qdma_subsystem_function_register (
     end
     else if (reg_en && ~reg_we) begin
       if ((reg_addr & REG_TABLE_MASK) == REG_TABLE_BASE) begin
-        reg_dout[15:0] <= reg_table[reg_addr[8:2]];
+        reg_dout <= {16'b0, reg_table[reg_addr[8:2]]};
       end
       else if ((reg_addr >= REG_HKEY_BASE) && (reg_addr < REG_HKEY_BASE + (10 << 2))) begin
         for (int i = 0; i < 10; i++) begin
